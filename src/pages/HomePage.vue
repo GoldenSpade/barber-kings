@@ -22,21 +22,23 @@
                 class="lead text-muted fw-normal mb-4 mx-auto"
                 style="font-size: 1.1rem; max-width: 600px; line-height: 1.6"
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Laed
-                ultremuncs urism uibh euismod lucdas utricies as duious maan.
+                Where tradition meets precision. Expert cuts, classic shaves,
+                and modern style crafted by masters of the trade.
               </p>
 
               <!-- Book Now Button -->
-              <button
-                class="btn btn-dark btn-lg px-5 py-3 fw-bold"
-                style="
-                  letter-spacing: 2px;
-                  background-color: #2c3e33 !important;
-                  border-color: #2c3e33 !important;
-                "
-              >
-                BOOK NOW
-              </button>
+              <router-link :to="{ name: 'booking' }">
+                <button
+                  class="btn btn-dark btn-lg px-5 py-3 fw-bold"
+                  style="
+                    letter-spacing: 2px;
+                    background-color: #2c3e33 !important;
+                    border-color: #2c3e33 !important;
+                  "
+                >
+                  BOOK NOW
+                </button>
+              </router-link>
             </div>
           </div>
         </div>
@@ -57,29 +59,13 @@
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="navbar navbar-light bg-white border-top py-3">
-      <div class="container">
-        <div class="navbar-nav mx-auto">
-          <div class="d-flex justify-content-center">
-            <a class="nav-link text-dark fw-bold fs-6 me-5" href="#home"
-              >HOME</a
-            >
-            <a class="nav-link text-dark fw-bold fs-6 me-5" href="#about"
-              >ABOUT</a
-            >
-            <a class="nav-link text-dark fw-bold fs-6" href="#services"
-              >SERVICES</a
-            >
-          </div>
-        </div>
-      </div>
-    </nav>
+    <Footer />
   </div>
 </template>
 
 <script setup>
 import Navigation from '@/components/Navigation.vue'
+import Footer from '@/components/Footer.vue'
 </script>
 
 <style scoped>

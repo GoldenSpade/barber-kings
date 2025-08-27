@@ -29,8 +29,10 @@
 
         <!-- Right Links -->
         <div class="col-4 d-flex justify-content-end">
-          <a class="nav-link text-dark fw-semibold fs-6" href="#contact"
-            >CONTACT</a
+          <router-link
+            class="nav-link text-dark fw-semibold fs-6"
+            :to="{ name: 'booking' }"
+            >CONTACT</router-link
           >
         </div>
       </div>
