@@ -12,7 +12,7 @@
     <!-- Back Button -->
     <div class="container py-3">
       <button @click="goBack" class="btn btn-link text-dark p-0" style="text-decoration: none;">
-        <i class="fas fa-arrow-left me-2"></i>Back
+        <i class="bi bi-arrow-left me-2"></i>Back
       </button>
     </div>
 
@@ -50,22 +50,15 @@
             <div
               class="service-card h-100"
               :class="{ selected: bookingStore.selectedLocation?.id === location.id }"
+              :style="{ backgroundImage: `url(${locationImages[location.id]})` }"
               @click="bookingStore.selectLocation(location)"
             >
-              <!-- Location Image -->
-              <div class="location-image">
-                <img
-                  :src="locationImages[location.id]"
-                  :alt="`${location.name} interior`"
-                  class="img-fluid w-100"
-                />
-              </div>
-              
-              <div class="card-body text-center p-4">
-                <h5 class="fw-bold text-dark mb-3">{{ location.name }}</h5>
-                <p class="text-muted mb-3">{{ location.address }}</p>
-                <p class="text-muted small mb-4">{{ location.description }}</p>
-                <button class="btn btn-outline-dark w-100 mt-auto">Choose</button>
+              <div class="card-overlay"></div>
+              <div class="card-content text-center p-4">
+                <h5 class="fw-bold text-white mb-3">{{ location.name }}</h5>
+                <p class="text-white mb-3">{{ location.address }}</p>
+                <p class="text-white small mb-4">{{ location.description }}</p>
+                <button class="btn btn-outline-light w-100 mt-auto">Choose</button>
               </div>
             </div>
           </div>
@@ -85,11 +78,11 @@
               <!-- Calendar Navigation -->
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <button class="btn btn-link text-dark" @click="bookingStore.previousWeek">
-                  <i class="fas fa-chevron-left"></i>
+                  <i class="bi bi-chevron-left"></i>
                 </button>
                 <h5 class="mb-0">{{ bookingStore.formatDateRange }}</h5>
                 <button class="btn btn-link text-dark" @click="bookingStore.nextWeek">
-                  <i class="fas fa-chevron-right"></i>
+                  <i class="bi bi-chevron-right"></i>
                 </button>
               </div>
 
@@ -144,7 +137,7 @@
             <!-- Contact Form -->
             <div class="bg-white rounded shadow p-4">
               <div class="d-flex align-items-center mb-4">
-                <i class="fas fa-user me-3" style="color: #2c3e33;"></i>
+                <i class="bi bi-person me-3" style="color: #2c3e33;"></i>
                 <h6 class="mb-0 fw-bold">Contact Details</h6>
               </div>
 
@@ -281,40 +274,59 @@ onMounted(() => {
 
 /* Service Cards */
 .service-card {
-  background: white;
   border: 2px solid transparent;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  min-height: 350px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
 }
 
-.location-image {
-  height: 200px;
-  overflow: hidden;
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  transition: opacity 0.3s ease;
 }
 
-.location-image img {
-  height: 100%;
+.card-content {
+  position: relative;
+  z-index: 2;
   width: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+}
+
+.card-content h5,
+.card-content p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .service-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border-color: #2c3e33;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-color: #fff;
 }
 
-.service-card:hover .location-image img {
-  transform: scale(1.05);
+.service-card:hover .card-overlay {
+  opacity: 0.9;
 }
 
 .service-card.selected {
-  border-color: #2c3e33;
-  background-color: #f8f9f8;
+  border-color: #fff;
+  box-shadow: 0 0 0 3px #2c3e33;
+}
+
+.service-card.selected .card-overlay {
+  background: linear-gradient(to bottom, rgba(44,62,51,0.4), rgba(44,62,51,0.8));
 }
 
 .service-card .btn {
@@ -323,9 +335,10 @@ onMounted(() => {
 
 .service-card:hover .btn,
 .service-card.selected .btn {
-  background-color: #2c3e33;
-  border-color: #2c3e33;
-  color: white;
+  background-color: white;
+  border-color: white;
+  color: #2c3e33;
+  font-weight: bold;
 }
 
 /* Calendar Styles */

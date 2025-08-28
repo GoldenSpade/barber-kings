@@ -30,11 +30,27 @@ export const useBookingStore = defineStore('booking', () => {
     }
   ])
 
+  // Helper function to generate time slots
+  const generateTimeSlots = () => {
+    const slots = []
+    // From 9:00 to 21:00 (9 PM) with 30-minute intervals
+    for (let hour = 9; hour <= 21; hour++) {
+      if (hour < 21) {
+        slots.push(`${hour.toString().padStart(2, '0')}:00`)
+        slots.push(`${hour.toString().padStart(2, '0')}:30`)
+      } else {
+        slots.push(`${hour.toString().padStart(2, '0')}:00`) // Last slot at 21:00
+      }
+    }
+    return slots
+  }
+
   // Getters
   const weekDays = computed(() => {
     const days = []
     const start = new Date(currentWeekStart.value)
     
+    // Show 1 week (7 days) - slider approach
     for (let i = 0; i < 7; i++) {
       const date = new Date(start)
       date.setDate(start.getDate() + i)
@@ -60,8 +76,8 @@ export const useBookingStore = defineStore('booking', () => {
         available = false
         reason = 'Same day not available'
       } else {
-        // Generate time slots for available days
-        timeSlots = ['18:00', '18:15', '18:30', '18:45']
+        // Generate time slots for available days (9:00-21:00, 30min intervals)
+        timeSlots = generateTimeSlots()
       }
       
       days.push({
@@ -81,7 +97,7 @@ export const useBookingStore = defineStore('booking', () => {
   const formatDateRange = computed(() => {
     const start = new Date(currentWeekStart.value)
     const end = new Date(start)
-    end.setDate(end.getDate() + 6)
+    end.setDate(end.getDate() + 6) // 6 days for 1 week
     
     const formatDate = (date) => {
       return date.toLocaleDateString('en-US', { 
@@ -129,13 +145,13 @@ export const useBookingStore = defineStore('booking', () => {
 
   const previousWeek = () => {
     const newDate = new Date(currentWeekStart.value)
-    newDate.setDate(newDate.getDate() - 7)
+    newDate.setDate(newDate.getDate() - 7) // Move 1 week back
     currentWeekStart.value = newDate
   }
 
   const nextWeek = () => {
     const newDate = new Date(currentWeekStart.value)
-    newDate.setDate(newDate.getDate() + 7)
+    newDate.setDate(newDate.getDate() + 7) // Move 1 week forward
     currentWeekStart.value = newDate
   }
 
@@ -172,18 +188,15 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   const initializeCalendar = () => {
-    // Initialize with next week by default
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    // Initialize with current week starting from Sunday
+    const today = new Date()
     
-    // Set to Monday of next week
-    const dayOfWeek = tomorrow.getDay()
-    const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek
+    // Find the current week's Sunday
+    const dayOfWeek = today.getDay()
+    const currentWeekSunday = new Date(today)
+    currentWeekSunday.setDate(today.getDate() - dayOfWeek)
     
-    const nextMonday = new Date(tomorrow)
-    nextMonday.setDate(tomorrow.getDate() + daysUntilMonday)
-    
-    currentWeekStart.value = nextMonday
+    currentWeekStart.value = currentWeekSunday
   }
 
   return {
