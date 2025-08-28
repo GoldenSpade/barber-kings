@@ -223,10 +223,20 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   const submitBooking = async () => {
-    // URL Google Apps Script веб-приложения
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbMnjSt2g_0ulbj_xoYE4eYck_DlZP6y1ZZs3Rixbz3Asg3LlpA2jOhp_jcJTnYDmc/exec'
+    // URL Google Apps Script веб-приложения из .env
+    const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
     
     try {
+      // Форматируем дату с -- разделителями для Google Sheets
+      const dateObj = new Date(selectedDate.value)
+      const day = dateObj.getDate().toString().padStart(2, '0')
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
+      const year = dateObj.getFullYear()
+      const formattedDate = `${day}--${month}--${year}`
+      
+      // Форматируем время с -- разделителями
+      const formattedTime = selectedTime.value.replace(':', '--')
+      
       // Подготавливаем данные для отправки
       const bookingData = {
         name: bookingForm.value.name,
@@ -234,11 +244,10 @@ export const useBookingStore = defineStore('booking', () => {
         location: selectedLocation.value.nameKey ? 
           selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
           selectedLocation.value.name,
-        date: selectedDate.value,
-        time: selectedTime.value
+        date: formattedDate,
+        time: formattedTime
       }
       
-      console.log('Sending booking data:', bookingData)
       
       // Отправляем данные в Google Таблицу
       const response = await fetch(GOOGLE_SCRIPT_URL, {
