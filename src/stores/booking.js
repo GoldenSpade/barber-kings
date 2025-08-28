@@ -9,6 +9,9 @@ export const useBookingStore = defineStore('booking', () => {
   const selectedTime = ref(null)
   const currentWeekStart = ref(new Date())
   
+  // Get user's timezone dynamically
+  const userTimezone = ref(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  
   const bookingForm = ref({
     name: '',
     phone: ''
@@ -168,6 +171,11 @@ export const useBookingStore = defineStore('booking', () => {
     return nextWeekStart <= maxWeekStart
   })
 
+  // Formatted timezone display
+  const formattedTimezone = computed(() => {
+    return userTimezone.value || 'UTC'
+  })
+
   // Actions
   const selectLocation = (location) => {
     selectedLocation.value = location
@@ -266,6 +274,7 @@ export const useBookingStore = defineStore('booking', () => {
     selectedDate,
     selectedTime,
     currentWeekStart,
+    userTimezone,
     bookingForm,
     locations,
     
@@ -273,6 +282,7 @@ export const useBookingStore = defineStore('booking', () => {
     weekDays,
     formatDateRange,
     formatBookingDate,
+    formattedTimezone,
     minDate,
     maxDate,
     canGoToPreviousWeek,

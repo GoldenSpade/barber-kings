@@ -109,8 +109,29 @@
       <!-- Step 2: Time Selection -->
       <div v-if="bookingStore.currentStep === 2" class="step-content">
         <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
-        <div class="text-center mb-4 text-muted">
-          <small>{{ getSelectedLocationName() }} • {{ $t('booking.haircut') }} • {{ $t('booking.timezone') }}</small>
+        
+        <!-- Selected Location Card -->
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-10">
+            <div 
+              class="selected-location-card"
+              :style="{ backgroundImage: `url(${locationImages[bookingStore.selectedLocation.id]})` }"
+            >
+              <div class="card-overlay"></div>
+              <div class="card-content text-center p-4">
+                <h5 class="fw-bold text-white mb-2">{{ getSelectedLocationName() }}</h5>
+                <p class="text-white mb-2">
+                  <i class="bi bi-geo-alt me-1"></i>{{ getSelectedLocationAddress() }}
+                </p>
+                <p class="text-white mb-2">
+                  <i class="bi bi-scissors me-1"></i>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})
+                </p>
+                <p class="text-white mb-0">
+                  <i class="bi bi-clock me-1"></i>{{ $t('booking.timezone', { timezone: bookingStore.formattedTimezone }) }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="row justify-content-center">
@@ -181,7 +202,7 @@
               <h6 class="fw-bold mb-3">{{ $t('booking.timeConfirmation') }}</h6>
               <div class="booking-details">
                 <p class="mb-2"><strong>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})</strong></p>
-                <p class="text-muted mb-0">{{ bookingStore.formatBookingDate }} (Europe/Kiev)</p>
+                <p class="text-muted mb-0">{{ bookingStore.formatBookingDate }} ({{ bookingStore.formattedTimezone }})</p>
               </div>
             </div>
 
@@ -322,6 +343,13 @@ const getSelectedLocationName = () => {
     bookingStore.selectedLocation.name
 }
 
+const getSelectedLocationAddress = () => {
+  if (!bookingStore.selectedLocation) return ''
+  return bookingStore.selectedLocation.addressKey ? 
+    $t(bookingStore.selectedLocation.addressKey) : 
+    bookingStore.selectedLocation.address
+}
+
 const formattedDateRange = computed(() => {
   const start = new Date(bookingStore.currentWeekStart)
   const end = new Date(start)
@@ -460,6 +488,40 @@ onMounted(() => {
   border-color: white;
   color: #2c3e33;
   font-weight: bold;
+}
+
+/* Selected Location Card */
+.selected-location-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  min-height: 350px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selected-location-card .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(44,62,51,0.4), rgba(44,62,51,0.8));
+}
+
+.selected-location-card .card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.selected-location-card .card-content h5,
+.selected-location-card .card-content p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* Calendar Styles */
