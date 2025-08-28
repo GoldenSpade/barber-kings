@@ -46,20 +46,26 @@
       <div v-if="bookingStore.currentStep === 1" class="step-content">
         <h2 class="text-center mb-5 fw-bold">Choose Location</h2>
         <div class="row justify-content-center">
-          <div class="col-md-4 mb-4" v-for="location in bookingStore.locations" :key="location.id">
+          <div class="col-md-5 mb-4" v-for="location in bookingStore.locations" :key="location.id">
             <div
               class="service-card h-100"
               :class="{ selected: bookingStore.selectedLocation?.id === location.id }"
               @click="bookingStore.selectLocation(location)"
             >
+              <!-- Location Image -->
+              <div class="location-image">
+                <img
+                  :src="locationImages[location.id]"
+                  :alt="`${location.name} interior`"
+                  class="img-fluid w-100"
+                />
+              </div>
+              
               <div class="card-body text-center p-4">
-                <div class="service-icon mb-3">
-                  <i class="fas fa-map-marker-alt fa-2x" style="color: #2c3e33;"></i>
-                </div>
                 <h5 class="fw-bold text-dark mb-3">{{ location.name }}</h5>
                 <p class="text-muted mb-3">{{ location.address }}</p>
-                <p class="text-muted small">{{ location.description }}</p>
-                <button class="btn btn-outline-dark w-100 mt-3">Choose</button>
+                <p class="text-muted small mb-4">{{ location.description }}</p>
+                <button class="btn btn-outline-dark w-100 mt-auto">Choose</button>
               </div>
             </div>
           </div>
@@ -193,9 +199,17 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBookingStore } from '@/stores/booking'
 import Footer from '@/components/Footer.vue'
+import address1 from '@/assets/address-1.jpg'
+import address2 from '@/assets/address-2.jpg'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
+
+// Location images mapping
+const locationImages = {
+  1: address1,
+  2: address2
+}
 
 // Methods
 const goBack = () => {
@@ -273,12 +287,29 @@ onMounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.location-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.location-image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
 .service-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border-color: #2c3e33;
+}
+
+.service-card:hover .location-image img {
+  transform: scale(1.05);
 }
 
 .service-card.selected {
