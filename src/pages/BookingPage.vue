@@ -118,11 +118,21 @@
             <div class="bg-white rounded shadow p-4">
               <!-- Calendar Navigation -->
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn btn-link text-dark" @click="bookingStore.previousWeek">
+                <button 
+                  class="btn btn-link text-dark" 
+                  @click="bookingStore.previousWeek"
+                  :disabled="!bookingStore.canGoToPreviousWeek"
+                  :class="{ 'opacity-50': !bookingStore.canGoToPreviousWeek }"
+                >
                   <i class="bi bi-chevron-left"></i>
                 </button>
                 <h5 class="mb-0">{{ formattedDateRange }}</h5>
-                <button class="btn btn-link text-dark" @click="bookingStore.nextWeek">
+                <button 
+                  class="btn btn-link text-dark" 
+                  @click="bookingStore.nextWeek"
+                  :disabled="!bookingStore.canGoToNextWeek"
+                  :class="{ 'opacity-50': !bookingStore.canGoToNextWeek }"
+                >
                   <i class="bi bi-chevron-right"></i>
                 </button>
               </div>
