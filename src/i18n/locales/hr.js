@@ -6,6 +6,13 @@ export default {
     booking: 'Rezervacija'
   },
   
+  // Common
+  common: {
+    loading: 'Učitava...',
+    loadingSlots: 'Učitavaju se dostupni termini...',
+    submittingBooking: 'Šalje se vaša rezervacija...'
+  },
+  
   // Home page
   home: {
     welcome: 'DOBRODOŠLI',
@@ -27,6 +34,7 @@ export default {
     timeConfirmation: 'Potvrda vremena',
     choose: 'Odaberi',
     bookNow: 'Rezerviraj',
+    submitting: 'Šalje se',
     closed: 'Zatvoreno',
     pastday: 'Prošli dan',
     notavailabletoday: 'Danas nije dostupno',
@@ -38,6 +46,7 @@ export default {
     fullName: 'Puno ime',
     phone: 'Telefon',
     enterName: 'Unesite vaše ime',
+    enterPhone: 'Unesite broj telefona',
     successMessage: 'Hvala! Vaša rezervacija je primljena. Kontaktirat ćemo vas za potvrdu.',
     previousWeek: 'Prethodna Tjedni',
     nextWeek: 'Sljedeći Tjedan'

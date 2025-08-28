@@ -82,7 +82,16 @@
       <!-- Step 1: Location Selection -->
       <div v-if="bookingStore.currentStep === 1" class="step-content">
         <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseLocation') }}</h2>
-        <div class="row justify-content-center">
+        
+        <!-- Loading Spinner -->
+        <Loader 
+          v-if="bookingStore.isLoadingBookedSlots" 
+          size="large" 
+          :message="$t('common.loadingSlots')" 
+        />
+        
+        <!-- Location Cards -->
+        <div v-else class="row justify-content-center">
           <div class="col-md-5 mb-4" v-for="location in translatedLocations" :key="location.id">
             <div
               class="service-card h-100"
@@ -224,7 +233,12 @@
                 <h6 class="mb-0 fw-bold">{{ $t('booking.contactDetails') }}</h6>
               </div>
 
-              <form @submit.prevent="handleSubmitBooking">
+              <!-- Loading Overlay -->
+              <div v-if="bookingStore.isSubmittingBooking" class="booking-form-overlay">
+                <Loader size="medium" :message="$t('common.submittingBooking')" />
+              </div>
+
+              <form @submit.prevent="handleSubmitBooking" :class="{ 'form-disabled': bookingStore.isSubmittingBooking }">
                 <div class="mb-3">
                   <label class="form-label">{{ $t('booking.fullName') }} *</label>
                   <input
@@ -232,6 +246,7 @@
                     class="form-control"
                     v-model="bookingStore.bookingForm.name"
                     :placeholder="$t('booking.enterName')"
+                    :disabled="bookingStore.isSubmittingBooking"
                     required
                   />
                 </div>
@@ -242,7 +257,8 @@
                     type="tel"
                     class="form-control"
                     v-model="bookingStore.bookingForm.phone"
-                    placeholder="Enter phone number"
+                    :placeholder="$t('booking.enterPhone')"
+                    :disabled="bookingStore.isSubmittingBooking"
                     required
                   />
                 </div>
@@ -250,13 +266,15 @@
                 <button
                   type="submit"
                   class="btn btn-lg w-100 fw-bold"
+                  :disabled="bookingStore.isSubmittingBooking"
                   style="
                     background-color: #2c3e33 !important;
                     border-color: #2c3e33 !important;
                     color: white;
                   "
                 >
-                  {{ $t('booking.bookNow') }}
+                  <span v-if="!bookingStore.isSubmittingBooking">{{ $t('booking.bookNow') }}</span>
+                  <span v-else>{{ $t('booking.submitting') }}...</span>
                 </button>
               </form>
             </div>
@@ -275,6 +293,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Footer from '@/components/Footer.vue'
+import Loader from '@/components/Loader.vue'
 import address1 from '@/assets/address-1.jpg'
 import address2 from '@/assets/address-2.jpg'
 
@@ -390,8 +409,10 @@ const formattedDateRange = computed(() => {
 })
 
 // Initialize calendar on mount
-onMounted(() => {
+onMounted(async () => {
   bookingStore.initializeCalendar()
+  // Загружаем занятые слоты при загрузке страницы
+  await bookingStore.fetchBookedSlots()
 })
 </script>
 
@@ -582,6 +603,35 @@ onMounted(() => {
   padding: 1rem;
   border-radius: 8px;
   border-left: 4px solid #2c3e33;
+}
+
+/* Booking Form Loading */
+.bg-white {
+  position: relative;
+}
+
+.booking-form-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.form-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.form-disabled input,
+.form-disabled button {
+  cursor: not-allowed;
 }
 
 /* Responsive */

@@ -16,6 +16,15 @@ export const useBookingStore = defineStore('booking', () => {
     name: '',
     phone: ''
   })
+  
+  // Занятые слоты из Google Таблицы
+  const bookedSlots = ref([])
+  
+  // Состояние загрузки данных
+  const isLoadingBookedSlots = ref(false)
+  
+  // Состояние отправки бронирования
+  const isSubmittingBooking = ref(false)
 
   // Locations data
   const locations = ref([
@@ -78,7 +87,11 @@ export const useBookingStore = defineStore('booking', () => {
       let timeSlots = []
       
       // Check if date is within our allowed range (tomorrow to +3 months)
-      if (date < minDate.value) {
+      if (date.getTime() === today.getTime()) {
+        // Today - not available for booking
+        available = false
+        reason = 'Not available today'
+      } else if (date < minDate.value) {
         available = false
         reason = 'Past day'
       } else if (date > maxDate.value) {
@@ -89,7 +102,22 @@ export const useBookingStore = defineStore('booking', () => {
         reason = 'Closed'
       } else {
         // Generate time slots for available days (9:00-21:00, 30min intervals)
-        timeSlots = generateTimeSlots()
+        const allSlots = generateTimeSlots()
+        
+        // Фильтруем занятые слоты для текущей даты и локации
+        const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        const currentLocation = selectedLocation.value?.nameKey ? 
+          selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
+          selectedLocation.value?.name
+        
+        timeSlots = allSlots.filter(slot => {
+          const isBooked = bookedSlots.value.some(booking => 
+            booking.date === dateString && 
+            booking.time === slot && 
+            booking.location === currentLocation
+          )
+          return !isBooked
+        })
       }
       
       days.push({
@@ -226,16 +254,18 @@ export const useBookingStore = defineStore('booking', () => {
     // URL Google Apps Script веб-приложения из .env
     const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
     
+    isSubmittingBooking.value = true
+    
     try {
-      // Форматируем дату с -- разделителями для Google Sheets
+      // Форматируем дату в стандартном формате DD/MM/YYYY
       const dateObj = new Date(selectedDate.value)
       const day = dateObj.getDate().toString().padStart(2, '0')
       const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
       const year = dateObj.getFullYear()
-      const formattedDate = `${day}--${month}--${year}`
+      const formattedDate = `${day}/${month}/${year}`
       
-      // Форматируем время с -- разделителями
-      const formattedTime = selectedTime.value.replace(':', '--')
+      // Время остается в стандартном формате HH:MM
+      const formattedTime = selectedTime.value
       
       // Подготавливаем данные для отправки
       const bookingData = {
@@ -278,6 +308,8 @@ export const useBookingStore = defineStore('booking', () => {
         success: false,
         message: 'Sorry, there was an error submitting your booking. Please try again.'
       }
+    } finally {
+      isSubmittingBooking.value = false
     }
   }
 
@@ -289,6 +321,55 @@ export const useBookingStore = defineStore('booking', () => {
     bookingForm.value = {
       name: '',
       phone: ''
+    }
+  }
+
+  // Загружаем занятые слоты из Google Таблицы
+  const fetchBookedSlots = async () => {
+    try {
+      isLoadingBookedSlots.value = true
+      const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+      
+      // Используем JSONP для обхода CORS
+      const callbackName = 'jsonp_callback_' + Date.now()
+      
+      return new Promise((resolve, reject) => {
+        // Создаем глобальную callback функцию
+        window[callbackName] = function(data) {
+          console.log('📥 JSONP Response received:', data)
+          if (data.success) {
+            bookedSlots.value = data.bookings
+            console.log('✅ Booked slots loaded:', data.bookings.length, 'bookings')
+            console.table(data.bookings) // Красивая таблица в консоли
+          } else {
+            console.error('❌ Error fetching booked slots:', data.message)
+          }
+          
+          // Очищаем
+          document.head.removeChild(script)
+          delete window[callbackName]
+          isLoadingBookedSlots.value = false
+          resolve()
+        }
+        
+        // Создаем script элемент
+        const script = document.createElement('script')
+        const requestUrl = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}`
+        console.log('📤 JSONP Request URL:', requestUrl)
+        script.src = requestUrl
+        script.onerror = () => {
+          document.head.removeChild(script)
+          delete window[callbackName]
+          isLoadingBookedSlots.value = false
+          console.error('Error loading booked slots via JSONP')
+          reject(new Error('JSONP request failed'))
+        }
+        
+        document.head.appendChild(script)
+      })
+    } catch (error) {
+      console.error('Error fetching booked slots:', error)
+      isLoadingBookedSlots.value = false
     }
   }
 
@@ -315,6 +396,8 @@ export const useBookingStore = defineStore('booking', () => {
     userTimezone,
     bookingForm,
     locations,
+    isLoadingBookedSlots,
+    isSubmittingBooking,
     
     // Getters
     weekDays,
@@ -334,6 +417,7 @@ export const useBookingStore = defineStore('booking', () => {
     nextWeek,
     submitBooking,
     resetBooking,
-    initializeCalendar
+    initializeCalendar,
+    fetchBookedSlots
   }
 })

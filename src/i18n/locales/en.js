@@ -6,6 +6,13 @@ export default {
     booking: 'Booking'
   },
   
+  // Common
+  common: {
+    loading: 'Loading...',
+    loadingSlots: 'Loading available slots...',
+    submittingBooking: 'Submitting your booking...'
+  },
+  
   // Home page
   home: {
     welcome: 'WELCOME',
@@ -27,6 +34,7 @@ export default {
     timeConfirmation: 'Time Confirmation',
     choose: 'Choose',
     bookNow: 'Book Now',
+    submitting: 'Submitting',
     closed: 'Closed',
     pastday: 'Past day',
     notavailabletoday: 'Not available today',
@@ -38,6 +46,7 @@ export default {
     fullName: 'Full Name',
     phone: 'Phone',
     enterName: 'Enter your name',
+    enterPhone: 'Enter phone number',
     successMessage: 'Thank you! Your booking has been received. We will contact you for confirmation.',
     previousWeek: 'Previous Week',
     nextWeek: 'Next Week'

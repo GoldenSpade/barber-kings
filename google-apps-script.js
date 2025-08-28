@@ -1,13 +1,74 @@
 // Google Apps Script код для интеграции с Google Таблицей
 // Этот файл нужно скопировать в Google Apps Script проект
 
+// ID вашей Google Таблицы (замените на свой ID)
+const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
+
+function doGet(e) {
+  try {
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+    
+    // Получаем все данные начиная со второй строки (пропускаем заголовки)
+    const data = sheet.getDataRange().getValues()
+    const bookings = []
+    
+    // Начинаем с индекса 1, чтобы пропустить заголовки
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i]
+      // Проверяем что строка не пустая
+      if (row[1] && row[3] && row[4] && row[5]) { // Name, Location, Date, Time
+        bookings.push({
+          location: row[3], // Location
+          date: row[4],     // Date  
+          time: row[5],     // Time
+          status: row[6]    // Status
+        })
+      }
+    }
+    
+    const result = {
+      success: true,
+      bookings: bookings
+    }
+    
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(result) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+    
+    // Обычный JSON ответ
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON)
+      
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error fetching bookings: ' + error.toString()
+    }
+    
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(errorResult) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify(errorResult))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
 function doPost(e) {
   try {
     // Получаем данные из POST запроса
     const data = JSON.parse(e.postData.contents)
-
-    // ID вашей Google Таблицы (замените на свой ID)
-    const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps' // Замените на ID вашей таблицы
 
     // Открываем таблицу
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
@@ -15,9 +76,9 @@ function doPost(e) {
     // Создаем timestamp
     const timestamp = new Date()
 
-    // Дата и время уже отформатированы на фронтенде с -- разделителями
-    const dateString = data.date
-    const timeString = data.time
+    // Дата и время уже отформатированы на фронтенде в стандартном формате
+    const dateString = data.date    // DD/MM/YYYY
+    const timeString = data.time    // HH:MM
 
     // Подготавливаем данные для записи в таблицу
     // Порядок: Timestamp, Name, Phone, Location, Date, Time, Status
