@@ -231,7 +231,7 @@
                     type="tel"
                     class="form-control"
                     v-model="bookingStore.bookingForm.phone"
-                    placeholder="+380..."
+                    placeholder="Enter phone number"
                     required
                   />
                 </div>
