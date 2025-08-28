@@ -222,24 +222,53 @@ export const useBookingStore = defineStore('booking', () => {
     }
   }
 
-  const submitBooking = () => {
-    // Here would be the actual booking submission logic
-    // For now, just show success message
-    const bookingData = {
-      location: selectedLocation.value,
-      date: selectedDate.value,
-      time: selectedTime.value,
-      customer: bookingForm.value
-    }
+  const submitBooking = async () => {
+    // URL Google Apps Script веб-приложения
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbMnjSt2g_0ulbj_xoYE4eYck_DlZP6y1ZZs3Rixbz3Asg3LlpA2jOhp_jcJTnYDmc/exec'
     
-    console.log('Booking submitted:', bookingData)
-    
-    // Reset form after successful submission
-    resetBooking()
-    
-    return {
-      success: true,
-      message: 'Thank you! Your booking has been received. We will contact you for confirmation.'
+    try {
+      // Подготавливаем данные для отправки
+      const bookingData = {
+        name: bookingForm.value.name,
+        phone: bookingForm.value.phone,
+        location: selectedLocation.value.nameKey ? 
+          selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
+          selectedLocation.value.name,
+        date: selectedDate.value,
+        time: selectedTime.value
+      }
+      
+      console.log('Sending booking data:', bookingData)
+      
+      // Отправляем данные в Google Таблицу
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData),
+        mode: 'no-cors' // Необходимо для Google Apps Script
+      })
+      
+      // При mode: 'no-cors' мы не можем получить response, 
+      // поэтому считаем отправку успешной
+      console.log('Booking submitted successfully')
+      
+      // Сбрасываем форму после успешной отправки
+      resetBooking()
+      
+      return {
+        success: true,
+        message: 'Thank you! Your booking has been received. We will contact you for confirmation.'
+      }
+      
+    } catch (error) {
+      console.error('Error submitting booking:', error)
+      
+      return {
+        success: false,
+        message: 'Sorry, there was an error submitting your booking. Please try again.'
+      }
     }
   }
 

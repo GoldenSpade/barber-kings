@@ -6,28 +6,24 @@
         <div class="row align-items-center">
           <!-- Logo -->
           <div class="col-12 col-md-8 text-center text-md-start">
-            <img
-              src="@/assets/main-logo.png"
-              alt="Barber Kings"
-              style="height: 80px"
-            />
+            <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
           </div>
-          
+
           <!-- Language Switcher -->
           <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
             <div class="dropdown d-inline-block">
-              <button 
-                class="btn btn-outline-secondary btn-sm dropdown-toggle" 
-                type="button" 
-                id="languageDropdown" 
+              <button
+                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                type="button"
+                id="languageDropdown"
                 data-bs-toggle="dropdown"
               >
                 {{ locale.toUpperCase() }}
               </button>
               <ul class="dropdown-menu">
                 <li>
-                  <button 
-                    class="dropdown-item" 
+                  <button
+                    class="dropdown-item"
                     @click="changeLanguage('en')"
                     :class="{ active: locale === 'en' }"
                   >
@@ -35,8 +31,8 @@
                   </button>
                 </li>
                 <li>
-                  <button 
-                    class="dropdown-item" 
+                  <button
+                    class="dropdown-item"
                     @click="changeLanguage('hr')"
                     :class="{ active: locale === 'hr' }"
                   >
@@ -52,7 +48,7 @@
 
     <!-- Back Button -->
     <div class="container py-3">
-      <button @click="goBack" class="btn btn-link text-dark p-0" style="text-decoration: none;">
+      <button @click="goBack" class="btn btn-link text-dark p-0" style="text-decoration: none">
         <i class="bi bi-arrow-left me-2"></i>{{ $t('booking.back') }}
       </button>
     </div>
@@ -99,7 +95,9 @@
                 <h5 class="fw-bold text-white mb-3">{{ location.name }}</h5>
                 <p class="text-white mb-3">{{ location.address }}</p>
                 <p class="text-white small mb-4">{{ location.description }}</p>
-                <button class="btn btn-outline-light w-100 mt-auto">{{ $t('booking.choose') }}</button>
+                <button class="btn btn-outline-light w-100 mt-auto">
+                  {{ $t('booking.choose') }}
+                </button>
               </div>
             </div>
           </div>
@@ -109,13 +107,15 @@
       <!-- Step 2: Time Selection -->
       <div v-if="bookingStore.currentStep === 2" class="step-content">
         <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
-        
+
         <!-- Selected Location Card -->
         <div class="row justify-content-center mb-4">
           <div class="col-lg-10">
-            <div 
+            <div
               class="selected-location-card"
-              :style="{ backgroundImage: `url(${locationImages[bookingStore.selectedLocation.id]})` }"
+              :style="{
+                backgroundImage: `url(${locationImages[bookingStore.selectedLocation.id]})`,
+              }"
             >
               <div class="card-overlay"></div>
               <div class="card-content text-center p-4">
@@ -124,23 +124,26 @@
                   <i class="bi bi-geo-alt me-1"></i>{{ getSelectedLocationAddress() }}
                 </p>
                 <p class="text-white mb-2">
-                  <i class="bi bi-scissors me-1"></i>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})
+                  <i class="bi bi-scissors me-1"></i>{{ $t('booking.haircut') }} ({{
+                    $t('booking.duration')
+                  }})
                 </p>
                 <p class="text-white mb-0">
-                  <i class="bi bi-clock me-1"></i>{{ $t('booking.timezone', { timezone: bookingStore.formattedTimezone }) }}
+                  <i class="bi bi-clock me-1"></i
+                  >{{ $t('booking.timezone', { timezone: bookingStore.formattedTimezone }) }}
                 </p>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="row justify-content-center">
           <div class="col-lg-10">
             <div class="bg-white rounded shadow p-4">
               <!-- Calendar Navigation -->
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <button 
-                  class="btn btn-link text-dark" 
+                <button
+                  class="btn btn-link text-dark"
                   @click="bookingStore.previousWeek"
                   :disabled="!bookingStore.canGoToPreviousWeek"
                   :class="{ 'opacity-50': !bookingStore.canGoToPreviousWeek }"
@@ -148,8 +151,8 @@
                   <i class="bi bi-chevron-left"></i>
                 </button>
                 <h5 class="mb-0">{{ formattedDateRange }}</h5>
-                <button 
-                  class="btn btn-link text-dark" 
+                <button
+                  class="btn btn-link text-dark"
                   @click="bookingStore.nextWeek"
                   :disabled="!bookingStore.canGoToNextWeek"
                   :class="{ 'opacity-50': !bookingStore.canGoToNextWeek }"
@@ -173,7 +176,11 @@
                           v-for="time in day.timeSlots"
                           :key="time"
                           class="btn btn-outline-secondary btn-sm mb-2 d-block w-100"
-                          :class="{ 'btn-success': bookingStore.selectedTime === time && bookingStore.selectedDate === day.date }"
+                          :class="{
+                            'btn-success':
+                              bookingStore.selectedTime === time &&
+                              bookingStore.selectedDate === day.date,
+                          }"
                           @click="bookingStore.selectTime(day.date, time)"
                         >
                           {{ time }}
@@ -194,22 +201,26 @@
       <!-- Step 3: Contact Form -->
       <div v-if="bookingStore.currentStep === 3" class="step-content">
         <h2 class="text-center mb-5 fw-bold">{{ $t('booking.contactDetails') }}</h2>
-        
+
         <div class="row justify-content-center">
           <div class="col-md-6">
             <!-- Booking Confirmation -->
             <div class="bg-white rounded shadow p-4 mb-4">
               <h6 class="fw-bold mb-3">{{ $t('booking.timeConfirmation') }}</h6>
               <div class="booking-details">
-                <p class="mb-2"><strong>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})</strong></p>
-                <p class="text-muted mb-0">{{ bookingStore.formatBookingDate }} ({{ bookingStore.formattedTimezone }})</p>
+                <p class="mb-2">
+                  <strong>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})</strong>
+                </p>
+                <p class="text-muted mb-0">
+                  {{ bookingStore.formatBookingDate }} ({{ bookingStore.formattedTimezone }})
+                </p>
               </div>
             </div>
 
             <!-- Contact Form -->
             <div class="bg-white rounded shadow p-4">
               <div class="d-flex align-items-center mb-4">
-                <i class="bi bi-person me-3" style="color: #2c3e33;"></i>
+                <i class="bi bi-person me-3" style="color: #2c3e33"></i>
                 <h6 class="mb-0 fw-bold">{{ $t('booking.contactDetails') }}</h6>
               </div>
 
@@ -235,7 +246,6 @@
                     required
                   />
                 </div>
-
 
                 <button
                   type="submit"
@@ -275,42 +285,44 @@ const { t: $t, locale } = useI18n()
 // Location images mapping
 const locationImages = {
   1: address1,
-  2: address2
+  2: address2,
 }
 
 // Computed locations with translations
 const translatedLocations = computed(() => {
-  return bookingStore.locations.map(location => ({
+  return bookingStore.locations.map((location) => ({
     ...location,
     name: $t(location.nameKey),
     address: $t(location.addressKey),
-    description: $t(location.descriptionKey)
+    description: $t(location.descriptionKey),
   }))
 })
 
 // Computed calendar days with translations
 const translatedWeekDays = computed(() => {
   // Use locale from above
-  const dayNames = locale.value === 'hr' 
-    ? ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
-    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  
-  const monthNames = locale.value === 'hr'
-    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
-    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  
-  return bookingStore.weekDays.map(day => {
+  const dayNames =
+    locale.value === 'hr'
+      ? ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
+      : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+  const monthNames =
+    locale.value === 'hr'
+      ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+      : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+  return bookingStore.weekDays.map((day) => {
     let translatedReason = ''
     if (day.reason) {
       const reasonKey = day.reason.toLowerCase().replace(/\s+/g, '')
       translatedReason = $t(`booking.${reasonKey}`)
     }
-    
+
     return {
       ...day,
       dayName: dayNames[new Date(day.date).getDay()],
       month: monthNames[new Date(day.date).getMonth()],
-      reason: translatedReason
+      reason: translatedReason,
     }
   })
 })
@@ -328,44 +340,52 @@ const goBack = () => {
   }
 }
 
-const handleSubmitBooking = () => {
-  const result = bookingStore.submitBooking()
-  if (result.success) {
-    alert(result.message)
-    router.push('/')
+const handleSubmitBooking = async () => {
+  try {
+    const result = await bookingStore.submitBooking()
+    if (result.success) {
+      alert(result.message)
+      router.push('/')
+    } else {
+      alert(result.message)
+    }
+  } catch (error) {
+    console.error('Error submitting booking:', error)
+    alert('Sorry, there was an error submitting your booking. Please try again.')
   }
 }
 
 const getSelectedLocationName = () => {
   if (!bookingStore.selectedLocation) return ''
-  return bookingStore.selectedLocation.nameKey ? 
-    $t(bookingStore.selectedLocation.nameKey) : 
-    bookingStore.selectedLocation.name
+  return bookingStore.selectedLocation.nameKey
+    ? $t(bookingStore.selectedLocation.nameKey)
+    : bookingStore.selectedLocation.name
 }
 
 const getSelectedLocationAddress = () => {
   if (!bookingStore.selectedLocation) return ''
-  return bookingStore.selectedLocation.addressKey ? 
-    $t(bookingStore.selectedLocation.addressKey) : 
-    bookingStore.selectedLocation.address
+  return bookingStore.selectedLocation.addressKey
+    ? $t(bookingStore.selectedLocation.addressKey)
+    : bookingStore.selectedLocation.address
 }
 
 const formattedDateRange = computed(() => {
   const start = new Date(bookingStore.currentWeekStart)
   const end = new Date(start)
   end.setDate(end.getDate() + 6)
-  
-  const monthNames = locale.value === 'hr'
-    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
-    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  
+
+  const monthNames =
+    locale.value === 'hr'
+      ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+      : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0')
     const month = monthNames[date.getMonth()]
     const year = date.getFullYear()
     return `${month} ${day}, ${year}`
   }
-  
+
   return `${formatDate(start)} - ${formatDate(end)}`
 })
 
@@ -444,7 +464,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
   transition: opacity 0.3s ease;
 }
 
@@ -475,7 +495,7 @@ onMounted(() => {
 }
 
 .service-card.selected .card-overlay {
-  background: linear-gradient(to bottom, rgba(44,62,51,0.4), rgba(44,62,51,0.8));
+  background: linear-gradient(to bottom, rgba(44, 62, 51, 0.4), rgba(44, 62, 51, 0.8));
 }
 
 .service-card .btn {
@@ -510,7 +530,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(44,62,51,0.4), rgba(44,62,51,0.8));
+  background: linear-gradient(to bottom, rgba(44, 62, 51, 0.4), rgba(44, 62, 51, 0.8));
 }
 
 .selected-location-card .card-content {
@@ -569,21 +589,21 @@ onMounted(() => {
   .step-line {
     margin: 0 0.5rem;
   }
-  
+
   .step-number {
     width: 35px;
     height: 35px;
     font-size: 0.9rem;
   }
-  
+
   .step-text {
     font-size: 0.8rem;
   }
-  
+
   .service-card {
     margin-bottom: 1rem;
   }
-  
+
   .day-column {
     min-height: 250px;
     margin-bottom: 1rem;
@@ -594,17 +614,17 @@ onMounted(() => {
   .container {
     padding: 0 1rem;
   }
-  
+
   .step-item {
     flex-direction: row;
     text-align: left;
   }
-  
+
   .step-number {
     margin-right: 0.5rem;
     margin-bottom: 0;
   }
-  
+
   .step-line {
     display: none;
   }
