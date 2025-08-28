@@ -7,10 +7,9 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-8 text-center">
-            <h1 class="display-4 fw-bold text-dark mb-4">About Barber Kings</h1>
+            <h1 class="display-4 fw-bold text-dark mb-4">{{ $t('about.title') }}</h1>
             <p class="lead text-muted mb-0">
-              Learn more about our story, mission, and the team behind Barber
-              Kings
+              {{ $t('about.subtitle') }}
             </p>
           </div>
         </div>
@@ -24,77 +23,62 @@
           <div class="col-12">
             <div class="bg-white p-3 p-md-5 rounded shadow">
               <p class="lead text-dark mb-5">
-                At Barber Kings, we keep things simple: great cuts, honest
-                advice, and a place you'll actually look forward to visiting.
-                Our barbers blend old-school craft with modern technique to
-                deliver sharp fades, classic scissor work, precise beard
-                sculpting, and hot-towel straight-razor shaves.
+                {{ $t('about.intro') }}
               </p>
 
-              <h2 class="h3 mb-4 text-dark fw-bold">Our Story</h2>
+              <h2 class="h3 mb-4 text-dark fw-bold">{{ $t('about.ourStory') }}</h2>
               <p class="text-muted mb-5" style="line-height: 1.8">
-                We started this shop to bring back the feeling of a true
-                neighborhood barbershop—somewhere you're greeted by name, the
-                music's right, and the conversation's easy. From day one, our
-                goal has been the same: consistent results, zero fuss, and
-                service that respects your time.
+                {{ $t('about.ourStoryText') }}
               </p>
 
-              <h2 class="h3 mb-4 text-dark fw-bold">What We Do</h2>
+              <h2 class="h3 mb-4 text-dark fw-bold">{{ $t('about.whatWeDo') }}</h2>
               <ul class="list-unstyled text-muted mb-5" style="line-height: 2">
-                <li>• Classic & modern haircuts</li>
-                <li>• Skin fades, tapers, and scissor cuts</li>
-                <li>• Beard trims, line-ups, and reshapes</li>
-                <li>• Hot-towel shaves & razor finishes</li>
-                <li>• Kids' cuts (patient barbers, parent-approved)</li>
+                <li>• {{ $t('about.services.cuts') }}</li>
+                <li>• {{ $t('about.services.fades') }}</li>
+                <li>• {{ $t('about.services.beards') }}</li>
+                <li>• {{ $t('about.services.shaves') }}</li>
+                <li>• {{ $t('about.services.kids') }}</li>
               </ul>
               <p class="text-muted mb-5" style="line-height: 1.8">
-                We use pro-grade tools and products we trust, and we'll show you
-                how to style your cut at home so it looks good every day—not
-                just when you leave the chair.
+                {{ $t('about.whatWeDoText') }}
               </p>
 
-              <h2 class="h3 mb-4 text-dark fw-bold">Why Choose Us</h2>
+              <h2 class="h3 mb-4 text-dark fw-bold">{{ $t('about.whyChooseUs') }}</h2>
               <div class="row mb-5">
                 <div class="col-md-6 mb-3">
-                  <h5 class="fw-bold text-dark">Craft first</h5>
+                  <h5 class="fw-bold text-dark">{{ $t('about.features.craft.title') }}</h5>
                   <p class="text-muted">
-                    Detail-driven barbers who care about the final millimeter.
+                    {{ $t('about.features.craft.description') }}
                   </p>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <h5 class="fw-bold text-dark">Clean & comfortable</h5>
+                  <h5 class="fw-bold text-dark">{{ $t('about.features.clean.title') }}</h5>
                   <p class="text-muted">
-                    Sanitized tools, fresh capes, and a relaxed vibe.
+                    {{ $t('about.features.clean.description') }}
                   </p>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <h5 class="fw-bold text-dark">On time</h5>
+                  <h5 class="fw-bold text-dark">{{ $t('about.features.onTime.title') }}</h5>
                   <p class="text-muted">
-                    Easy online booking and walk-ins when chairs are open.
+                    {{ $t('about.features.onTime.description') }}
                   </p>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <h5 class="fw-bold text-dark">Straight talk</h5>
+                  <h5 class="fw-bold text-dark">{{ $t('about.features.straightTalk.title') }}</h5>
                   <p class="text-muted">
-                    We'll recommend what fits your hair, face shape, and
-                    lifestyle.
+                    {{ $t('about.features.straightTalk.description') }}
                   </p>
                 </div>
               </div>
 
-              <h2 class="h3 mb-4 text-dark fw-bold">Our Promise</h2>
+              <h2 class="h3 mb-4 text-dark fw-bold">{{ $t('about.ourPromise') }}</h2>
               <p class="text-muted mb-5" style="line-height: 1.8">
-                You should walk out feeling confident and camera-ready. If
-                something isn't perfect, let us know before you leave—we'll make
-                it right.
+                {{ $t('about.ourPromiseText') }}
               </p>
 
-              <h2 class="h3 mb-4 text-dark fw-bold">Visit Us</h2>
+              <h2 class="h3 mb-4 text-dark fw-bold">{{ $t('about.visitUs') }}</h2>
               <p class="text-muted mb-4" style="line-height: 1.8">
-                Book online, call ahead, or swing by—coffee's on, chairs are
-                ready. Whether you're after a sharp new look or just a clean
-                refresh, Barber Kings has you covered.
+                {{ $t('about.visitUsText') }}
               </p>
 
               <div class="text-center">
@@ -107,7 +91,7 @@
                       border-color: #2c3e33 !important;
                     "
                   >
-                    BOOK NOW
+                    {{ $t('home.bookNow') }}
                   </button>
                 </router-link>
               </div>

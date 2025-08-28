@@ -14,7 +14,7 @@
                 class="display-1 fw-bold text-dark mb-4"
                 style="font-size: 7rem; letter-spacing: 5px; line-height: 0.9"
               >
-                WELCOME
+                {{ $t('home.welcome') }}
               </h1>
 
               <!-- Description text -->
@@ -22,7 +22,7 @@
                 class="lead text-muted fw-normal mb-4 mx-auto"
                 style="font-size: 1.1rem; max-width: 600px; line-height: 1.6"
               >
-                Where tradition meets precision. Expert cuts, classic shaves, and modern style crafted by masters of the trade.
+                {{ $t('home.description') }}
               </p>
 
               <!-- Book Now Button -->
@@ -35,7 +35,7 @@
                     border-color: #2c3e33 !important;
                   "
                 >
-                  BOOK NOW
+                  {{ $t('home.bookNow') }}
                 </button>
               </router-link>
             </div>

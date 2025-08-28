@@ -52,7 +52,7 @@
                   @click="changeLanguage('en')"
                   :class="{ active: locale === 'en' }"
                 >
-                  🇺🇸 English
+                  EN
                 </button>
               </li>
               <li>
@@ -61,7 +61,7 @@
                   @click="changeLanguage('hr')"
                   :class="{ active: locale === 'hr' }"
                 >
-                  🇭🇷 Hrvatski
+                  HR
                 </button>
               </li>
             </ul>

@@ -1,12 +1,53 @@
 <template>
   <div class="booking-page bg-light">
     <!-- Logo Header -->
-    <div class="text-center py-4 bg-white">
-      <img
-        src="@/assets/main-logo.png"
-        alt="Barber Kings"
-        style="height: 80px"
-      />
+    <div class="py-4 bg-white">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Logo -->
+          <div class="col-12 col-md-8 text-center text-md-start">
+            <img
+              src="@/assets/main-logo.png"
+              alt="Barber Kings"
+              style="height: 80px"
+            />
+          </div>
+          
+          <!-- Language Switcher -->
+          <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
+            <div class="dropdown d-inline-block">
+              <button 
+                class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                type="button" 
+                id="languageDropdown" 
+                data-bs-toggle="dropdown"
+              >
+                {{ locale.toUpperCase() }}
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button 
+                    class="dropdown-item" 
+                    @click="changeLanguage('en')"
+                    :class="{ active: locale === 'en' }"
+                  >
+                    EN
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    class="dropdown-item" 
+                    @click="changeLanguage('hr')"
+                    :class="{ active: locale === 'hr' }"
+                  >
+                    HR
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Back Button -->
@@ -46,7 +87,7 @@
       <div v-if="bookingStore.currentStep === 1" class="step-content">
         <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseLocation') }}</h2>
         <div class="row justify-content-center">
-          <div class="col-md-5 mb-4" v-for="location in bookingStore.locations" :key="location.id">
+          <div class="col-md-5 mb-4" v-for="location in translatedLocations" :key="location.id">
             <div
               class="service-card h-100"
               :class="{ selected: bookingStore.selectedLocation?.id === location.id }"
@@ -55,9 +96,9 @@
             >
               <div class="card-overlay"></div>
               <div class="card-content text-center p-4">
-                <h5 class="fw-bold text-white mb-3">{{ $t(location.nameKey) }}</h5>
-                <p class="text-white mb-3">{{ $t(location.addressKey) }}</p>
-                <p class="text-white small mb-4">{{ $t(location.descriptionKey) }}</p>
+                <h5 class="fw-bold text-white mb-3">{{ location.name }}</h5>
+                <p class="text-white mb-3">{{ location.address }}</p>
+                <p class="text-white small mb-4">{{ location.description }}</p>
                 <button class="btn btn-outline-light w-100 mt-auto">{{ $t('booking.choose') }}</button>
               </div>
             </div>
@@ -69,7 +110,7 @@
       <div v-if="bookingStore.currentStep === 2" class="step-content">
         <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
         <div class="text-center mb-4 text-muted">
-          <small>{{ bookingStore.selectedLocation ? $t(bookingStore.selectedLocation.nameKey) : '' }} • {{ $t('booking.haircut') }} • {{ $t('booking.timezone') }}</small>
+          <small>{{ getSelectedLocationName() }} • {{ $t('booking.haircut') }} • {{ $t('booking.timezone') }}</small>
         </div>
         
         <div class="row justify-content-center">
@@ -80,7 +121,7 @@
                 <button class="btn btn-link text-dark" @click="bookingStore.previousWeek">
                   <i class="bi bi-chevron-left"></i>
                 </button>
-                <h5 class="mb-0">{{ bookingStore.formatDateRange }}</h5>
+                <h5 class="mb-0">{{ formattedDateRange }}</h5>
                 <button class="btn btn-link text-dark" @click="bookingStore.nextWeek">
                   <i class="bi bi-chevron-right"></i>
                 </button>
@@ -88,7 +129,7 @@
 
               <!-- Week Days -->
               <div class="row text-center">
-                <div class="col" v-for="day in bookingStore.weekDays" :key="day.date">
+                <div class="col" v-for="day in translatedWeekDays" :key="day.date">
                   <div class="day-column">
                     <div class="day-header mb-3">
                       <div class="day-name small text-muted">{{ day.dayName }}</div>
@@ -188,8 +229,9 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Footer from '@/components/Footer.vue'
 import address1 from '@/assets/address-1.jpg'
@@ -197,6 +239,7 @@ import address2 from '@/assets/address-2.jpg'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
+const { t: $t, locale } = useI18n()
 
 // Location images mapping
 const locationImages = {
@@ -204,7 +247,49 @@ const locationImages = {
   2: address2
 }
 
+// Computed locations with translations
+const translatedLocations = computed(() => {
+  return bookingStore.locations.map(location => ({
+    ...location,
+    name: $t(location.nameKey),
+    address: $t(location.addressKey),
+    description: $t(location.descriptionKey)
+  }))
+})
+
+// Computed calendar days with translations
+const translatedWeekDays = computed(() => {
+  // Use locale from above
+  const dayNames = locale.value === 'hr' 
+    ? ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  
+  const monthNames = locale.value === 'hr'
+    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  
+  return bookingStore.weekDays.map(day => {
+    let translatedReason = ''
+    if (day.reason) {
+      const reasonKey = day.reason.toLowerCase().replace(/\s+/g, '')
+      translatedReason = $t(`booking.${reasonKey}`)
+    }
+    
+    return {
+      ...day,
+      dayName: dayNames[new Date(day.date).getDay()],
+      month: monthNames[new Date(day.date).getMonth()],
+      reason: translatedReason
+    }
+  })
+})
+
 // Methods
+const changeLanguage = (lang) => {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
+}
+
 const goBack = () => {
   const shouldGoHome = bookingStore.goToPreviousStep()
   if (shouldGoHome) {
@@ -219,6 +304,32 @@ const handleSubmitBooking = () => {
     router.push('/')
   }
 }
+
+const getSelectedLocationName = () => {
+  if (!bookingStore.selectedLocation) return ''
+  return bookingStore.selectedLocation.nameKey ? 
+    $t(bookingStore.selectedLocation.nameKey) : 
+    bookingStore.selectedLocation.name
+}
+
+const formattedDateRange = computed(() => {
+  const start = new Date(bookingStore.currentWeekStart)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  
+  const monthNames = locale.value === 'hr'
+    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  
+  const formatDate = (date) => {
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = monthNames[date.getMonth()]
+    const year = date.getFullYear()
+    return `${month} ${day}, ${year}`
+  }
+  
+  return `${formatDate(start)} - ${formatDate(end)}`
+})
 
 // Initialize calendar on mount
 onMounted(() => {
