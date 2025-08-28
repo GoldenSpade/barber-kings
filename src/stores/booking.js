@@ -18,12 +18,20 @@ export const useBookingStore = defineStore('booking', () => {
   const locations = ref([
     {
       id: 1,
+      nameKey: 'locations.downtown.name',
+      addressKey: 'locations.downtown.address',
+      descriptionKey: 'locations.downtown.description',
+      // Keep original properties for backward compatibility
       name: 'Downtown Barber Kings',
       address: '25 Khreshchatyk Street',
       description: 'Central location with full range of services'
     },
     {
       id: 2,  
+      nameKey: 'locations.podil.name',
+      addressKey: 'locations.podil.address',
+      descriptionKey: 'locations.podil.description',
+      // Keep original properties for backward compatibility
       name: 'Barber Kings Podil',
       address: '15 Sagaidachnogo Street',
       description: 'Cozy atmosphere in historic district'
@@ -74,7 +82,7 @@ export const useBookingStore = defineStore('booking', () => {
         reason = 'Closed'
       } else if (date.getTime() === today.getTime()) {
         available = false
-        reason = 'Same day not available'
+        reason = 'Not available today'
       } else {
         // Generate time slots for available days (9:00-21:00, 30min intervals)
         timeSlots = generateTimeSlots()

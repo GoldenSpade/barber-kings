@@ -12,7 +12,7 @@
     <!-- Back Button -->
     <div class="container py-3">
       <button @click="goBack" class="btn btn-link text-dark p-0" style="text-decoration: none;">
-        <i class="bi bi-arrow-left me-2"></i>Back
+        <i class="bi bi-arrow-left me-2"></i>{{ $t('booking.back') }}
       </button>
     </div>
 
@@ -23,17 +23,17 @@
           <div class="d-flex align-items-center justify-content-between">
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 1 }">1</span>
-              <span class="step-text">Locations</span>
+              <span class="step-text">{{ $t('booking.steps.locations') }}</span>
             </div>
             <div class="step-line"></div>
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 2 }">2</span>
-              <span class="step-text">Time</span>
+              <span class="step-text">{{ $t('booking.steps.time') }}</span>
             </div>
             <div class="step-line"></div>
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 3 }">3</span>
-              <span class="step-text">Details</span>
+              <span class="step-text">{{ $t('booking.steps.details') }}</span>
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
     <div class="container pb-5">
       <!-- Step 1: Location Selection -->
       <div v-if="bookingStore.currentStep === 1" class="step-content">
-        <h2 class="text-center mb-5 fw-bold">Choose Location</h2>
+        <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseLocation') }}</h2>
         <div class="row justify-content-center">
           <div class="col-md-5 mb-4" v-for="location in bookingStore.locations" :key="location.id">
             <div
@@ -55,10 +55,10 @@
             >
               <div class="card-overlay"></div>
               <div class="card-content text-center p-4">
-                <h5 class="fw-bold text-white mb-3">{{ location.name }}</h5>
-                <p class="text-white mb-3">{{ location.address }}</p>
-                <p class="text-white small mb-4">{{ location.description }}</p>
-                <button class="btn btn-outline-light w-100 mt-auto">Choose</button>
+                <h5 class="fw-bold text-white mb-3">{{ $t(location.nameKey) }}</h5>
+                <p class="text-white mb-3">{{ $t(location.addressKey) }}</p>
+                <p class="text-white small mb-4">{{ $t(location.descriptionKey) }}</p>
+                <button class="btn btn-outline-light w-100 mt-auto">{{ $t('booking.choose') }}</button>
               </div>
             </div>
           </div>
@@ -67,9 +67,9 @@
 
       <!-- Step 2: Time Selection -->
       <div v-if="bookingStore.currentStep === 2" class="step-content">
-        <h2 class="text-center mb-3 fw-bold">Choose Your Time</h2>
+        <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
         <div class="text-center mb-4 text-muted">
-          <small>{{ bookingStore.selectedLocation?.name }} • Type: Haircut • Timezone: Europe/Kiev</small>
+          <small>{{ bookingStore.selectedLocation ? $t(bookingStore.selectedLocation.nameKey) : '' }} • {{ $t('booking.haircut') }} • {{ $t('booking.timezone') }}</small>
         </div>
         
         <div class="row justify-content-center">
@@ -121,15 +121,15 @@
 
       <!-- Step 3: Contact Form -->
       <div v-if="bookingStore.currentStep === 3" class="step-content">
-        <h2 class="text-center mb-5 fw-bold">Contact Details</h2>
+        <h2 class="text-center mb-5 fw-bold">{{ $t('booking.contactDetails') }}</h2>
         
         <div class="row justify-content-center">
           <div class="col-md-6">
             <!-- Booking Confirmation -->
             <div class="bg-white rounded shadow p-4 mb-4">
-              <h6 class="fw-bold mb-3">Time Confirmation</h6>
+              <h6 class="fw-bold mb-3">{{ $t('booking.timeConfirmation') }}</h6>
               <div class="booking-details">
-                <p class="mb-2"><strong>Haircut (60 min)</strong></p>
+                <p class="mb-2"><strong>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})</strong></p>
                 <p class="text-muted mb-0">{{ bookingStore.formatBookingDate }} (Europe/Kiev)</p>
               </div>
             </div>
@@ -138,23 +138,23 @@
             <div class="bg-white rounded shadow p-4">
               <div class="d-flex align-items-center mb-4">
                 <i class="bi bi-person me-3" style="color: #2c3e33;"></i>
-                <h6 class="mb-0 fw-bold">Contact Details</h6>
+                <h6 class="mb-0 fw-bold">{{ $t('booking.contactDetails') }}</h6>
               </div>
 
               <form @submit.prevent="handleSubmitBooking">
                 <div class="mb-3">
-                  <label class="form-label">Full Name *</label>
+                  <label class="form-label">{{ $t('booking.fullName') }} *</label>
                   <input
                     type="text"
                     class="form-control"
                     v-model="bookingStore.bookingForm.name"
-                    placeholder="Enter your name"
+                    :placeholder="$t('booking.enterName')"
                     required
                   />
                 </div>
 
                 <div class="mb-4">
-                  <label class="form-label">Phone</label>
+                  <label class="form-label">{{ $t('booking.phone') }}</label>
                   <input
                     type="tel"
                     class="form-control"
@@ -174,7 +174,7 @@
                     color: white;
                   "
                 >
-                  Book Now
+                  {{ $t('booking.bookNow') }}
                 </button>
               </form>
             </div>

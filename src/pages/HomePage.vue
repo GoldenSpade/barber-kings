@@ -22,8 +22,7 @@
                 class="lead text-muted fw-normal mb-4 mx-auto"
                 style="font-size: 1.1rem; max-width: 600px; line-height: 1.6"
               >
-                Where tradition meets precision. Expert cuts, classic shaves,
-                and modern style crafted by masters of the trade.
+                Where tradition meets precision. Expert cuts, classic shaves, and modern style crafted by masters of the trade.
               </p>
 
               <!-- Book Now Button -->

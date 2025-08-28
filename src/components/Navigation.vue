@@ -9,12 +9,12 @@
           <router-link
             :to="{ name: 'home' }"
             class="nav-link text-dark fw-semibold fs-6 me-5"
-            >HOME</router-link
+            >{{ $t('nav.home').toUpperCase() }}</router-link
           >
           <router-link
             :to="{ name: 'about' }"
             class="nav-link text-dark fw-semibold fs-6"
-            >ABOUT</router-link
+            >{{ $t('nav.about').toUpperCase() }}</router-link
           >
         </div>
 
@@ -28,12 +28,44 @@
         </div>
 
         <!-- Right Links -->
-        <div class="col-4 d-flex justify-content-end">
+        <div class="col-4 d-flex justify-content-end align-items-center">
           <router-link
-            class="nav-link text-dark fw-semibold fs-6"
+            class="nav-link text-dark fw-semibold fs-6 me-4"
             :to="{ name: 'booking' }"
-            >CONTACT</router-link
+            >{{ $t('nav.booking').toUpperCase() }}</router-link
           >
+          
+          <!-- Language Switcher -->
+          <div class="dropdown">
+            <button 
+              class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+              type="button" 
+              id="languageDropdown" 
+              data-bs-toggle="dropdown"
+            >
+              {{ locale.toUpperCase() }}
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button 
+                  class="dropdown-item" 
+                  @click="changeLanguage('en')"
+                  :class="{ active: locale === 'en' }"
+                >
+                  🇺🇸 English
+                </button>
+              </li>
+              <li>
+                <button 
+                  class="dropdown-item" 
+                  @click="changeLanguage('hr')"
+                  :class="{ active: locale === 'hr' }"
+                >
+                  🇭🇷 Hrvatski
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -67,13 +99,36 @@
             <router-link
               :to="{ name: 'home' }"
               class="nav-link text-dark fw-semibold py-2"
-              >HOME</router-link
+              >{{ $t('nav.home').toUpperCase() }}</router-link
             >
             <router-link
               :to="{ name: 'about' }"
               class="nav-link text-dark fw-semibold py-2"
-              >ABOUT</router-link
+              >{{ $t('nav.about').toUpperCase() }}</router-link
             >
+            <router-link
+              :to="{ name: 'booking' }"
+              class="nav-link text-dark fw-semibold py-2"
+              >{{ $t('nav.booking').toUpperCase() }}</router-link
+            >
+            
+            <!-- Mobile Language Switcher -->
+            <div class="mt-3">
+              <button 
+                class="btn btn-outline-secondary btn-sm me-2" 
+                @click="changeLanguage('en')"
+                :class="{ 'btn-secondary text-white': locale === 'en' }"
+              >
+                🇺🇸 EN
+              </button>
+              <button 
+                class="btn btn-outline-secondary btn-sm" 
+                @click="changeLanguage('hr')"
+                :class="{ 'btn-secondary text-white': locale === 'hr' }"
+              >
+                🇭🇷 HR
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -82,8 +137,17 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
 const toggleMobileMenu = () => {
   // Bootstrap will handle the collapse functionality
+}
+
+const changeLanguage = (lang) => {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
 }
 </script>
 

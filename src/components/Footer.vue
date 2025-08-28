@@ -3,7 +3,7 @@
   <nav class="navbar navbar-light bg-white border-top py-3">
     <div class="container">
       <div class="navbar-nav mx-auto">
-        Copiright &copy; {{ year }} Barber Kings. All rights reserved.
+        {{ $t('footer.copyright').replace('2025', year) }}
       </div>
     </div>
   </nav>
