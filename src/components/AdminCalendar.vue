@@ -76,7 +76,7 @@
           <div class="day-column bg-white border rounded-bottom p-2">
             <!-- Day status or time slots -->
             <div v-if="!day.available" class="text-center text-muted py-4">
-              {{ day.reason }}
+              {{ day.reason === 'Closed' ? $t('admin.calendar.closed') : day.reason }}
             </div>
             <div v-else class="time-slots">
               <div 
