@@ -110,6 +110,10 @@
                     {{ getBookingForSlot(day, slot).phone }}
                     <i class="bi bi-clipboard ms-1 copy-icon"></i>
                   </div>
+                  <div v-if="getBookingForSlot(day, slot).location" class="booking-location text-muted small mb-1">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    {{ getLocationName(getBookingForSlot(day, slot).location) }}
+                  </div>
                   <div v-if="getBookingForSlot(day, slot).status" class="booking-status">
                     <span 
                       class="badge" 
@@ -298,6 +302,15 @@ const getStatusBadgeClass = (status) => {
   }
 }
 
+// Get location name from location key
+const getLocationName = (locationKey) => {
+  const locationMap = {
+    'downtown': 'Downtown',
+    'podil': 'Podil'
+  }
+  return locationMap[locationKey] || locationKey
+}
+
 // Copy phone number to clipboard
 const copyPhoneToClipboard = async (phone) => {
   if (!phone || phone === 'undefined') {
@@ -407,6 +420,11 @@ const copyPhoneToClipboard = async (phone) => {
 }
 
 .customer-phone {
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.booking-location {
   font-size: 0.7rem;
   line-height: 1.2;
 }
@@ -557,6 +575,11 @@ const copyPhoneToClipboard = async (phone) => {
     word-break: break-all;
   }
   
+  .booking-location {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+  
   .booking-status .badge {
     font-size: 0.55rem;
     padding: 0.15rem 0.3rem;
@@ -613,6 +636,11 @@ const copyPhoneToClipboard = async (phone) => {
     line-height: 1.1;
     white-space: normal;
     word-break: break-all;
+  }
+  
+  .booking-location {
+    font-size: 0.55rem;
+    line-height: 1.1;
   }
   
   .time-label {
