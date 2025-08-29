@@ -295,8 +295,8 @@ const handleSubmit = async () => {
       showMessage($t('admin.addBooking.successMessage'), 'success')
     }
     
-    // Refresh the bookings data
-    await bookingStore.fetchBookedSlots()
+    // Refresh the bookings data with admin flag
+    await bookingStore.fetchBookedSlots(true)
     
     // Reset form after successful submission
     resetForm()

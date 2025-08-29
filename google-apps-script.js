@@ -6,6 +6,9 @@ const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
 
 function doGet(e) {
   try {
+    // Проверяем, запрашиваются ли данные для админки
+    const isAdmin = e.parameter.admin === 'true'
+    
     // Открываем таблицу
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
     
@@ -18,18 +21,37 @@ function doGet(e) {
       const row = data[i]
       // Проверяем что строка не пустая
       if (row[1] && row[3] && row[4] && row[5]) { // Name, Location, Date, Time
-        bookings.push({
-          location: row[3], // Location
-          date: row[4],     // Date  
-          time: row[5],     // Time
-          status: row[6]    // Status
-        })
+        if (isAdmin) {
+          // Для админки возвращаем полную информацию
+          bookings.push({
+            timestamp: row[0],  // Timestamp
+            name: row[1],       // Name
+            phone: row[2],      // Phone  
+            location: row[3],   // Location
+            date: row[4],       // Date  
+            time: row[5],       // Time
+            status: row[6] || 'Pending' // Status (по умолчанию Pending)
+          })
+        } else {
+          // Для обычных пользователей - только необходимые данные
+          bookings.push({
+            location: row[3], // Location
+            date: row[4],     // Date  
+            time: row[5],     // Time
+            status: row[6]    // Status
+          })
+        }
       }
     }
     
     const result = {
       success: true,
       bookings: bookings
+    }
+    
+    // Добавляем количество для админки
+    if (isAdmin) {
+      result.totalCount = bookings.length
     }
     
     // Поддержка JSONP
@@ -108,6 +130,49 @@ function doPost(e) {
       JSON.stringify({
         success: false,
         message: 'Error saving booking: ' + error.toString(),
+      })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
+// Функция для обновления статуса бронирования (для админ-панели)
+function updateBookingStatus(e) {
+  try {
+    const data = JSON.parse(e.postData.contents)
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+    
+    // Находим строку по уникальным данным
+    const allData = sheet.getDataRange().getValues()
+    
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      // Ищем по комбинации имени, даты и времени
+      if (row[1] === data.name && row[4] === data.date && row[5] === data.time) {
+        // Обновляем статус (колонка G, индекс 6)
+        sheet.getRange(i + 1, 7).setValue(data.newStatus)
+        
+        return ContentService.createTextOutput(
+          JSON.stringify({
+            success: true,
+            message: 'Status updated successfully'
+          })
+        ).setMimeType(ContentService.MimeType.JSON)
+      }
+    }
+    
+    // Если не найдено
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        success: false,
+        message: 'Booking not found'
+      })
+    ).setMimeType(ContentService.MimeType.JSON)
+    
+  } catch (error) {
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        success: false,
+        message: 'Error updating status: ' + error.toString()
       })
     ).setMimeType(ContentService.MimeType.JSON)
   }

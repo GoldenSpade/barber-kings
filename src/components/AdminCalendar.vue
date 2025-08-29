@@ -82,18 +82,32 @@
               <div 
                 v-for="slot in allTimeSlots" 
                 :key="slot"
-                class="time-slot mb-1 p-2 rounded d-flex justify-content-between align-items-center"
+                class="time-slot mb-1 p-2 rounded"
                 :class="getSlotClass(day, slot)"
               >
-                <span class="fw-medium">{{ slot }}</span>
-                <div v-if="getBookingForSlot(day, slot)" class="booking-info">
-                  <small class="text-dark">
-                    {{ getBookingForSlot(day, slot).name }}
-                  </small>
-                  <br>
-                  <small class="text-muted">
-                    {{ getBookingForSlot(day, slot).phone }}
-                  </small>
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="fw-medium time-label">{{ slot }}</span>
+                  <div v-if="getBookingForSlot(day, slot)" class="booking-info text-end">
+                    <div class="customer-name text-dark fw-bold mb-1">
+                      <i class="bi bi-person-fill me-1"></i>
+                      {{ getBookingForSlot(day, slot).name }}
+                    </div>
+                    <div class="customer-phone text-muted small">
+                      <i class="bi bi-telephone-fill me-1"></i>
+                      <a :href="`tel:${getBookingForSlot(day, slot).phone}`" 
+                         class="text-decoration-none text-muted phone-link">
+                        {{ getBookingForSlot(day, slot).phone }}
+                      </a>
+                    </div>
+                    <div v-if="getBookingForSlot(day, slot).status" class="booking-status mt-1">
+                      <span 
+                        class="badge" 
+                        :class="getStatusBadgeClass(getBookingForSlot(day, slot).status)"
+                      >
+                        {{ getBookingForSlot(day, slot).status }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -117,7 +131,7 @@ const selectedLocationFilter = ref('')
 
 // Load bookings on mount
 onMounted(async () => {
-  await bookingStore.fetchBookedSlots()
+  await bookingStore.fetchBookedSlots(true) // Передаем true для админ-панели
 })
 
 // Generate all possible time slots for admin view
@@ -250,6 +264,22 @@ const getSlotClass = (day, slot) => {
     'available': !booking
   }
 }
+
+// Get CSS class for status badge
+const getStatusBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'confirmed':
+      return 'bg-success'
+    case 'pending':
+      return 'bg-warning text-dark'
+    case 'completed':
+      return 'bg-info'
+    case 'cancelled':
+      return 'bg-danger'
+    default:
+      return 'bg-secondary'
+  }
+}
 </script>
 
 <style scoped>
@@ -299,6 +329,32 @@ const getSlotClass = (day, slot) => {
 .booking-info {
   font-size: 0.75rem;
   text-align: right;
+  max-width: 70%;
+}
+
+.customer-name {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.customer-phone {
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.phone-link:hover {
+  color: #2c3e33 !important;
+  text-decoration: underline !important;
+}
+
+.time-label {
+  min-width: 50px;
+  color: #2c3e33;
+}
+
+.booking-status .badge {
+  font-size: 0.6rem;
+  padding: 0.2rem 0.4rem;
 }
 
 .legend {
@@ -358,6 +414,25 @@ const getSlotClass = (day, slot) => {
   
   .booking-info {
     font-size: 0.65rem;
+    max-width: 65%;
+  }
+  
+  .customer-name {
+    font-size: 0.7rem;
+  }
+  
+  .customer-phone {
+    font-size: 0.6rem;
+  }
+  
+  .booking-status .badge {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.3rem;
+  }
+  
+  .time-label {
+    min-width: 40px;
+    font-size: 0.7rem;
   }
 }
 </style>

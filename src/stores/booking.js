@@ -314,7 +314,7 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   // Загружаем занятые слоты из Google Таблицы
-  const fetchBookedSlots = async () => {
+  const fetchBookedSlots = async (isAdmin = false) => {
     try {
       isLoadingBookedSlots.value = true
       const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
@@ -340,7 +340,9 @@ export const useBookingStore = defineStore('booking', () => {
         
         // Создаем script элемент
         const script = document.createElement('script')
-        const requestUrl = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}`
+        // Добавляем параметр admin для получения полных данных
+        const adminParam = isAdmin ? '&admin=true' : ''
+        const requestUrl = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}${adminParam}`
         script.src = requestUrl
         script.onerror = () => {
           document.head.removeChild(script)
