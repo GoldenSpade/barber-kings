@@ -214,25 +214,24 @@ const weekDays = computed(() => {
   return days
 })
 
-// Format date range for display
+// Format date range for display (same as BookingPage)
 const formatDateRange = computed(() => {
-  const startDate = bookingStore.currentWeekStart || new Date()
-  const start = new Date(startDate)
+  const start = new Date(bookingStore.currentWeekStart)
   const end = new Date(start)
   end.setDate(start.getDate() + 6)
-  
-  const formatDate = (date) => {
-    const monthNames = locale.value === 'hr'
+
+  const monthNames =
+    locale.value === 'hr'
       ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
       : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    
+
+  const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0')
     const month = monthNames[date.getMonth()]
     const year = date.getFullYear()
-    
     return `${month} ${day}, ${year}`
   }
-  
+
   return `${formatDate(start)} - ${formatDate(end)}`
 })
 
