@@ -110,5 +110,84 @@ export default {
   // Footer
   footer: {
     copyright: 'Copyright © 2025 Barber Kings. All rights reserved.'
+  },
+
+  // Admin Panel
+  admin: {
+    title: 'Admin Panel - Barber Kings',
+    backToSite: 'Back to Site',
+    tabs: {
+      calendar: 'Bookings Calendar',
+      addBooking: 'Add Booking', 
+      manageBookings: 'Manage Bookings'
+    },
+    calendar: {
+      title: 'Bookings Calendar',
+      subtitle: 'Admin Calendar View',
+      previousWeek: 'Previous Week',
+      nextWeek: 'Next Week',
+      filterLocation: 'Filter by Location:',
+      allLocations: 'All Locations',
+      occupied: 'Occupied',
+      available: 'Available',
+      closed: 'Closed',
+      loading: 'Loading bookings...'
+    },
+    addBooking: {
+      title: 'Add New Booking',
+      customerInfo: 'Customer Information',
+      bookingDetails: 'Booking Details', 
+      bookingStatus: 'Booking Status',
+      fullName: 'Full Name',
+      phone: 'Phone Number',
+      location: 'Location',
+      date: 'Date',
+      time: 'Time',
+      selectLocation: 'Select location',
+      selectTime: 'Select time',
+      enterName: 'Enter customer name',
+      enterPhone: 'Enter phone number',
+      pending: 'Pending',
+      confirmed: 'Confirmed',
+      pendingConfirmation: 'Pending Confirmation',
+      addBooking: 'Add Booking',
+      adding: 'Adding...',
+      resetForm: 'Reset Form',
+      successMessage: 'Booking added successfully!',
+      errorMessage: 'Failed to add booking. Please try again.',
+      occupied: '(Occupied)'
+    },
+    bookings: {
+      title: 'All Bookings',
+      filterLocation: 'Filter by Location:',
+      filterStatus: 'Filter by Status:',
+      dateFrom: 'Date From:',
+      dateTo: 'Date To:',
+      search: 'Search by name or phone...',
+      resetFilters: 'Reset Filters',
+      refresh: 'Refresh',
+      noBookings: 'No bookings found',
+      noBookingsText: 'Try adjusting your filters or add some bookings.',
+      loading: 'Loading bookings...',
+      timestamp: 'Timestamp',
+      name: 'Name',
+      phone: 'Phone',
+      location: 'Location',
+      date: 'Date',
+      time: 'Time',
+      status: 'Status',
+      actions: 'Actions',
+      first: 'First',
+      previous: 'Previous',
+      next: 'Next',
+      last: 'Last',
+      showing: 'Showing {start} to {end} of {total} bookings',
+      statuses: {
+        pending: 'Pending',
+        confirmed: 'Confirmed',
+        completed: 'Completed',
+        cancelled: 'Cancelled'
+      }
+    }
   }
 }

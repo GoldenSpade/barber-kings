@@ -6,35 +6,35 @@
         <form @submit.prevent="handleSubmit" class="position-relative">
           <!-- Loading Overlay -->
           <div v-if="isSubmitting" class="form-overlay">
-            <Loader size="medium" message="Adding booking..." />
+            <Loader size="medium" :message="$t('admin.addBooking.adding')" />
           </div>
 
           <div class="row">
             <!-- Customer Information -->
             <div class="col-md-6 mb-4">
               <h6 class="fw-bold mb-3">
-                <i class="bi bi-person me-2"></i>Customer Information
+                <i class="bi bi-person me-2"></i>{{ $t('admin.addBooking.customerInfo') }}
               </h6>
               
               <div class="mb-3">
-                <label class="form-label">Full Name *</label>
+                <label class="form-label">{{ $t('admin.addBooking.fullName') }} *</label>
                 <input
                   type="text"
                   class="form-control"
                   v-model="form.name"
-                  placeholder="Enter customer name"
+                  :placeholder="$t('admin.addBooking.enterName')"
                   required
                   :disabled="isSubmitting"
                 />
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Phone Number *</label>
+                <label class="form-label">{{ $t('admin.addBooking.phone') }} *</label>
                 <input
                   type="tel"
                   class="form-control"
                   v-model="form.phone"
-                  placeholder="Enter phone number"
+                  :placeholder="$t('admin.addBooking.enterPhone')"
                   required
                   :disabled="isSubmitting"
                 />
@@ -44,18 +44,18 @@
             <!-- Booking Details -->
             <div class="col-md-6 mb-4">
               <h6 class="fw-bold mb-3">
-                <i class="bi bi-calendar-event me-2"></i>Booking Details
+                <i class="bi bi-calendar-event me-2"></i>{{ $t('admin.addBooking.bookingDetails') }}
               </h6>
               
               <div class="mb-3">
-                <label class="form-label">Location *</label>
+                <label class="form-label">{{ $t('admin.addBooking.location') }} *</label>
                 <select
                   class="form-select"
                   v-model="form.location"
                   required
                   :disabled="isSubmitting"
                 >
-                  <option value="">Select location</option>
+                  <option value="">{{ $t('admin.addBooking.selectLocation') }}</option>
                   <option value="downtown">Downtown Barber Kings</option>
                   <option value="podil">Barber Kings Podil</option>
                 </select>
@@ -63,7 +63,7 @@
 
               <div class="row">
                 <div class="col-sm-6 mb-3">
-                  <label class="form-label">Date *</label>
+                  <label class="form-label">{{ $t('admin.addBooking.date') }} *</label>
                   <input
                     type="date"
                     class="form-control"
@@ -76,21 +76,21 @@
                 </div>
 
                 <div class="col-sm-6 mb-3">
-                  <label class="form-label">Time *</label>
+                  <label class="form-label">{{ $t('admin.addBooking.time') }} *</label>
                   <select
                     class="form-select"
                     v-model="form.time"
                     required
                     :disabled="isSubmitting || !form.date || !form.location"
                   >
-                    <option value="">Select time</option>
+                    <option value="">{{ $t('admin.addBooking.selectTime') }}</option>
                     <option 
                       v-for="slot in availableTimeSlots" 
                       :key="slot"
                       :value="slot"
                       :disabled="isSlotBooked(slot)"
                     >
-                      {{ slot }} {{ isSlotBooked(slot) ? '(Occupied)' : '' }}
+                      {{ slot }} {{ isSlotBooked(slot) ? $t('admin.addBooking.occupied') : '' }}
                     </option>
                   </select>
                 </div>
@@ -101,7 +101,7 @@
           <!-- Status Selection -->
           <div class="mb-4">
             <h6 class="fw-bold mb-3">
-              <i class="bi bi-flag me-2"></i>Booking Status
+              <i class="bi bi-flag me-2"></i>{{ $t('admin.addBooking.bookingStatus') }}
             </h6>
             <div class="d-flex gap-3">
               <div class="form-check">
@@ -114,8 +114,8 @@
                   :disabled="isSubmitting"
                 />
                 <label class="form-check-label" for="pending">
-                  <span class="badge bg-warning me-2">Pending</span>
-                  Pending Confirmation
+                  <span class="badge bg-warning me-2">{{ $t('admin.addBooking.pending') }}</span>
+                  {{ $t('admin.addBooking.pendingConfirmation') }}
                 </label>
               </div>
               <div class="form-check">
@@ -128,8 +128,8 @@
                   :disabled="isSubmitting"
                 />
                 <label class="form-check-label" for="confirmed">
-                  <span class="badge bg-success me-2">Confirmed</span>
-                  Confirmed
+                  <span class="badge bg-success me-2">{{ $t('admin.addBooking.confirmed') }}</span>
+                  {{ $t('admin.addBooking.confirmed') }}
                 </label>
               </div>
             </div>
@@ -144,7 +144,7 @@
               style="background-color: #2c3e33; border-color: #2c3e33; color: white;"
             >
               <i class="bi bi-plus-circle me-2"></i>
-              {{ isSubmitting ? 'Adding...' : 'Add Booking' }}
+              {{ isSubmitting ? $t('admin.addBooking.adding') : $t('admin.addBooking.addBooking') }}
             </button>
             
             <button
@@ -154,7 +154,7 @@
               :disabled="isSubmitting"
             >
               <i class="bi bi-arrow-clockwise me-2"></i>
-              Reset Form
+              {{ $t('admin.addBooking.resetForm') }}
             </button>
           </div>
         </form>
@@ -178,8 +178,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
+
+const { t: $t } = useI18n()
 
 const bookingStore = useBookingStore()
 
@@ -285,11 +288,11 @@ const handleSubmit = async () => {
       })
       
       // With no-cors, we assume success
-      showMessage('Booking added successfully!', 'success')
+      showMessage($t('admin.addBooking.successMessage'), 'success')
     } else {
       // Simulate adding to local state for development
       console.log('Adding booking:', bookingData)
-      showMessage('Booking added successfully! (Development mode)', 'success')
+      showMessage($t('admin.addBooking.successMessage'), 'success')
     }
     
     // Refresh the bookings data
@@ -300,7 +303,7 @@ const handleSubmit = async () => {
     
   } catch (error) {
     console.error('Error adding booking:', error)
-    showMessage('Failed to add booking. Please try again.', 'error')
+    showMessage($t('admin.addBooking.errorMessage'), 'error')
   } finally {
     isSubmitting.value = false
   }

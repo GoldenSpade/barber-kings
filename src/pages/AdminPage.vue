@@ -4,15 +4,47 @@
     <div class="py-4 bg-white shadow-sm">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-12 col-md-8">
+          <div class="col-12 col-md-6">
             <h1 class="h3 mb-0 fw-bold text-dark">
               <i class="bi bi-shield-lock me-2" style="color: #2c3e33"></i>
-              Admin Panel - Barber Kings
+              {{ $t('admin.title') }}
             </h1>
           </div>
-          <div class="col-12 col-md-4 text-end mt-3 mt-md-0">
+          <div class="col-12 col-md-6 text-end mt-3 mt-md-0">
+            <!-- Language Switcher -->
+            <div class="dropdown d-inline-block me-3">
+              <button
+                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                type="button"
+                id="adminLanguageDropdown"
+                data-bs-toggle="dropdown"
+              >
+                {{ locale.toUpperCase() }}
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button
+                    class="dropdown-item"
+                    @click="changeLanguage('en')"
+                    :class="{ active: locale === 'en' }"
+                  >
+                    EN
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item"
+                    @click="changeLanguage('hr')"
+                    :class="{ active: locale === 'hr' }"
+                  >
+                    HR
+                  </button>
+                </li>
+              </ul>
+            </div>
+            
             <router-link to="/" class="btn btn-outline-secondary">
-              <i class="bi bi-house me-2"></i>Back to Site
+              <i class="bi bi-house me-2"></i>{{ $t('admin.backToSite') }}
             </router-link>
           </div>
         </div>
@@ -31,7 +63,7 @@
             type="button" 
             role="tab"
           >
-            <i class="bi bi-calendar-check me-2"></i>Bookings Calendar
+            <i class="bi bi-calendar-check me-2"></i>{{ $t('admin.tabs.calendar') }}
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -43,7 +75,7 @@
             type="button" 
             role="tab"
           >
-            <i class="bi bi-plus-circle me-2"></i>Add Booking
+            <i class="bi bi-plus-circle me-2"></i>{{ $t('admin.tabs.addBooking') }}
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -55,7 +87,7 @@
             type="button" 
             role="tab"
           >
-            <i class="bi bi-table me-2"></i>Manage Bookings
+            <i class="bi bi-table me-2"></i>{{ $t('admin.tabs.manageBookings') }}
           </button>
         </li>
       </ul>
@@ -67,7 +99,7 @@
           <div class="card">
             <div class="card-header bg-white">
               <h5 class="card-title mb-0">
-                <i class="bi bi-calendar3 me-2"></i>Bookings Calendar
+                <i class="bi bi-calendar3 me-2"></i>{{ $t('admin.tabs.calendar') }}
               </h5>
             </div>
             <div class="card-body">
@@ -81,7 +113,7 @@
           <div class="card">
             <div class="card-header bg-white">
               <h5 class="card-title mb-0">
-                <i class="bi bi-plus-circle me-2"></i>Add New Booking
+                <i class="bi bi-plus-circle me-2"></i>{{ $t('admin.tabs.addBooking') }}
               </h5>
             </div>
             <div class="card-body">
@@ -95,7 +127,7 @@
           <div class="card">
             <div class="card-header bg-white">
               <h5 class="card-title mb-0">
-                <i class="bi bi-table me-2"></i>All Bookings
+                <i class="bi bi-table me-2"></i>{{ $t('admin.tabs.manageBookings') }}
               </h5>
             </div>
             <div class="card-body">
@@ -110,12 +142,20 @@
 
 <script setup>
 import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AdminCalendar from '@/components/AdminCalendar.vue'
 import AddBookingForm from '@/components/AddBookingForm.vue'
 import BookingsTable from '@/components/BookingsTable.vue'
 import { useBookingStore } from '@/stores/booking'
 
 const bookingStore = useBookingStore()
+const { t: $t, locale } = useI18n()
+
+// Language switching
+const changeLanguage = (lang) => {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
+}
 
 onMounted(async () => {
   // Initialize calendar first

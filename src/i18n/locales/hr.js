@@ -110,5 +110,84 @@ export default {
   // Footer
   footer: {
     copyright: 'Autorska prava © 2025 Barber Kings. Sva prava zadržana.'
+  },
+
+  // Admin Panel
+  admin: {
+    title: 'Admin Panel - Barber Kings',
+    backToSite: 'Povratak na stranicu',
+    tabs: {
+      calendar: 'Kalendar rezervacija',
+      addBooking: 'Dodaj rezervaciju',
+      manageBookings: 'Upravljaj rezervacijama'
+    },
+    calendar: {
+      title: 'Kalendar rezervacija',
+      subtitle: 'Admin pregled kalendara',
+      previousWeek: 'Prethodni tjedan',
+      nextWeek: 'Sljedeći tjedan',
+      filterLocation: 'Filtriraj po lokaciji:',
+      allLocations: 'Sve lokacije',
+      occupied: 'Zauzeto',
+      available: 'Dostupno',
+      closed: 'Zatvoreno',
+      loading: 'Učitavaju se rezervacije...'
+    },
+    addBooking: {
+      title: 'Dodaj novu rezervaciju',
+      customerInfo: 'Informacije o korisniku',
+      bookingDetails: 'Detalji rezervacije',
+      bookingStatus: 'Status rezervacije',
+      fullName: 'Puno ime',
+      phone: 'Broj telefona',
+      location: 'Lokacija',
+      date: 'Datum',
+      time: 'Vrijeme',
+      selectLocation: 'Odaberite lokaciju',
+      selectTime: 'Odaberite vrijeme',
+      enterName: 'Unesite ime korisnika',
+      enterPhone: 'Unesite broj telefona',
+      pending: 'Na čekanju',
+      confirmed: 'Potvrđeno',
+      pendingConfirmation: 'Čeka potvrdu',
+      addBooking: 'Dodaj rezervaciju',
+      adding: 'Dodaje se...',
+      resetForm: 'Resetiraj formu',
+      successMessage: 'Rezervacija je uspješno dodana!',
+      errorMessage: 'Dodavanje rezervacije nije uspjelo. Molimo pokušajte ponovno.',
+      occupied: '(Zauzeto)'
+    },
+    bookings: {
+      title: 'Sve rezervacije',
+      filterLocation: 'Filtriraj po lokaciji:',
+      filterStatus: 'Filtriraj po statusu:',
+      dateFrom: 'Datum od:',
+      dateTo: 'Datum do:',
+      search: 'Pretraži po imenu ili telefonu...',
+      resetFilters: 'Resetiraj filtere',
+      refresh: 'Osvježi',
+      noBookings: 'Nema rezervacija',
+      noBookingsText: 'Pokušajte prilagoditi filtere ili dodajte rezervacije.',
+      loading: 'Učitavaju se rezervacije...',
+      timestamp: 'Vremenska oznaka',
+      name: 'Ime',
+      phone: 'Telefon',
+      location: 'Lokacija',
+      date: 'Datum',
+      time: 'Vrijeme',
+      status: 'Status',
+      actions: 'Akcije',
+      first: 'Prva',
+      previous: 'Prethodna',
+      next: 'Sljedeća',
+      last: 'Zadnja',
+      showing: 'Prikazuje {start} do {end} od {total} rezervacija',
+      statuses: {
+        pending: 'Na čekanju',
+        confirmed: 'Potvrđeno',
+        completed: 'Završeno',
+        cancelled: 'Otkazano'
+      }
+    }
   }
 }

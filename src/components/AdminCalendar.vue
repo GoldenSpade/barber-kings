@@ -8,12 +8,12 @@
         :disabled="!canGoToPreviousWeek"
       >
         <i class="bi bi-chevron-left"></i>
-        Previous Week
+        {{ $t('admin.calendar.previousWeek') }}
       </button>
       
       <div class="text-center">
         <h5 class="mb-0">{{ formatDateRange }}</h5>
-        <small class="text-muted">Admin Calendar View</small>
+        <small class="text-muted">{{ $t('admin.calendar.subtitle') }}</small>
       </div>
       
       <button 
@@ -21,7 +21,7 @@
         @click="nextWeek"
         :disabled="!canGoToNextWeek"
       >
-        Next Week
+        {{ $t('admin.calendar.nextWeek') }}
         <i class="bi bi-chevron-right"></i>
       </button>
     </div>
@@ -30,9 +30,9 @@
     <div class="mb-4">
       <div class="row align-items-center">
         <div class="col-md-6">
-          <label class="form-label fw-bold">Filter by Location:</label>
+          <label class="form-label fw-bold">{{ $t('admin.calendar.filterLocation') }}</label>
           <select v-model="selectedLocationFilter" class="form-select">
-            <option value="">All Locations</option>
+            <option value="">{{ $t('admin.calendar.allLocations') }}</option>
             <option value="downtown">Downtown</option>
             <option value="podil">Podil</option>
           </select>
@@ -41,11 +41,11 @@
           <div class="legend d-inline-flex align-items-center">
             <div class="legend-item me-3">
               <span class="legend-color occupied"></span>
-              <small>Occupied</small>
+              <small>{{ $t('admin.calendar.occupied') }}</small>
             </div>
             <div class="legend-item">
               <span class="legend-color available"></span>
-              <small>Available</small>
+              <small>{{ $t('admin.calendar.available') }}</small>
             </div>
           </div>
         </div>
@@ -54,7 +54,7 @@
 
     <!-- Loading -->
     <div v-if="bookingStore.isLoadingBookedSlots" class="text-center py-5">
-      <Loader size="large" message="Loading bookings..." />
+      <Loader size="large" :message="$t('admin.calendar.loading')" />
     </div>
 
     <!-- Calendar Grid -->
@@ -106,8 +106,11 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
+
+const { t: $t, locale } = useI18n()
 
 const bookingStore = useBookingStore()
 const selectedLocationFilter = ref('')
@@ -140,8 +143,13 @@ const weekDays = computed(() => {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i)
     
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const dayNames = locale.value === 'hr' 
+      ? ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
+      : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      
+    const monthNames = locale.value === 'hr'
+      ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+      : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     
     let available = true
     let reason = ''
@@ -176,11 +184,15 @@ const formatDateRange = computed(() => {
   end.setDate(start.getDate() + 6)
   
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      day: '2-digit', 
-      month: 'short',
-      year: 'numeric'
-    })
+    const monthNames = locale.value === 'hr'
+      ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+      : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = monthNames[date.getMonth()]
+    const year = date.getFullYear()
+    
+    return `${month} ${day}, ${year}`
   }
   
   return `${formatDate(start)} - ${formatDate(end)}`
@@ -244,8 +256,6 @@ const getSlotClass = (day, slot) => {
 .day-column {
   border: 1px solid #e9ecef;
   min-height: 400px;
-  max-height: 600px;
-  overflow-y: auto;
 }
 
 .time-slot {
