@@ -171,9 +171,11 @@
               </div>
 
               <!-- Week Days -->
-              <div class="row text-center">
-                <div class="col" v-for="day in translatedWeekDays" :key="day.date">
-                  <div class="day-column">
+              <div class="calendar-wrapper">
+                <div class="calendar-grid">
+                  <div class="row text-center">
+                    <div class="col" v-for="day in translatedWeekDays" :key="day.date">
+                      <div class="day-column">
                     <div class="day-header mb-3">
                       <div class="day-name small text-muted">{{ day.dayName }}</div>
                       <div class="day-number fw-bold">{{ day.dayNumber }}</div>
@@ -209,6 +211,8 @@
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
                 </div>
               </div>
             </div>
@@ -614,6 +618,14 @@ onMounted(async () => {
 }
 
 /* Calendar Styles */
+.calendar-wrapper {
+  width: 100%;
+}
+
+.calendar-grid {
+  width: 100%;
+}
+
 .day-column {
   min-height: 300px;
 }
@@ -752,6 +764,20 @@ onMounted(async () => {
     margin-bottom: 1rem;
   }
 
+  .calendar-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .calendar-grid {
+    min-width: 700px;
+  }
+  
+  .calendar-grid .col {
+    min-width: 100px;
+    padding: 0 1px;
+  }
+
   .day-column {
     min-height: 250px;
     margin-bottom: 1rem;
@@ -775,6 +801,14 @@ onMounted(async () => {
 
   .step-line {
     display: none;
+  }
+
+  .calendar-grid {
+    min-width: 560px;
+  }
+  
+  .calendar-grid .col {
+    min-width: 80px;
   }
 }
 </style>
