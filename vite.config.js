@@ -26,6 +26,6 @@ export default defineConfig(({ command, mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    base: '/barber-kings/',
+    // base: '/barber-kings/',
   }
 })

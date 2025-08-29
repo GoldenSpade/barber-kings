@@ -68,32 +68,26 @@ export const useBookingStore = defineStore('booking', () => {
   // Getters
   const weekDays = computed(() => {
     const days = []
-    const start = new Date(currentWeekStart.value)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     
-    // Show 1 week (7 days) - slider approach for extended calendar
+    // Show 7 days starting from today
     for (let i = 0; i < 7; i++) {
-      const date = new Date(start)
-      date.setDate(start.getDate() + i)
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
       
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-      
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      date.setHours(0, 0, 0, 0)
       
       let available = true
       let reason = ''
       let timeSlots = []
       
-      // Check if date is within our allowed range (tomorrow to +3 months)
+      // Check if date is within our allowed range
       if (date.getTime() === today.getTime()) {
         // Today - not available for booking
         available = false
         reason = 'Not available today'
-      } else if (date < minDate.value) {
-        available = false
-        reason = 'Past day'
       } else if (date > maxDate.value) {
         available = false
         reason = 'Too far ahead'
@@ -135,9 +129,10 @@ export const useBookingStore = defineStore('booking', () => {
   })
 
   const formatDateRange = computed(() => {
-    const start = new Date(currentWeekStart.value)
-    const end = new Date(start)
-    end.setDate(end.getDate() + 6) // 6 days for 1 week
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const end = new Date(today)
+    end.setDate(today.getDate() + 6) // 6 days from today
     
     const formatDate = (date) => {
       return date.toLocaleDateString('en-US', { 
@@ -147,7 +142,7 @@ export const useBookingStore = defineStore('booking', () => {
       })
     }
     
-    return `${formatDate(start)} - ${formatDate(end)}`
+    return `${formatDate(today)} - ${formatDate(end)}`
   })
 
   const formatBookingDate = computed(() => {
@@ -183,20 +178,17 @@ export const useBookingStore = defineStore('booking', () => {
     const prevWeekStart = new Date(currentWeekStart.value)
     prevWeekStart.setDate(prevWeekStart.getDate() - 7)
     
-    const minWeekStart = new Date(minDate.value)
-    minWeekStart.setDate(minWeekStart.getDate() - minWeekStart.getDay())
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     
-    return prevWeekStart >= minWeekStart
+    return prevWeekStart >= today
   })
 
   const canGoToNextWeek = computed(() => {
     const nextWeekStart = new Date(currentWeekStart.value)
     nextWeekStart.setDate(nextWeekStart.getDate() + 7)
     
-    const maxWeekStart = new Date(maxDate.value)
-    maxWeekStart.setDate(maxWeekStart.getDate() - maxWeekStart.getDay())
-    
-    return nextWeekStart <= maxWeekStart
+    return nextWeekStart <= maxDate.value
   })
 
   // Formatted timezone display
@@ -228,11 +220,11 @@ export const useBookingStore = defineStore('booking', () => {
     const newDate = new Date(currentWeekStart.value)
     newDate.setDate(newDate.getDate() - 7) // Move 1 week back
     
-    // Don't go before the minimum date
-    const minWeekStart = new Date(minDate.value)
-    minWeekStart.setDate(minWeekStart.getDate() - minWeekStart.getDay()) // Find Sunday of min date week
+    // Don't go before today
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     
-    if (newDate >= minWeekStart) {
+    if (newDate >= today) {
       currentWeekStart.value = newDate
     }
   }
@@ -241,11 +233,8 @@ export const useBookingStore = defineStore('booking', () => {
     const newDate = new Date(currentWeekStart.value)
     newDate.setDate(newDate.getDate() + 7) // Move 1 week forward
     
-    // Don't go past the maximum date
-    const maxWeekStart = new Date(maxDate.value)
-    maxWeekStart.setDate(maxWeekStart.getDate() - maxWeekStart.getDay()) // Find Sunday of max date week
-    
-    if (newDate <= maxWeekStart) {
+    // Don't go too far ahead (check if the first day of the new week is within maxDate)
+    if (newDate <= maxDate.value) {
       currentWeekStart.value = newDate
     }
   }
@@ -374,16 +363,12 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   const initializeCalendar = () => {
-    // Initialize calendar starting from tomorrow
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    // Initialize calendar starting from today
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     
-    // Find the week that contains tomorrow
-    const dayOfWeek = tomorrow.getDay()
-    const weekSunday = new Date(tomorrow)
-    weekSunday.setDate(tomorrow.getDate() - dayOfWeek)
-    
-    currentWeekStart.value = weekSunday
+    // Since we now show 7 days starting from today, we can just set currentWeekStart to today
+    currentWeekStart.value = today
   }
 
   return {
