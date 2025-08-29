@@ -325,11 +325,12 @@ export const useBookingStore = defineStore('booking', () => {
       return new Promise((resolve, reject) => {
         // Создаем глобальную callback функцию
         window[callbackName] = function(data) {
-          console.log('📥 JSONP Response received:', data)
+          // console.log('📥 JSONP Response received:', data)
           if (data.success) {
             bookedSlots.value = data.bookings
-            console.log('✅ Booked slots loaded:', data.bookings.length, 'bookings')
-            console.table(data.bookings) // Красивая таблица в консоли
+            console.log('✅ Booked slots loaded')
+            // console.log('✅ Booked slots loaded:', data.bookings.length, 'bookings')
+            // console.table(data.bookings) // Красивая таблица в консоли
           } else {
             console.error('❌ Error fetching booked slots:', data.message)
           }
