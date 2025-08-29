@@ -206,8 +206,8 @@
                           </div>
                         </div>
                       </div>
-                      <div v-else class="text-muted small">
-                        {{ day.reason }}
+                      <div v-else class="text-muted small text-center">
+                        <div class="reason-text">{{ day.reason }}</div>
                       </div>
                     </div>
                   </div>
@@ -699,6 +699,11 @@ onMounted(async () => {
 .time-label {
   color: #2c3e33;
   font-size: 0.8rem;
+}
+
+.reason-text {
+  word-spacing: 100vw;
+  line-height: 1.4;
 }
 
 /* Form Styles */
