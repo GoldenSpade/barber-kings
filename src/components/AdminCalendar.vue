@@ -105,7 +105,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
@@ -114,6 +114,11 @@ const { t: $t, locale } = useI18n()
 
 const bookingStore = useBookingStore()
 const selectedLocationFilter = ref('')
+
+// Load bookings on mount
+onMounted(async () => {
+  await bookingStore.fetchBookedSlots()
+})
 
 // Generate all possible time slots for admin view
 const allTimeSlots = computed(() => {
@@ -212,20 +217,29 @@ const nextWeek = () => {
 
 // Get booking for specific slot
 const getBookingForSlot = (day, slot) => {
-  if (!bookingStore.bookedSlots || !Array.isArray(bookingStore.bookedSlots)) {
+  // Return null if data is not yet loaded
+  if (!bookingStore.bookedSlots || !Array.isArray(bookingStore.bookedSlots) || bookingStore.bookedSlots.length === 0) {
     return null
   }
   
   const date = new Date(day.date)
   const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   
-  return bookingStore.bookedSlots.find(booking => {
+  // Find booking that matches date and time
+  const booking = bookingStore.bookedSlots.find(booking => {
     const matchesDate = booking.date === dateString
     const matchesTime = booking.time === slot
-    const matchesLocation = selectedLocationFilter.value ? booking.location === selectedLocationFilter.value : true
     
-    return matchesDate && matchesTime && matchesLocation
+    // If location filter is selected, also check location
+    if (selectedLocationFilter.value) {
+      return matchesDate && matchesTime && booking.location === selectedLocationFilter.value
+    }
+    
+    // If no filter, show all bookings
+    return matchesDate && matchesTime
   })
+  
+  return booking
 }
 
 // Get CSS class for time slot
