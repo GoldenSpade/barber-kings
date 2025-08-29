@@ -69,22 +69,23 @@
     </div>
 
     <!-- Calendar Grid -->
-    <div v-else class="calendar-grid">
-      <div class="row">
-        <!-- Days Headers -->
-        <div class="col" v-for="day in weekDays" :key="day.date">
-          <div class="day-header text-center p-3 bg-light rounded-top">
-            <div class="day-name fw-bold">{{ day.dayName }}</div>
-            <div class="day-number h5 mb-0">{{ day.dayNumber }}</div>
-            <div class="day-month small text-muted">{{ day.month }}</div>
+    <div v-else class="calendar-wrapper">
+      <div class="calendar-grid">
+        <div class="row">
+          <!-- Days Headers -->
+          <div class="col" v-for="day in weekDays" :key="day.date">
+            <div class="day-header text-center p-3 bg-light rounded-top">
+              <div class="day-name fw-bold">{{ day.dayName }}</div>
+              <div class="day-number h5 mb-0">{{ day.dayNumber }}</div>
+              <div class="day-month small text-muted">{{ day.month }}</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <!-- Time Slots -->
-        <div class="col" v-for="day in weekDays" :key="day.date">
-          <div class="day-column bg-white border rounded-bottom p-2">
+        <div class="row">
+          <!-- Time Slots -->
+          <div class="col" v-for="day in weekDays" :key="day.date">
+            <div class="day-column bg-white border rounded-bottom p-2">
             <!-- Day status or time slots -->
             <div v-if="!day.available" class="text-center text-muted py-4">
               {{ day.reason === 'Closed' ? $t('admin.calendar.closed') : day.reason }}
@@ -101,7 +102,7 @@
                   <div v-if="getBookingForSlot(day, slot)" class="booking-info text-end">
                     <div class="customer-name text-dark fw-bold mb-1">
                       <i class="bi bi-person-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).name || 'No name' }}
+                      {{ getBookingForSlot(day, slot).name }}
                     </div>
                     <div 
                       class="customer-phone text-muted small phone-clickable" 
@@ -109,7 +110,7 @@
                       :title="$t('admin.calendar.clickToCopyPhone')"
                     >
                       <i class="bi bi-telephone-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).phone || 'No phone' }}
+                      {{ getBookingForSlot(day, slot).phone }}
                       <i class="bi bi-clipboard ms-1 copy-icon"></i>
                     </div>
                     <div v-if="getBookingForSlot(day, slot).status" class="booking-status mt-1">
@@ -127,6 +128,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -341,6 +343,14 @@ const copyPhoneToClipboard = async (phone) => {
   width: 100%;
 }
 
+.calendar-wrapper {
+  width: 100%;
+}
+
+.calendar-grid {
+  width: 100%;
+}
+
 .calendar-grid .col {
   min-width: 0;
   padding: 0 2px;
@@ -471,9 +481,20 @@ const copyPhoneToClipboard = async (phone) => {
   box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
+  .calendar-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .calendar-grid {
+    min-width: 910px; /* Increased minimum width */
+  }
+  
   .calendar-grid .col {
     padding: 0 1px;
+    min-width: 130px; /* Increased minimum width for each day column */
   }
   
   .day-column {
@@ -487,15 +508,24 @@ const copyPhoneToClipboard = async (phone) => {
   
   .booking-info {
     font-size: 0.65rem;
-    max-width: 65%;
+    max-width: 100%; /* Allow full width */
+    margin-right: 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .customer-name {
     font-size: 0.7rem;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-word;
   }
   
   .customer-phone {
     font-size: 0.6rem;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-all;
   }
   
   .booking-status .badge {
@@ -506,6 +536,63 @@ const copyPhoneToClipboard = async (phone) => {
   .time-label {
     min-width: 40px;
     font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .calendar-grid {
+    min-width: 770px; /* Increased minimum width for very small screens */
+  }
+  
+  .calendar-grid .col {
+    min-width: 110px; /* Increased minimum width for each day column */
+  }
+  
+  .day-column {
+    margin-bottom: 1rem;
+    min-height: 250px;
+  }
+  
+  .time-slot {
+    font-size: 0.7rem;
+    padding: 0.2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .booking-info {
+    font-size: 0.6rem;
+    max-width: 100%; /* Allow full width on small screens */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .customer-name {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  .customer-phone {
+    font-size: 0.55rem;
+    line-height: 1.1;
+    white-space: normal;
+    word-break: break-all;
+  }
+  
+  .time-label {
+    font-size: 0.65rem;
+    min-width: 35px;
+  }
+  
+  .copy-icon {
+    font-size: 0.5rem;
+  }
+  
+  /* Hide some icons on small screens */
+  .customer-name .bi-person-fill,
+  .customer-phone .bi-telephone-fill {
+    display: none;
   }
 }
 </style>
