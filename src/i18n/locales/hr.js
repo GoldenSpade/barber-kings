@@ -49,7 +49,8 @@ export default {
     enterPhone: 'Unesite broj telefona',
     successMessage: 'Hvala! Vaša rezervacija je primljena. Kontaktirat ćemo vas za potvrdu.',
     previousWeek: 'Prethodna Tjedni',
-    nextWeek: 'Sljedeći Tjedan'
+    nextWeek: 'Sljedeći Tjedan',
+    occupied: 'Zauzeto'
   },
   
   // Locations

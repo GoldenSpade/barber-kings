@@ -49,7 +49,8 @@ export default {
     enterPhone: 'Enter phone number',
     successMessage: 'Thank you! Your booking has been received. We will contact you for confirmation.',
     previousWeek: 'Previous Week',
-    nextWeek: 'Next Week'
+    nextWeek: 'Next Week',
+    occupied: 'Occupied'
   },
   
   // Locations

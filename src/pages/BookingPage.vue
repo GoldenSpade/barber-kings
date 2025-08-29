@@ -181,19 +181,28 @@
                     </div>
                     <div class="time-slots">
                       <div v-if="day.available">
-                        <button
-                          v-for="time in day.timeSlots"
+                        <div
+                          v-for="time in day.allTimeSlots"
                           :key="time"
-                          class="btn btn-outline-secondary btn-sm mb-2 d-block w-100"
-                          :class="{
-                            'btn-success':
-                              bookingStore.selectedTime === time &&
-                              bookingStore.selectedDate === day.date,
-                          }"
-                          @click="bookingStore.selectTime(day.date, time)"
+                          class="time-slot mb-1 p-2 rounded"
+                          :class="getSlotClass(day, time)"
                         >
-                          {{ time }}
-                        </button>
+                          <button
+                            v-if="!isSlotBooked(day, time)"
+                            class="btn btn-outline-secondary btn-sm w-100"
+                            :class="{
+                              'btn-success':
+                                bookingStore.selectedTime === time &&
+                                bookingStore.selectedDate === day.date,
+                            }"
+                            @click="bookingStore.selectTime(day.date, time)"
+                          >
+                            {{ time }}
+                          </button>
+                          <div v-else class="d-flex justify-content-center align-items-center">
+                            <span class="fw-medium time-label">{{ time }}</span>
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="text-muted small">
                         {{ day.reason }}
@@ -342,6 +351,7 @@ const translatedWeekDays = computed(() => {
       dayName: dayNames[new Date(day.date).getDay()],
       month: monthNames[new Date(day.date).getMonth()],
       reason: translatedReason,
+      allTimeSlots: generateAllTimeSlots(), // Добавляем все слоты времени
     }
   })
 })
@@ -407,6 +417,44 @@ const formattedDateRange = computed(() => {
 
   return `${formatDate(start)} - ${formatDate(end)}`
 })
+
+// Helper function to generate all time slots
+const generateAllTimeSlots = () => {
+  const slots = []
+  for (let hour = 9; hour <= 21; hour++) {
+    if (hour < 21) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`)
+      slots.push(`${hour.toString().padStart(2, '0')}:30`)
+    } else {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`)
+    }
+  }
+  return slots
+}
+
+// Check if a slot is booked
+const isSlotBooked = (day, slot) => {
+  const date = new Date(day.date)
+  const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  const currentLocation = bookingStore.selectedLocation?.nameKey ? 
+    bookingStore.selectedLocation.nameKey.replace('locations.', '').replace('.name', '') : 
+    bookingStore.selectedLocation?.name
+
+  return bookingStore.bookedSlots.some(booking => 
+    booking.date === dateString && 
+    booking.time === slot && 
+    booking.location === currentLocation
+  )
+}
+
+// Get CSS class for time slot
+const getSlotClass = (day, slot) => {
+  const isBooked = isSlotBooked(day, slot)
+  return {
+    'occupied': isBooked,
+    'available': !isBooked
+  }
+}
 
 // Initialize calendar on mount
 onMounted(async () => {
@@ -589,6 +637,56 @@ onMounted(async () => {
 .time-slots .btn-success {
   background-color: #2c3e33 !important;
   border-color: #2c3e33 !important;
+}
+
+/* Time Slot Styles */
+.time-slot {
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.time-slot.occupied {
+  background-color: #ffebee;
+  border-color: #e57373;
+}
+
+.time-slot.available {
+  background-color: #f1f8e9;
+  border-color: #aed581;
+  padding: 0 !important;
+}
+
+.time-slot.available .btn {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  color: #2c3e33;
+  font-weight: 500;
+}
+
+.time-slot.available .btn:hover {
+  background-color: rgba(44, 62, 51, 0.1);
+}
+
+.time-slot.available .btn.btn-success {
+  background-color: #2c3e33 !important;
+  color: white !important;
+}
+
+.time-slot.occupied:hover {
+  background-color: #ffcdd2;
+}
+
+.time-slot.available:hover {
+  background-color: #dcedc8;
+}
+
+.time-label {
+  color: #2c3e33;
+  font-size: 0.8rem;
 }
 
 /* Form Styles */

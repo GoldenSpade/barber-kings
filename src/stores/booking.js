@@ -71,10 +71,14 @@ export const useBookingStore = defineStore('booking', () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    // Show 7 days starting from today
+    // Use currentWeekStart instead of today for navigation
+    const startDate = new Date(currentWeekStart.value)
+    startDate.setHours(0, 0, 0, 0)
+    
+    // Show 7 days starting from currentWeekStart
     for (let i = 0; i < 7; i++) {
-      const date = new Date(today)
-      date.setDate(today.getDate() + i)
+      const date = new Date(startDate)
+      date.setDate(startDate.getDate() + i)
       
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -129,10 +133,10 @@ export const useBookingStore = defineStore('booking', () => {
   })
 
   const formatDateRange = computed(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const end = new Date(today)
-    end.setDate(today.getDate() + 6) // 6 days from today
+    const start = new Date(currentWeekStart.value)
+    start.setHours(0, 0, 0, 0)
+    const end = new Date(start)
+    end.setDate(start.getDate() + 6) // 6 days from currentWeekStart
     
     const formatDate = (date) => {
       return date.toLocaleDateString('en-US', { 
@@ -142,7 +146,7 @@ export const useBookingStore = defineStore('booking', () => {
       })
     }
     
-    return `${formatDate(today)} - ${formatDate(end)}`
+    return `${formatDate(start)} - ${formatDate(end)}`
   })
 
   const formatBookingDate = computed(() => {

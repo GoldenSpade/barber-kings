@@ -101,7 +101,7 @@
                   <div v-if="getBookingForSlot(day, slot)" class="booking-info text-end">
                     <div class="customer-name text-dark fw-bold mb-1">
                       <i class="bi bi-person-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).name }}
+                      {{ getBookingForSlot(day, slot).name || 'No name' }}
                     </div>
                     <div 
                       class="customer-phone text-muted small phone-clickable" 
@@ -109,7 +109,7 @@
                       :title="$t('admin.calendar.clickToCopyPhone')"
                     >
                       <i class="bi bi-telephone-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).phone }}
+                      {{ getBookingForSlot(day, slot).phone || 'No phone' }}
                       <i class="bi bi-clipboard ms-1 copy-icon"></i>
                     </div>
                     <div v-if="getBookingForSlot(day, slot).status" class="booking-status mt-1">
@@ -300,6 +300,11 @@ const getStatusBadgeClass = (status) => {
 
 // Copy phone number to clipboard
 const copyPhoneToClipboard = async (phone) => {
+  if (!phone || phone === 'undefined') {
+    console.error('Phone number is undefined or empty')
+    return
+  }
+  
   try {
     await navigator.clipboard.writeText(phone)
     copiedPhone.value = phone
@@ -379,6 +384,7 @@ const copyPhoneToClipboard = async (phone) => {
   font-size: 0.75rem;
   text-align: right;
   max-width: 70%;
+  margin-right: 4px;
 }
 
 .customer-name {
