@@ -1,5 +1,16 @@
 <template>
   <div class="admin-calendar">
+    <!-- Copy Notification -->
+    <div 
+      v-if="showCopyNotification" 
+      class="copy-notification alert alert-success alert-dismissible fade show position-fixed"
+      style="top: 20px; right: 20px; z-index: 9999;"
+    >
+      <i class="bi bi-check-circle me-2"></i>
+      {{ $t('admin.calendar.phoneCopied', { phone: copiedPhone }) }}
+      <button type="button" class="btn-close" @click="showCopyNotification = false"></button>
+    </div>
+
     <!-- Calendar Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <button 
@@ -92,12 +103,14 @@
                       <i class="bi bi-person-fill me-1"></i>
                       {{ getBookingForSlot(day, slot).name }}
                     </div>
-                    <div class="customer-phone text-muted small">
+                    <div 
+                      class="customer-phone text-muted small phone-clickable" 
+                      @click="copyPhoneToClipboard(getBookingForSlot(day, slot).phone)"
+                      :title="$t('admin.calendar.clickToCopyPhone')"
+                    >
                       <i class="bi bi-telephone-fill me-1"></i>
-                      <a :href="`tel:${getBookingForSlot(day, slot).phone}`" 
-                         class="text-decoration-none text-muted phone-link">
-                        {{ getBookingForSlot(day, slot).phone }}
-                      </a>
+                      {{ getBookingForSlot(day, slot).phone }}
+                      <i class="bi bi-clipboard ms-1 copy-icon"></i>
                     </div>
                     <div v-if="getBookingForSlot(day, slot).status" class="booking-status mt-1">
                       <span 
@@ -128,6 +141,10 @@ const { t: $t, locale } = useI18n()
 
 const bookingStore = useBookingStore()
 const selectedLocationFilter = ref('')
+
+// State for copy notification
+const showCopyNotification = ref(false)
+const copiedPhone = ref('')
 
 // Load bookings on mount
 onMounted(async () => {
@@ -280,6 +297,38 @@ const getStatusBadgeClass = (status) => {
       return 'bg-secondary'
   }
 }
+
+// Copy phone number to clipboard
+const copyPhoneToClipboard = async (phone) => {
+  try {
+    await navigator.clipboard.writeText(phone)
+    copiedPhone.value = phone
+    showCopyNotification.value = true
+    
+    // Hide notification after 2 seconds
+    setTimeout(() => {
+      showCopyNotification.value = false
+    }, 2000)
+  } catch (error) {
+    console.error('Failed to copy phone number:', error)
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = phone
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      copiedPhone.value = phone
+      showCopyNotification.value = true
+      setTimeout(() => {
+        showCopyNotification.value = false
+      }, 2000)
+    } catch (fallbackError) {
+      console.error('Fallback copy failed:', fallbackError)
+    }
+    document.body.removeChild(textArea)
+  }
+}
 </script>
 
 <style scoped>
@@ -342,10 +391,28 @@ const getStatusBadgeClass = (status) => {
   line-height: 1.2;
 }
 
-.phone-link:hover {
-  color: #2c3e33 !important;
-  text-decoration: underline !important;
+.phone-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 2px 4px;
 }
+
+.phone-clickable:hover {
+  background-color: rgba(44, 62, 51, 0.1);
+  color: #2c3e33 !important;
+}
+
+.copy-icon {
+  opacity: 0.6;
+  font-size: 0.65rem;
+  transition: opacity 0.2s ease;
+}
+
+.phone-clickable:hover .copy-icon {
+  opacity: 1;
+}
+
 
 .time-label {
   min-width: 50px;

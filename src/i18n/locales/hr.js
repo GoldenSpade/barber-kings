@@ -131,7 +131,9 @@ export default {
       occupied: 'Zauzeto',
       available: 'Dostupno',
       closed: 'Zatvoreno',
-      loading: 'Učitavaju se rezervacije...'
+      loading: 'Učitavaju se rezervacije...',
+      clickToCopyPhone: 'Kliknite za kopiranje broja telefona',
+      phoneCopied: 'Telefon {phone} kopiran u međuspremnik!'
     },
     addBooking: {
       title: 'Dodaj novu rezervaciju',

@@ -131,7 +131,9 @@ export default {
       occupied: 'Occupied',
       available: 'Available',
       closed: 'Closed',
-      loading: 'Loading bookings...'
+      loading: 'Loading bookings...',
+      clickToCopyPhone: 'Click to copy phone number',
+      phoneCopied: 'Phone {phone} copied to clipboard!'
     },
     addBooking: {
       title: 'Add New Booking',
