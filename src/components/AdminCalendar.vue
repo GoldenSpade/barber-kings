@@ -14,12 +14,11 @@
     <!-- Calendar Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <button 
-        class="btn btn-outline-secondary" 
+        class="btn-nav-arrow" 
         @click="previousWeek"
         :disabled="!canGoToPreviousWeek"
       >
         <i class="bi bi-chevron-left"></i>
-        {{ $t('admin.calendar.previousWeek') }}
       </button>
       
       <div class="text-center">
@@ -28,11 +27,10 @@
       </div>
       
       <button 
-        class="btn btn-outline-secondary" 
+        class="btn-nav-arrow" 
         @click="nextWeek"
         :disabled="!canGoToNextWeek"
       >
-        {{ $t('admin.calendar.nextWeek') }}
         <i class="bi bi-chevron-right"></i>
       </button>
     </div>
@@ -97,31 +95,32 @@
                 class="time-slot mb-1 p-2 rounded"
                 :class="getSlotClass(day, slot)"
               >
-                <div class="d-flex justify-content-between align-items-start">
-                  <span class="fw-medium time-label">{{ slot }}</span>
-                  <div v-if="getBookingForSlot(day, slot)" class="booking-info text-end">
-                    <div class="customer-name text-dark fw-bold mb-1">
-                      <i class="bi bi-person-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).name }}
-                    </div>
-                    <div 
-                      class="customer-phone text-muted small phone-clickable" 
-                      @click="copyPhoneToClipboard(getBookingForSlot(day, slot).phone)"
-                      :title="$t('admin.calendar.clickToCopyPhone')"
-                    >
-                      <i class="bi bi-telephone-fill me-1"></i>
-                      {{ getBookingForSlot(day, slot).phone }}
-                      <i class="bi bi-clipboard ms-1 copy-icon"></i>
-                    </div>
-                    <div v-if="getBookingForSlot(day, slot).status" class="booking-status mt-1">
-                      <span 
-                        class="badge" 
-                        :class="getStatusBadgeClass(getBookingForSlot(day, slot).status)"
-                      >
-                        {{ getBookingForSlot(day, slot).status }}
-                      </span>
-                    </div>
+                <div v-if="getBookingForSlot(day, slot)" class="booking-info-vertical text-center">
+                  <div class="time-label fw-medium mb-1">{{ slot }}</div>
+                  <div class="customer-name text-dark fw-bold mb-1">
+                    <i class="bi bi-person-fill me-1"></i>
+                    {{ getBookingForSlot(day, slot).name }}
                   </div>
+                  <div 
+                    class="customer-phone text-muted small phone-clickable mb-1" 
+                    @click="copyPhoneToClipboard(getBookingForSlot(day, slot).phone)"
+                    :title="$t('admin.calendar.clickToCopyPhone')"
+                  >
+                    <i class="bi bi-telephone-fill me-1"></i>
+                    {{ getBookingForSlot(day, slot).phone }}
+                    <i class="bi bi-clipboard ms-1 copy-icon"></i>
+                  </div>
+                  <div v-if="getBookingForSlot(day, slot).status" class="booking-status">
+                    <span 
+                      class="badge" 
+                      :class="getStatusBadgeClass(getBookingForSlot(day, slot).status)"
+                    >
+                      {{ getBookingForSlot(day, slot).status }}
+                    </span>
+                  </div>
+                </div>
+                <div v-else class="d-flex justify-content-center align-items-center">
+                  <span class="fw-medium time-label">{{ slot }}</span>
                 </div>
               </div>
             </div>
@@ -396,6 +395,12 @@ const copyPhoneToClipboard = async (phone) => {
   margin-right: 4px;
 }
 
+.booking-info-vertical {
+  font-size: 0.75rem;
+  width: 100%;
+  padding: 0.25rem;
+}
+
 .customer-name {
   font-size: 0.8rem;
   line-height: 1.2;
@@ -464,6 +469,25 @@ const copyPhoneToClipboard = async (phone) => {
   background-color: #f1f8e9;
 }
 
+.btn-nav-arrow {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.btn-nav-arrow:hover:not(:disabled) {
+  color: #2c3e33;
+}
+
+.btn-nav-arrow:disabled {
+  color: #dee2e6;
+  cursor: not-allowed;
+}
+
 .btn-outline-secondary {
   border-color: #2c3e33;
   color: #2c3e33;
@@ -509,6 +533,12 @@ const copyPhoneToClipboard = async (phone) => {
     font-size: 0.65rem;
     max-width: 100%; /* Allow full width */
     margin-right: 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .booking-info-vertical {
+    font-size: 0.65rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -561,6 +591,12 @@ const copyPhoneToClipboard = async (phone) => {
   .booking-info {
     font-size: 0.6rem;
     max-width: 100%; /* Allow full width on small screens */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .booking-info-vertical {
+    font-size: 0.6rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
