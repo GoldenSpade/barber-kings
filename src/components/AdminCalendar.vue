@@ -325,7 +325,8 @@ const isLoading = computed(() => bookingStore.isLoadingBookedSlots)
 // Refresh bookings
 const refreshBookings = async () => {
   try {
-    await bookingStore.fetchBookedSlots(true)
+    console.log('Manual refresh triggered')
+    await bookingStore.fetchBookedSlots(true, true) // forceRefresh = true
   } catch (error) {
     console.error('Failed to refresh bookings:', error)
   }
