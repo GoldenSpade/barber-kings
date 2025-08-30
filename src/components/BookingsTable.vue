@@ -16,10 +16,10 @@
             <label class="form-label fw-bold">{{ $t('admin.bookings.filterStatus') }}</label>
             <select v-model="statusFilter" class="form-select">
               <option value="">{{ $t('admin.bookings.allStatus') }}</option>
-              <option value="Pending">{{ $t('admin.bookings.statuses.pending') }}</option>
-              <option value="Confirmed">{{ $t('admin.bookings.statuses.confirmed') }}</option>
-              <option value="Completed">{{ $t('admin.bookings.statuses.completed') }}</option>
-              <option value="Cancelled">{{ $t('admin.bookings.statuses.cancelled') }}</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
         </div>
@@ -28,7 +28,7 @@
         <div class="row">
           <div class="col-sm-6 mb-3">
             <label class="form-label fw-bold">{{ $t('admin.bookings.selectDate') }}</label>
-            <input type="date" v-model="selectedDateFilter" class="form-control">
+            <input type="date" v-model="selectedDateFilter" class="form-control" />
           </div>
         </div>
       </div>
@@ -44,9 +44,18 @@
           <input
             type="text"
             class="form-control"
-:placeholder="$t('admin.bookings.search')"
+            :placeholder="$t('admin.bookings.search')"
             v-model="searchQuery"
           />
+          <button
+            v-if="searchQuery"
+            class="btn btn-outline-secondary"
+            type="button"
+            @click="clearSearch"
+            title="Clear search"
+          >
+            <i class="bi bi-x"> </i>
+          </button>
         </div>
       </div>
       <div class="col-md-6 text-end">
@@ -107,7 +116,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(booking, index) in paginatedBookings" :key="booking.id || `${booking.date}-${booking.time}-${booking.name}-${booking.phone}-${index}`">
+          <tr
+            v-for="(booking, index) in paginatedBookings"
+            :key="
+              booking.id ||
+              `${booking.date}-${booking.time}-${booking.name}-${booking.phone}-${index}`
+            "
+          >
             <td class="text-muted small">
               {{ formatTimestamp(booking.timestamp) }}
             </td>
@@ -123,23 +138,20 @@
             <td>{{ formatDate(booking.date) }}</td>
             <td class="fw-medium">{{ booking.time || 'N/A' }}</td>
             <td>
-              <span 
-                class="badge"
-                :class="getStatusBadgeClass(booking.status)"
-              >
+              <span class="badge" :class="getStatusBadgeClass(booking.status)">
                 {{ getStatusText(booking.status) }}
               </span>
             </td>
             <td>
               <div class="btn-group btn-group-sm" role="group">
-                <button 
+                <button
                   class="btn btn-outline-primary"
                   @click="editBooking(booking)"
                   title="Edit booking"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button 
+                <button
                   class="btn btn-outline-danger"
                   @click="deleteBooking(booking)"
                   title="Delete booking"
@@ -156,7 +168,13 @@
       <nav v-if="totalPages > 1" class="mt-4">
         <div class="d-flex justify-content-between align-items-center">
           <div class="text-muted">
-            {{ $t('admin.bookings.showing', { start: startItem, end: endItem, total: filteredBookings.length }) }}
+            {{
+              $t('admin.bookings.showing', {
+                start: startItem,
+                end: endItem,
+                total: filteredBookings.length,
+              })
+            }}
           </div>
           <ul class="pagination pagination-sm mb-0">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -169,9 +187,9 @@
                 {{ $t('admin.bookings.previous') }}
               </button>
             </li>
-            
-            <li 
-              v-for="page in visiblePages" 
+
+            <li
+              v-for="page in visiblePages"
               :key="page"
               class="page-item"
               :class="{ active: page === currentPage }"
@@ -180,14 +198,22 @@
                 {{ page }}
               </button>
             </li>
-            
+
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-              <button class="page-link" @click="currentPage++" :disabled="currentPage === totalPages">
+              <button
+                class="page-link"
+                @click="currentPage++"
+                :disabled="currentPage === totalPages"
+              >
                 {{ $t('admin.bookings.next') }}
               </button>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-              <button class="page-link" @click="currentPage = totalPages" :disabled="currentPage === totalPages">
+              <button
+                class="page-link"
+                @click="currentPage = totalPages"
+                :disabled="currentPage === totalPages"
+              >
                 {{ $t('admin.bookings.last') }}
               </button>
             </li>
@@ -230,69 +256,67 @@ const filteredBookings = computed(() => {
   if (!bookingStore.bookedSlots || !Array.isArray(bookingStore.bookedSlots)) {
     return []
   }
-  
+
   let bookings = [...bookingStore.bookedSlots]
-  
+
   // Apply filters
   if (locationFilter.value) {
-    bookings = bookings.filter(b => b.location === locationFilter.value)
+    bookings = bookings.filter((b) => b.location === locationFilter.value)
   }
-  
+
   if (statusFilter.value) {
-    bookings = bookings.filter(b => (b.status || 'Pending') === statusFilter.value)
+    bookings = bookings.filter((b) => (b.status || 'Pending') === statusFilter.value)
   }
-  
+
   if (selectedDateFilter.value) {
-    bookings = bookings.filter(b => {
+    bookings = bookings.filter((b) => {
       const bookingDate = convertDateToComparable(b.date)
       const filterDate = convertDateToComparable(selectedDateFilter.value, true)
-      const result = bookingDate === filterDate
-      console.log(`Date Filter: booking "${b.date}" (${new Date(bookingDate).toLocaleDateString()}) === filter "${selectedDateFilter.value}" (${new Date(filterDate).toLocaleDateString()}) = ${result}`)
-      return result
+      return bookingDate === filterDate
     })
   }
-  
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    bookings = bookings.filter(b => {
+    bookings = bookings.filter((b) => {
       const name = (b.name || '').toString().toLowerCase()
       const phone = (b.phone || '').toString().toLowerCase()
       return name.includes(query) || phone.includes(query)
     })
   }
-  
+
   // Apply sorting
   bookings.sort((a, b) => {
     let aVal = a[sortField.value] || ''
     let bVal = b[sortField.value] || ''
-    
+
     // Handle special cases
     if (sortField.value === 'date') {
       aVal = convertDateToComparable(aVal)
       bVal = convertDateToComparable(bVal)
     }
-    
+
     if (sortField.value === 'time') {
       aVal = convertTimeToComparable(aVal)
       bVal = convertTimeToComparable(bVal)
     }
-    
+
     if (sortField.value === 'timestamp' && aVal && bVal) {
       aVal = new Date(aVal)
       bVal = new Date(bVal)
     }
-    
+
     // Handle string comparison
     if (typeof aVal === 'string' && typeof bVal === 'string') {
       aVal = aVal.toLowerCase()
       bVal = bVal.toLowerCase()
     }
-    
+
     if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1
     if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1
     return 0
   })
-  
+
   return bookings
 })
 
@@ -317,7 +341,7 @@ const visiblePages = computed(() => {
   const pages = []
   const total = totalPages.value
   const current = currentPage.value
-  
+
   if (total <= 7) {
     for (let i = 1; i <= total; i++) {
       pages.push(i)
@@ -339,14 +363,14 @@ const visiblePages = computed(() => {
       pages.push(total)
     }
   }
-  
+
   return pages
 })
 
 // Helper functions
 const convertDateToComparable = (dateStr, isYMD = false) => {
   if (!dateStr) return 0
-  
+
   try {
     if (isYMD) {
       // YYYY-MM-DD format (from HTML date input)
@@ -382,11 +406,11 @@ const formatDate = (dateStr) => {
     const [day, month, year] = dateStr.split('/')
     if (!day || !month || !year) return 'N/A'
     const date = new Date(year, month - 1, day)
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     })
   } catch (error) {
     console.warn('Date formatting error:', error, 'for date:', dateStr)
@@ -396,7 +420,7 @@ const formatDate = (dateStr) => {
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return 'N/A'
-  
+
   try {
     const date = new Date(timestamp)
     return date.toLocaleDateString('en-US', {
@@ -404,7 +428,7 @@ const formatTimestamp = (timestamp) => {
       day: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   } catch {
     return timestamp
@@ -413,23 +437,16 @@ const formatTimestamp = (timestamp) => {
 
 const getStatusBadgeClass = (status) => {
   const statusClass = {
-    'Pending': 'bg-warning text-dark',
-    'Confirmed': 'bg-success',
-    'Completed': 'bg-primary',
-    'Cancelled': 'bg-danger'
+    Pending: 'bg-warning text-dark',
+    Confirmed: 'bg-success',
+    Completed: 'bg-primary',
+    Cancelled: 'bg-danger',
   }
   return statusClass[status] || 'bg-warning text-dark'
 }
 
 const getStatusText = (status) => {
-  const currentStatus = status || 'Pending'
-  const statusMap = {
-    'Pending': $t('admin.bookings.statuses.pending'),
-    'Confirmed': $t('admin.bookings.statuses.confirmed'),
-    'Completed': $t('admin.bookings.statuses.completed'),
-    'Cancelled': $t('admin.bookings.statuses.cancelled')
-  }
-  return statusMap[currentStatus] || $t('admin.bookings.statuses.pending')
+  return status || 'Pending'
 }
 
 const getSortIcon = (field) => {
@@ -453,6 +470,10 @@ const resetFilters = () => {
   selectedDateFilter.value = ''
   searchQuery.value = ''
   currentPage.value = 1
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
 }
 
 const refreshData = async () => {
@@ -536,15 +557,30 @@ const deleteBooking = (booking) => {
   border-color: #ced4da;
 }
 
+.input-group .btn:last-child {
+  border-left: none;
+}
+
+.input-group .btn-outline-secondary {
+  border-color: #ced4da;
+}
+
+.input-group .btn-outline-secondary:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #495057;
+}
+
 @media (max-width: 768px) {
   .table-responsive {
     font-size: 0.8rem;
   }
-  
-  .table td, .table th {
+
+  .table td,
+  .table th {
     padding: 0.5rem 0.25rem;
   }
-  
+
   .btn-group-sm .btn {
     padding: 0.125rem 0.25rem;
   }
