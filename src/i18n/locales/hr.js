@@ -190,7 +190,13 @@ export default {
         confirmed: 'Potvrđeno',
         completed: 'Završeno',
         cancelled: 'Otkazano'
-      }
+      },
+      locations: {
+        allLocations: 'Sve lokacije',
+        downtown: 'Centar',
+        podil: 'Podil'
+      },
+      allStatus: 'Svi statusni'
     }
   }
 }

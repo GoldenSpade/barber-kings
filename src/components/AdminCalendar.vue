@@ -53,7 +53,7 @@
             :disabled="isLoading"
           >
             <i class="bi bi-arrow-clockwise me-1" :class="{ 'spin': isLoading }"></i>
-            {{ isLoading ? $t('admin.calendar.loading') : 'Refresh' }}
+            {{ isLoading ? $t('admin.calendar.loading') : $t('admin.bookings.refresh') }}
           </button>
           <div class="legend d-inline-flex align-items-center">
             <div class="legend-item me-3">

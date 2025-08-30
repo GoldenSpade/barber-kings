@@ -5,21 +5,21 @@
       <div class="col-md-6">
         <div class="row">
           <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">Filter by Location:</label>
+            <label class="form-label fw-bold">{{ $t('admin.bookings.filterLocation') }}</label>
             <select v-model="locationFilter" class="form-select">
-              <option value="">All Locations</option>
+              <option value="">{{ $t('admin.bookings.locations.allLocations') }}</option>
               <option value="downtown">Downtown</option>
-              <option value="podil">Podil</option>
+              <option value="podil">{{ $t('admin.bookings.locations.podil') }}</option>
             </select>
           </div>
           <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">Filter by Status:</label>
+            <label class="form-label fw-bold">{{ $t('admin.bookings.filterStatus') }}</label>
             <select v-model="statusFilter" class="form-select">
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="">{{ $t('admin.bookings.allStatus') }}</option>
+              <option value="Pending">{{ $t('admin.bookings.statuses.pending') }}</option>
+              <option value="Confirmed">{{ $t('admin.bookings.statuses.confirmed') }}</option>
+              <option value="Completed">{{ $t('admin.bookings.statuses.completed') }}</option>
+              <option value="Cancelled">{{ $t('admin.bookings.statuses.cancelled') }}</option>
             </select>
           </div>
         </div>
@@ -27,11 +27,11 @@
       <div class="col-md-6">
         <div class="row">
           <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">Date From:</label>
+            <label class="form-label fw-bold">{{ $t('admin.bookings.dateFrom') }}</label>
             <input type="date" v-model="dateFromFilter" class="form-control">
           </div>
           <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">Date To:</label>
+            <label class="form-label fw-bold">{{ $t('admin.bookings.dateTo') }}</label>
             <input type="date" v-model="dateToFilter" class="form-control">
           </div>
         </div>
@@ -48,7 +48,7 @@
           <input
             type="text"
             class="form-control"
-            placeholder="Search by name or phone..."
+:placeholder="$t('admin.bookings.search')"
             v-model="searchQuery"
           />
         </div>
@@ -58,7 +58,7 @@
           <i class="bi bi-arrow-clockwise me-2"></i>Reset Filters
         </button>
         <button class="btn btn-success ms-2" @click="refreshData">
-          <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+          <i class="bi bi-arrow-clockwise me-2"></i>{{ $t('admin.bookings.refresh') }}
         </button>
       </div>
     </div>
@@ -80,38 +80,38 @@
         <thead class="table-light">
           <tr>
             <th @click="sortBy('timestamp')" class="sortable">
-              <i class="bi bi-clock me-1"></i>Timestamp
+              <i class="bi bi-clock me-1"></i>{{ $t('admin.bookings.timestamp') }}
               <i :class="getSortIcon('timestamp')"></i>
             </th>
             <th @click="sortBy('name')" class="sortable">
-              <i class="bi bi-person me-1"></i>Name
+              <i class="bi bi-person me-1"></i>{{ $t('admin.bookings.name') }}
               <i :class="getSortIcon('name')"></i>
             </th>
             <th @click="sortBy('phone')" class="sortable">
-              <i class="bi bi-telephone me-1"></i>Phone
+              <i class="bi bi-telephone me-1"></i>{{ $t('admin.bookings.phone') }}
               <i :class="getSortIcon('phone')"></i>
             </th>
             <th @click="sortBy('location')" class="sortable">
-              <i class="bi bi-geo-alt me-1"></i>Location
+              <i class="bi bi-geo-alt me-1"></i>{{ $t('admin.bookings.location') }}
               <i :class="getSortIcon('location')"></i>
             </th>
             <th @click="sortBy('date')" class="sortable">
-              <i class="bi bi-calendar me-1"></i>Date
+              <i class="bi bi-calendar me-1"></i>{{ $t('admin.bookings.date') }}
               <i :class="getSortIcon('date')"></i>
             </th>
             <th @click="sortBy('time')" class="sortable">
-              <i class="bi bi-clock me-1"></i>Time
+              <i class="bi bi-clock me-1"></i>{{ $t('admin.bookings.time') }}
               <i :class="getSortIcon('time')"></i>
             </th>
             <th @click="sortBy('status')" class="sortable">
-              <i class="bi bi-flag me-1"></i>Status
+              <i class="bi bi-flag me-1"></i>{{ $t('admin.bookings.status') }}
               <i :class="getSortIcon('status')"></i>
             </th>
-            <th>Actions</th>
+            <th>{{ $t('admin.bookings.actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="booking in paginatedBookings" :key="booking.id || `${booking.date}-${booking.time}-${booking.name}`">
+          <tr v-for="(booking, index) in paginatedBookings" :key="booking.id || `${booking.date}-${booking.time}-${booking.name}-${booking.phone}-${index}`">
             <td class="text-muted small">
               {{ formatTimestamp(booking.timestamp) }}
             </td>
@@ -131,7 +131,7 @@
                 class="badge"
                 :class="getStatusBadgeClass(booking.status)"
               >
-                {{ booking.status || 'Pending' }}
+                {{ getStatusText(booking.status) }}
               </span>
             </td>
             <td>
@@ -207,8 +207,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
+
+const { t: $t } = useI18n()
 
 const bookingStore = useBookingStore()
 
@@ -403,6 +406,17 @@ const getStatusBadgeClass = (status) => {
   return statusClass[status] || 'bg-warning text-dark'
 }
 
+const getStatusText = (status) => {
+  const currentStatus = status || 'Pending'
+  const statusMap = {
+    'Pending': $t('admin.bookings.statuses.pending'),
+    'Confirmed': $t('admin.bookings.statuses.confirmed'),
+    'Completed': $t('admin.bookings.statuses.completed'),
+    'Cancelled': $t('admin.bookings.statuses.cancelled')
+  }
+  return statusMap[currentStatus] || $t('admin.bookings.statuses.pending')
+}
+
 const getSortIcon = (field) => {
   if (sortField.value !== field) return 'bi bi-arrow-down-up text-muted'
   return sortOrder.value === 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'
@@ -494,6 +508,7 @@ const deleteBooking = (booking) => {
 .pagination .page-item.active .page-link {
   background-color: #2c3e33;
   border-color: #2c3e33;
+  color: white !important;
 }
 
 .pagination .page-link:hover {

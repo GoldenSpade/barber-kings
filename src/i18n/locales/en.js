@@ -190,7 +190,13 @@ export default {
         confirmed: 'Confirmed',
         completed: 'Completed',
         cancelled: 'Cancelled'
-      }
+      },
+      locations: {
+        allLocations: 'All Locations',
+        downtown: 'Downtown',
+        podil: 'Podil'
+      },
+      allStatus: 'All Status'
     }
   }
 }
