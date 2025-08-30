@@ -158,7 +158,7 @@ export default {
       resetForm: 'Reset Form',
       successMessage: 'Booking added successfully!',
       errorMessage: 'Failed to add booking. Please try again.',
-      occupied: '(Occupied)'
+      occupied: 'Occupied'
     },
     bookings: {
       title: 'All Bookings',

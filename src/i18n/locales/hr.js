@@ -158,7 +158,7 @@ export default {
       resetForm: 'Resetiraj formu',
       successMessage: 'Rezervacija je uspješno dodana!',
       errorMessage: 'Dodavanje rezervacije nije uspjelo. Molimo pokušajte ponovno.',
-      occupied: '(Zauzeto)'
+      occupied: 'Zauzeto'
     },
     bookings: {
       title: 'Sve rezervacije',

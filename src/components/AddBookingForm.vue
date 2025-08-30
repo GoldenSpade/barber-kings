@@ -89,8 +89,9 @@
                       :key="slot"
                       :value="slot"
                       :disabled="isSlotBooked(slot)"
+                      :class="{ 'text-muted': isSlotBooked(slot) }"
                     >
-                      {{ slot }} {{ isSlotBooked(slot) ? $t('admin.addBooking.occupied') : '' }}
+                      {{ slot }}{{ isSlotBooked(slot) ? ' (' + $t('admin.addBooking.occupied') + ')' : '' }}
                     </option>
                   </select>
                 </div>
@@ -177,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
@@ -235,11 +236,21 @@ const isSlotBooked = (slot) => {
   const [year, month, day] = form.value.date.split('-')
   const formattedDate = `${day}/${month}/${year}`
   
-  return bookingStore.bookedSlots.some(booking => 
-    booking.date === formattedDate && 
-    booking.time === slot && 
-    booking.location === form.value.location
-  )
+  // Normalize location names for comparison
+  const normalizeLocation = (location) => {
+    if (location === 'downtown' || location === 'Downtown Barber Kings') return 'downtown'
+    if (location === 'podil' || location === 'Barber Kings Podil') return 'podil'
+    return location.toLowerCase()
+  }
+  
+  const currentLocation = normalizeLocation(form.value.location)
+  
+  return bookingStore.bookedSlots.some(booking => {
+    const bookingLocation = normalizeLocation(booking.location || '')
+    return booking.date === formattedDate && 
+           booking.time === slot && 
+           bookingLocation === currentLocation
+  })
 }
 
 // Form validation
@@ -277,16 +288,28 @@ const handleSubmit = async () => {
     
     if (GOOGLE_SCRIPT_URL) {
       // Используем JSONP для обхода CORS ограничений
-      const callbackName = 'addBooking_' + Date.now()
+      const callbackName = 'addBooking_' + Date.now() + '_' + Math.random().toString(36).substring(7)
       
       return new Promise((resolve, reject) => {
+        // Очищаем возможные старые callback функции
+        Object.keys(window).forEach(key => {
+          if (key.startsWith('addBooking_') && typeof window[key] === 'function') {
+            delete window[key]
+          }
+        })
+        
         // Создаем глобальную callback функцию
         window[callbackName] = function(data) {
           // Очищаем script элемент
-          document.head.removeChild(script)
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
           delete window[callbackName]
           
           if (data.success) {
+            // Reset form fields first
+            resetFormFields()
+            // Then show success message
             showMessage($t('admin.addBooking.successMessage'), 'success')
             resolve()
           } else {
@@ -310,25 +333,40 @@ const handleSubmit = async () => {
         
         script.src = `${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`
         script.onerror = () => {
-          document.head.removeChild(script)
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
           delete window[callbackName]
           showMessage($t('admin.addBooking.errorMessage'), 'error')
           reject(new Error('JSONP request failed'))
         }
+        
+        // Добавляем timeout для очистки
+        setTimeout(() => {
+          if (window[callbackName]) {
+            if (script && script.parentNode) {
+              document.head.removeChild(script)
+            }
+            delete window[callbackName]
+            reject(new Error('Request timeout'))
+          }
+        }, 10000)
         
         document.head.appendChild(script)
       })
     } else {
       // Simulate adding to local state for development
       console.log('Adding booking:', bookingData)
+      // Reset form fields first
+      resetFormFields()
+      // Then show success message
       showMessage($t('admin.addBooking.successMessage'), 'success')
     }
     
-    // Refresh the bookings data with admin flag
-    await bookingStore.fetchBookedSlots(true)
-    
-    // Reset form after successful submission
-    resetForm()
+    // Refresh the bookings data with admin flag after a short delay
+    setTimeout(async () => {
+      await bookingStore.fetchBookedSlots(true)
+    }, 100)
     
   } catch (error) {
     console.error('Error adding booking:', error)
@@ -339,7 +377,7 @@ const handleSubmit = async () => {
 }
 
 // Helper functions
-const resetForm = () => {
+const resetFormFields = () => {
   form.value = {
     name: '',
     phone: '',
@@ -348,10 +386,15 @@ const resetForm = () => {
     time: '',
     status: 'Pending'
   }
+}
+
+const resetForm = () => {
+  resetFormFields()
   clearMessage()
 }
 
 const showMessage = (text, type) => {
+  console.log('Showing message:', text, 'Type:', type)
   message.value = text
   messageType.value = type
   
@@ -367,6 +410,21 @@ const clearMessage = () => {
   message.value = ''
   messageType.value = 'success'
 }
+
+// Watch for changes in date or location to clear time selection
+watch([() => form.value.date, () => form.value.location], (newValues, oldValues) => {
+  // Only clear message if this is a user interaction, not a programmatic reset
+  if (oldValues[0] && oldValues[1]) {
+    // Clear selected time when date or location changes
+    form.value.time = ''
+    clearMessage()
+  }
+})
+
+// Load booked slots when component mounts
+onMounted(async () => {
+  await bookingStore.fetchBookedSlots(true)
+})
 </script>
 
 <style scoped>
@@ -422,6 +480,15 @@ h6 i {
 
 .badge {
   font-size: 0.7em;
+}
+
+option:disabled {
+  color: #6c757d !important;
+  font-style: italic;
+}
+
+.text-muted {
+  color: #6c757d !important;
 }
 
 @media (max-width: 768px) {

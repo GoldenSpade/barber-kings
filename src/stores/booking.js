@@ -318,28 +318,48 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   // Загружаем занятые слоты из Google Таблицы
-  const fetchBookedSlots = async (isAdmin = false) => {
+  const fetchBookedSlots = async (isAdmin = false, retryCount = 0) => {
+    const MAX_RETRIES = 3
+    
     try {
       isLoadingBookedSlots.value = true
       const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
       
+      if (!GOOGLE_SCRIPT_URL) {
+        console.warn('GOOGLE_SCRIPT_URL not configured')
+        isLoadingBookedSlots.value = false
+        return
+      }
+      
       // Используем JSONP для обхода CORS
-      const callbackName = 'jsonp_callback_' + Date.now()
+      const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substring(7)
       
       return new Promise((resolve, reject) => {
+        // Очищаем возможные старые callback функции только если это первая попытка
+        if (retryCount === 0) {
+          Object.keys(window).forEach(key => {
+            if (key.startsWith('jsonp_callback_') && typeof window[key] === 'function') {
+              delete window[key]
+            }
+          })
+        }
+        
         // Создаем глобальную callback функцию
         window[callbackName] = function(data) {
           if (data.success) {
             bookedSlots.value = data.bookings
+            console.log(`Successfully loaded ${data.bookings.length} bookings`)
           } else {
             console.error('Error fetching booked slots:', data.message)
           }
           
           // Очищаем
-          document.head.removeChild(script)
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
           delete window[callbackName]
           isLoadingBookedSlots.value = false
-          resolve()
+          resolve(data)
         }
         
         // Создаем script элемент
@@ -348,19 +368,63 @@ export const useBookingStore = defineStore('booking', () => {
         const adminParam = isAdmin ? '&admin=true' : ''
         const requestUrl = `${GOOGLE_SCRIPT_URL}?callback=${callbackName}${adminParam}`
         script.src = requestUrl
-        script.onerror = () => {
-          document.head.removeChild(script)
+        
+        script.onerror = async () => {
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
           delete window[callbackName]
-          isLoadingBookedSlots.value = false
-          console.error('Error loading booked slots via JSONP')
-          reject(new Error('JSONP request failed'))
+          
+          // Повторная попытка при ошибке
+          if (retryCount < MAX_RETRIES) {
+            console.log(`JSONP request failed, retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+            setTimeout(async () => {
+              try {
+                const result = await fetchBookedSlots(isAdmin, retryCount + 1)
+                resolve(result)
+              } catch (error) {
+                reject(error)
+              }
+            }, 1000 * (retryCount + 1)) // Увеличиваем задержку с каждой попыткой
+          } else {
+            isLoadingBookedSlots.value = false
+            console.error('Error loading booked slots via JSONP after all retries')
+            reject(new Error('JSONP request failed after retries'))
+          }
         }
+        
+        // Добавляем timeout для очистки
+        setTimeout(() => {
+          if (window[callbackName]) {
+            if (script && script.parentNode) {
+              document.head.removeChild(script)
+            }
+            delete window[callbackName]
+            
+            // Повторная попытка при timeout
+            if (retryCount < MAX_RETRIES) {
+              console.log(`Request timeout, retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+              setTimeout(async () => {
+                try {
+                  const result = await fetchBookedSlots(isAdmin, retryCount + 1)
+                  resolve(result)
+                } catch (error) {
+                  reject(error)
+                }
+              }, 1000 * (retryCount + 1))
+            } else {
+              isLoadingBookedSlots.value = false
+              reject(new Error('Request timeout after retries'))
+            }
+          }
+        }, 8000) // Сократили timeout до 8 секунд
         
         document.head.appendChild(script)
       })
     } catch (error) {
       console.error('Error fetching booked slots:', error)
       isLoadingBookedSlots.value = false
+      throw error
     }
   }
 

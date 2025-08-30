@@ -47,6 +47,14 @@
           </select>
         </div>
         <div class="col-md-6 text-end mt-3 mt-md-0">
+          <button 
+            class="btn btn-outline-primary btn-sm me-3" 
+            @click="refreshBookings"
+            :disabled="isLoading"
+          >
+            <i class="bi bi-arrow-clockwise me-1" :class="{ 'spin': isLoading }"></i>
+            {{ isLoading ? $t('admin.calendar.loading') : 'Refresh' }}
+          </button>
           <div class="legend d-inline-flex align-items-center">
             <div class="legend-item me-3">
               <span class="legend-color occupied"></span>
@@ -311,6 +319,18 @@ const getLocationName = (locationKey) => {
   return locationMap[locationKey] || locationKey
 }
 
+// Loading state
+const isLoading = computed(() => bookingStore.isLoadingBookedSlots)
+
+// Refresh bookings
+const refreshBookings = async () => {
+  try {
+    await bookingStore.fetchBookedSlots(true)
+  } catch (error) {
+    console.error('Failed to refresh bookings:', error)
+  }
+}
+
 // Copy phone number to clipboard
 const copyPhoneToClipboard = async (phone) => {
   if (!phone || phone === 'undefined') {
@@ -504,6 +524,15 @@ const copyPhoneToClipboard = async (phone) => {
 .btn-nav-arrow:disabled {
   color: #dee2e6;
   cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .btn-outline-secondary {
