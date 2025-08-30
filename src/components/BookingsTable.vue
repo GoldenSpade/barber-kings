@@ -27,12 +27,8 @@
       <div class="col-md-6">
         <div class="row">
           <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">{{ $t('admin.bookings.dateFrom') }}</label>
-            <input type="date" v-model="dateFromFilter" class="form-control">
-          </div>
-          <div class="col-sm-6 mb-3">
-            <label class="form-label fw-bold">{{ $t('admin.bookings.dateTo') }}</label>
-            <input type="date" v-model="dateToFilter" class="form-control">
+            <label class="form-label fw-bold">{{ $t('admin.bookings.selectDate') }}</label>
+            <input type="date" v-model="selectedDateFilter" class="form-control">
           </div>
         </div>
       </div>
@@ -218,8 +214,7 @@ const bookingStore = useBookingStore()
 // Filters
 const locationFilter = ref('')
 const statusFilter = ref('')
-const dateFromFilter = ref('')
-const dateToFilter = ref('')
+const selectedDateFilter = ref('')
 const searchQuery = ref('')
 
 // Sorting
@@ -247,19 +242,13 @@ const filteredBookings = computed(() => {
     bookings = bookings.filter(b => (b.status || 'Pending') === statusFilter.value)
   }
   
-  if (dateFromFilter.value) {
+  if (selectedDateFilter.value) {
     bookings = bookings.filter(b => {
       const bookingDate = convertDateToComparable(b.date)
-      const filterDate = convertDateToComparable(dateFromFilter.value, true)
-      return bookingDate >= filterDate
-    })
-  }
-  
-  if (dateToFilter.value) {
-    bookings = bookings.filter(b => {
-      const bookingDate = convertDateToComparable(b.date)
-      const filterDate = convertDateToComparable(dateToFilter.value, true)
-      return bookingDate <= filterDate
+      const filterDate = convertDateToComparable(selectedDateFilter.value, true)
+      const result = bookingDate === filterDate
+      console.log(`Date Filter: booking "${b.date}" (${new Date(bookingDate).toLocaleDateString()}) === filter "${selectedDateFilter.value}" (${new Date(filterDate).toLocaleDateString()}) = ${result}`)
+      return result
     })
   }
   
@@ -351,13 +340,20 @@ const visiblePages = computed(() => {
 const convertDateToComparable = (dateStr, isYMD = false) => {
   if (!dateStr) return 0
   
-  if (isYMD) {
-    // YYYY-MM-DD format
-    return new Date(dateStr).getTime()
-  } else {
-    // DD/MM/YYYY format
-    const [day, month, year] = dateStr.split('/')
-    return new Date(year, month - 1, day).getTime()
+  try {
+    if (isYMD) {
+      // YYYY-MM-DD format (from HTML date input)
+      const date = new Date(dateStr + 'T00:00:00')
+      return date.getTime()
+    } else {
+      // DD/MM/YYYY format (from booking data)
+      const [day, month, year] = dateStr.split('/')
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+      return date.getTime()
+    }
+  } catch (error) {
+    console.error('Date conversion error:', error, 'for date:', dateStr)
+    return 0
   }
 }
 
@@ -435,8 +431,7 @@ const sortBy = (field) => {
 const resetFilters = () => {
   locationFilter.value = ''
   statusFilter.value = ''
-  dateFromFilter.value = ''
-  dateToFilter.value = ''
+  selectedDateFilter.value = ''
   searchQuery.value = ''
   currentPage.value = 1
 }
