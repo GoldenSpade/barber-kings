@@ -6,7 +6,15 @@ const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
 
 function doGet(e) {
   try {
-    // Проверяем, запрашиваются ли данные для админки
+    // Проверяем действие
+    const action = e.parameter.action
+    
+    if (action === 'add') {
+      // Обрабатываем добавление новой записи через GET (для обхода CORS)
+      return handleAddBooking(e)
+    }
+    
+    // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
     
     // Открываем таблицу
@@ -87,6 +95,80 @@ function doGet(e) {
   }
 }
 
+// Функция для добавления записи через GET параметры (для обхода CORS)
+function handleAddBooking(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const name = e.parameter.name
+    const phone = e.parameter.phone
+    const location = e.parameter.location
+    const date = e.parameter.date
+    const time = e.parameter.time
+    const status = e.parameter.status || 'Pending'
+    
+    // Проверяем обязательные поля
+    if (!name || !phone || !location || !date || !time) {
+      throw new Error('Missing required fields')
+    }
+    
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+    
+    // Создаем timestamp
+    const timestamp = new Date()
+    
+    // Подготавливаем данные для записи в таблицу
+    // Порядок: Timestamp, Name, Phone, Location, Date, Time, Status
+    const rowData = [
+      timestamp, // A - Timestamp (автоматический)
+      name, // B - Name
+      phone, // C - Phone
+      location, // D - Location
+      "'" + date, // E - Date (с апострофом для принудительного текстового формата)
+      "'" + time, // F - Time (с апострофом для принудительного текстового формата)
+      status, // G - Status
+    ]
+    
+    // Добавляем строку в конец таблицы
+    sheet.appendRow(rowData)
+    
+    const result = {
+      success: true,
+      message: 'Booking added successfully'
+    }
+    
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(result) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON)
+      
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error adding booking: ' + error.toString()
+    }
+    
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(errorResult) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify(errorResult))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
 function doPost(e) {
   try {
     // Получаем данные из POST запроса
@@ -101,6 +183,7 @@ function doPost(e) {
     // Дата и время уже отформатированы на фронтенде в стандартном формате
     const dateString = data.date    // DD/MM/YYYY
     const timeString = data.time    // HH:MM
+    const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
 
     // Подготавливаем данные для записи в таблицу
     // Порядок: Timestamp, Name, Phone, Location, Date, Time, Status
@@ -111,7 +194,7 @@ function doPost(e) {
       data.location, // D - Location
       "'" + dateString, // E - Date (с апострофом для принудительного текстового формата)
       "'" + timeString, // F - Time (с апострофом для принудительного текстового формата)
-      'Pending', // G - Status (по умолчанию "Pending")
+      status, // G - Status (из формы или "Pending")
     ]
 
     // Добавляем строку в конец таблицы

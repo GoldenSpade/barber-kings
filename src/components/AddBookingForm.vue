@@ -273,22 +273,51 @@ const handleSubmit = async () => {
       status: form.value.status
     }
     
-    // Here you would call an API to add the booking
-    // For now, we'll simulate the process
     const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
     
     if (GOOGLE_SCRIPT_URL) {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData),
-        mode: 'no-cors'
-      })
+      // Используем JSONP для обхода CORS ограничений
+      const callbackName = 'addBooking_' + Date.now()
       
-      // With no-cors, we assume success
-      showMessage($t('admin.addBooking.successMessage'), 'success')
+      return new Promise((resolve, reject) => {
+        // Создаем глобальную callback функцию
+        window[callbackName] = function(data) {
+          // Очищаем script элемент
+          document.head.removeChild(script)
+          delete window[callbackName]
+          
+          if (data.success) {
+            showMessage($t('admin.addBooking.successMessage'), 'success')
+            resolve()
+          } else {
+            showMessage($t('admin.addBooking.errorMessage') + ': ' + data.message, 'error')
+            reject(new Error(data.message))
+          }
+        }
+        
+        // Создаем script элемент для JSONP запроса
+        const script = document.createElement('script')
+        const queryParams = new URLSearchParams({
+          callback: callbackName,
+          action: 'add',
+          name: bookingData.name,
+          phone: bookingData.phone,
+          location: bookingData.location,
+          date: bookingData.date,
+          time: bookingData.time,
+          status: bookingData.status
+        })
+        
+        script.src = `${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`
+        script.onerror = () => {
+          document.head.removeChild(script)
+          delete window[callbackName]
+          showMessage($t('admin.addBooking.errorMessage'), 'error')
+          reject(new Error('JSONP request failed'))
+        }
+        
+        document.head.appendChild(script)
+      })
     } else {
       // Simulate adding to local state for development
       console.log('Adding booking:', bookingData)
