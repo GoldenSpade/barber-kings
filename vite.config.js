@@ -20,12 +20,11 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     plugins,
-    base: '/barber-kings/',
+    // base: '/barber-kings/',
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    // base: '/barber-kings/',
   }
 })
