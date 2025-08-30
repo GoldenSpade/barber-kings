@@ -22,11 +22,17 @@
                 <input
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': v$.name.$error }"
                   v-model="form.name"
                   :placeholder="$t('admin.addBooking.enterName')"
-                  required
                   :disabled="isSubmitting"
+                  @blur="v$.name.$touch"
                 />
+                <div v-if="v$.name.$error" class="invalid-feedback">
+                  <div v-for="error in v$.name.$errors" :key="error.$uid">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
 
               <div class="mb-3">
@@ -34,11 +40,17 @@
                 <input
                   type="tel"
                   class="form-control"
+                  :class="{ 'is-invalid': v$.phone.$error }"
                   v-model="form.phone"
                   :placeholder="$t('admin.addBooking.enterPhone')"
-                  required
                   :disabled="isSubmitting"
+                  @blur="v$.phone.$touch"
                 />
+                <div v-if="v$.phone.$error" class="invalid-feedback">
+                  <div v-for="error in v$.phone.$errors" :key="error.$uid">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -52,14 +64,20 @@
                 <label class="form-label">{{ $t('admin.addBooking.location') }} *</label>
                 <select
                   class="form-select"
+                  :class="{ 'is-invalid': v$.location.$error }"
                   v-model="form.location"
-                  required
                   :disabled="isSubmitting"
+                  @blur="v$.location.$touch"
                 >
                   <option value="">{{ $t('admin.addBooking.selectLocation') }}</option>
                   <option value="downtown">Downtown Barber Kings</option>
                   <option value="podil">Barber Kings Podil</option>
                 </select>
+                <div v-if="v$.location.$error" class="invalid-feedback">
+                  <div v-for="error in v$.location.$errors" :key="error.$uid">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
 
               <div class="row">
@@ -68,21 +86,28 @@
                   <input
                     type="date"
                     class="form-control"
+                    :class="{ 'is-invalid': v$.date.$error }"
                     v-model="form.date"
                     :min="minDate"
                     :max="maxDate"
-                    required
                     :disabled="isSubmitting"
+                    @blur="v$.date.$touch"
                   />
+                  <div v-if="v$.date.$error" class="invalid-feedback">
+                    <div v-for="error in v$.date.$errors" :key="error.$uid">
+                      {{ error.$message }}
+                    </div>
+                  </div>
                 </div>
 
                 <div class="col-sm-6 mb-3">
                   <label class="form-label">{{ $t('admin.addBooking.time') }} *</label>
                   <select
                     class="form-select"
+                    :class="{ 'is-invalid': v$.time.$error }"
                     v-model="form.time"
-                    required
                     :disabled="isSubmitting || !form.date || !form.location"
+                    @blur="v$.time.$touch"
                   >
                     <option value="">{{ $t('admin.addBooking.selectTime') }}</option>
                     <option 
@@ -95,6 +120,11 @@
                       {{ slot }}{{ isSlotBooked(slot) ? ' (' + $t('admin.addBooking.occupied') + ')' : '' }}
                     </option>
                   </select>
+                  <div v-if="v$.time.$error" class="invalid-feedback">
+                    <div v-for="error in v$.time.$errors" :key="error.$uid">
+                      {{ error.$message }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -168,6 +198,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
 import Loader from '@/components/Loader.vue'
 
@@ -187,6 +219,44 @@ const form = ref({
 
 // Form state
 const isSubmitting = ref(false)
+
+// Custom phone validator
+const phoneValidator = helpers.withMessage(
+  () => $t('validation.invalidPhone'),
+  (value) => {
+    if (!value) return true // Let required handle empty values
+    // Basic phone validation - allows various formats
+    const phoneRegex = /^[\d\s\+\-\(\)]{8,20}$/
+    return phoneRegex.test(value.trim())
+  }
+)
+
+// Validation rules
+const rules = computed(() => ({
+  name: {
+    required: helpers.withMessage(() => $t('validation.nameRequired'), required),
+    minLength: helpers.withMessage(() => $t('validation.nameMinLength'), minLength(2))
+  },
+  phone: {
+    required: helpers.withMessage(() => $t('validation.phoneRequired'), required),
+    phoneValidator
+  },
+  location: {
+    required: helpers.withMessage(() => $t('validation.locationRequired'), required)
+  },
+  date: {
+    required: helpers.withMessage(() => $t('validation.dateRequired'), required)
+  },
+  time: {
+    required: helpers.withMessage(() => $t('validation.timeRequired'), required)
+  },
+  status: {
+    required: helpers.withMessage(() => $t('validation.statusRequired'), required)
+  }
+}))
+
+// Setup validation
+const v$ = useVuelidate(rules, form)
 
 // Date limits
 const minDate = computed(() => {
@@ -241,17 +311,18 @@ const isSlotBooked = (slot) => {
 
 // Form validation
 const isFormValid = computed(() => {
-  return form.value.name.trim() && 
-         form.value.phone.trim() && 
-         form.value.location && 
-         form.value.date && 
-         form.value.time &&
-         form.value.status
+  return !v$.value.$invalid && form.value.status // Only check status separately since it's not in our validation rules
 })
 
 // Submit handler
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  // Validate form first
+  const isValid = await v$.value.$validate()
+  
+  if (!isValid || !form.value.status) {
+    // Show validation errors
+    return
+  }
   
   isSubmitting.value = true
   clearMessage()
@@ -263,7 +334,7 @@ const handleSubmit = async () => {
     
     const bookingData = {
       name: form.value.name.trim(),
-      phone: form.value.phone.trim(),
+      phone: form.value.phone.trim(), // Апостроф добавляется на стороне Google Apps Script
       location: form.value.location,
       date: formattedDate,
       time: form.value.time,
@@ -372,6 +443,8 @@ const resetFormFields = () => {
     time: '',
     status: 'Pending'
   }
+  // Reset validation state
+  v$.value.$reset()
 }
 
 const resetForm = () => {

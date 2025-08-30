@@ -197,5 +197,17 @@ export default {
       },
       allStatus: 'All Status'
     }
+  },
+
+  // Validation messages
+  validation: {
+    nameRequired: 'Name is required',
+    nameMinLength: 'Name must be at least 2 characters long',
+    phoneRequired: 'Phone number is required',
+    invalidPhone: 'Please enter a valid phone number (8-20 digits, spaces, +, -, ( ) allowed)',
+    locationRequired: 'Location is required',
+    dateRequired: 'Date is required',
+    timeRequired: 'Time is required',
+    statusRequired: 'Status is required'
   }
 }

@@ -122,7 +122,7 @@ function handleAddBooking(e) {
     const rowData = [
       timestamp, // A - Timestamp (автоматический)
       name, // B - Name
-      phone, // C - Phone
+      "'" + phone, // C - Phone (с апострофом для принудительного текстового формата)
       location, // D - Location
       "'" + date, // E - Date (с апострофом для принудительного текстового формата)
       "'" + time, // F - Time (с апострофом для принудительного текстового формата)
@@ -190,7 +190,7 @@ function doPost(e) {
     const rowData = [
       timestamp, // A - Timestamp (автоматический)
       data.name, // B - Name
-      data.phone, // C - Phone
+      "'" + data.phone, // C - Phone (с апострофом для принудительного текстового формата)
       data.location, // D - Location
       "'" + dateString, // E - Date (с апострофом для принудительного текстового формата)
       "'" + timeString, // F - Time (с апострофом для принудительного текстового формата)

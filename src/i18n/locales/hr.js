@@ -197,5 +197,17 @@ export default {
       },
       allStatus: 'Svi statusni'
     }
+  },
+
+  // Validation messages
+  validation: {
+    nameRequired: 'Ime je obavezno',
+    nameMinLength: 'Ime mora imati najmanje 2 znakova',
+    phoneRequired: 'Broj telefona je obavezan',
+    invalidPhone: 'Molimo unesite valjani broj telefona (8-20 brojeva, razmaci, +, -, ( ) dozvoljeni)',
+    locationRequired: 'Lokacija je obavezna',
+    dateRequired: 'Datum je obavezan',
+    timeRequired: 'Vrijeme je obavezno',
+    statusRequired: 'Status je obavezan'
   }
 }

@@ -247,9 +247,57 @@ export const useBookingStore = defineStore('booking', () => {
     }
   }
 
+  const validateBookingForm = () => {
+    const errors = []
+    
+    // Validate name
+    if (!bookingForm.value.name?.trim()) {
+      errors.push('Name is required')
+    } else if (bookingForm.value.name.trim().length < 2) {
+      errors.push('Name must be at least 2 characters long')
+    }
+    
+    // Validate phone
+    if (!bookingForm.value.phone?.trim()) {
+      errors.push('Phone number is required')
+    } else {
+      const phoneRegex = /^[\d\s\+\-\(\)]{8,20}$/
+      if (!phoneRegex.test(bookingForm.value.phone.trim())) {
+        errors.push('Please enter a valid phone number')
+      }
+    }
+    
+    // Validate required selections
+    if (!selectedLocation.value) {
+      errors.push('Please select a location')
+    }
+    
+    if (!selectedDate.value) {
+      errors.push('Please select a date')
+    }
+    
+    if (!selectedTime.value) {
+      errors.push('Please select a time')
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    }
+  }
+
   const submitBooking = async () => {
     // URL Google Apps Script веб-приложения из .env
     const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+    
+    // Validate form before submission
+    const validation = validateBookingForm()
+    if (!validation.isValid) {
+      return {
+        success: false,
+        message: validation.errors.join(', ')
+      }
+    }
     
     isSubmittingBooking.value = true
     
@@ -267,7 +315,7 @@ export const useBookingStore = defineStore('booking', () => {
       // Подготавливаем данные для отправки
       const bookingData = {
         name: bookingForm.value.name,
-        phone: bookingForm.value.phone,
+        phone: bookingForm.value.phone, // Апостроф добавляется на стороне Google Apps Script
         location: selectedLocation.value.nameKey ? 
           selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
           selectedLocation.value.name,
@@ -310,7 +358,7 @@ export const useBookingStore = defineStore('booking', () => {
     }
   }
 
-  const resetBooking = () => {
+  const resetBooking = (resetValidation = null) => {
     currentStep.value = 1
     selectedLocation.value = null
     selectedDate.value = null
@@ -318,6 +366,11 @@ export const useBookingStore = defineStore('booking', () => {
     bookingForm.value = {
       name: '',
       phone: ''
+    }
+    
+    // Reset validation if callback provided
+    if (resetValidation && typeof resetValidation === 'function') {
+      resetValidation()
     }
   }
 
@@ -540,6 +593,7 @@ export const useBookingStore = defineStore('booking', () => {
     submitBooking,
     resetBooking,
     initializeCalendar,
-    fetchBookedSlots
+    fetchBookedSlots,
+    validateBookingForm
   }
 })

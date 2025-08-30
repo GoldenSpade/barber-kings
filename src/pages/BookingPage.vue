@@ -257,23 +257,35 @@
                   <input
                     type="text"
                     class="form-control"
+                    :class="{ 'is-invalid': v$.name.$error }"
                     v-model="bookingStore.bookingForm.name"
                     :placeholder="$t('booking.enterName')"
                     :disabled="bookingStore.isSubmittingBooking"
-                    required
+                    @blur="v$.name.$touch"
                   />
+                  <div v-if="v$.name.$error" class="invalid-feedback">
+                    <div v-for="error in v$.name.$errors" :key="error.$uid">
+                      {{ error.$message }}
+                    </div>
+                  </div>
                 </div>
 
                 <div class="mb-4">
-                  <label class="form-label">{{ $t('booking.phone') }}</label>
+                  <label class="form-label">{{ $t('booking.phone') }} *</label>
                   <input
                     type="tel"
                     class="form-control"
+                    :class="{ 'is-invalid': v$.phone.$error }"
                     v-model="bookingStore.bookingForm.phone"
                     :placeholder="$t('booking.enterPhone')"
                     :disabled="bookingStore.isSubmittingBooking"
-                    required
+                    @blur="v$.phone.$touch"
                   />
+                  <div v-if="v$.phone.$error" class="invalid-feedback">
+                    <div v-for="error in v$.phone.$errors" :key="error.$uid">
+                      {{ error.$message }}
+                    </div>
+                  </div>
                 </div>
 
                 <button
@@ -304,6 +316,8 @@
 import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
@@ -313,6 +327,32 @@ import address2 from '@/assets/address-2.jpg'
 const router = useRouter()
 const bookingStore = useBookingStore()
 const { t: $t, locale } = useI18n()
+
+// Custom phone validator
+const phoneValidator = helpers.withMessage(
+  () => $t('validation.invalidPhone'),
+  (value) => {
+    if (!value) return true // Let required handle empty values
+    // Basic phone validation - allows various formats
+    const phoneRegex = /^[\d\s\+\-\(\)]{8,20}$/
+    return phoneRegex.test(value.trim())
+  }
+)
+
+// Validation rules
+const rules = computed(() => ({
+  name: {
+    required: helpers.withMessage(() => $t('validation.nameRequired'), required),
+    minLength: helpers.withMessage(() => $t('validation.nameMinLength'), minLength(2))
+  },
+  phone: {
+    required: helpers.withMessage(() => $t('validation.phoneRequired'), required),
+    phoneValidator
+  }
+}))
+
+// Setup validation
+const v$ = useVuelidate(rules, bookingStore.bookingForm)
 
 // Location images mapping
 const locationImages = {
@@ -374,9 +414,19 @@ const goBack = () => {
 }
 
 const handleSubmitBooking = async () => {
+  // Validate form first
+  const isValid = await v$.value.$validate()
+  
+  if (!isValid) {
+    // Show validation errors
+    return
+  }
+
   try {
     const result = await bookingStore.submitBooking()
     if (result.success) {
+      // Reset validation state on successful submission
+      v$.value.$reset()
       alert(result.message)
       router.push('/')
     } else {
