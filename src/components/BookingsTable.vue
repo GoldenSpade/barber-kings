@@ -51,7 +51,7 @@
       </div>
       <div class="col-md-6 text-end">
         <button class="btn btn-outline-secondary" @click="resetFilters">
-          <i class="bi bi-arrow-clockwise me-2"></i>Reset Filters
+          <i class="bi bi-arrow-clockwise me-2"></i>{{ $t('admin.bookings.resetFilters') }}
         </button>
         <button class="btn btn-success ms-2" @click="refreshData">
           <i class="bi bi-arrow-clockwise me-2"></i>{{ $t('admin.bookings.refresh') }}
@@ -68,8 +68,8 @@
     <div v-else class="table-responsive">
       <div v-if="filteredBookings.length === 0" class="text-center py-5">
         <i class="bi bi-calendar-x display-1 text-muted"></i>
-        <h5 class="mt-3 text-muted">No bookings found</h5>
-        <p class="text-muted">Try adjusting your filters or add some bookings.</p>
+        <h5 class="mt-3 text-muted">{{ $t('admin.bookings.noBookings') }}</h5>
+        <p class="text-muted">{{ $t('admin.bookings.noBookingsText') }}</p>
       </div>
 
       <table v-else class="table table-hover">
@@ -111,17 +111,17 @@
             <td class="text-muted small">
               {{ formatTimestamp(booking.timestamp) }}
             </td>
-            <td class="fw-medium">{{ booking.name }}</td>
+            <td class="fw-medium">{{ booking.name || 'N/A' }}</td>
             <td>
-              <a :href="`tel:${booking.phone}`" class="text-decoration-none">
-                {{ booking.phone }}
+              <a :href="`tel:${booking.phone || ''}`" class="text-decoration-none">
+                {{ booking.phone || 'N/A' }}
               </a>
             </td>
             <td>
-              <span class="badge bg-info text-capitalize">{{ booking.location }}</span>
+              <span class="badge bg-info text-capitalize">{{ booking.location || 'N/A' }}</span>
             </td>
             <td>{{ formatDate(booking.date) }}</td>
-            <td class="fw-medium">{{ booking.time }}</td>
+            <td class="fw-medium">{{ booking.time || 'N/A' }}</td>
             <td>
               <span 
                 class="badge"
@@ -156,17 +156,17 @@
       <nav v-if="totalPages > 1" class="mt-4">
         <div class="d-flex justify-content-between align-items-center">
           <div class="text-muted">
-            Showing {{ startItem }} to {{ endItem }} of {{ filteredBookings.length }} bookings
+            {{ $t('admin.bookings.showing', { start: startItem, end: endItem, total: filteredBookings.length }) }}
           </div>
           <ul class="pagination pagination-sm mb-0">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
               <button class="page-link" @click="currentPage = 1" :disabled="currentPage === 1">
-                First
+                {{ $t('admin.bookings.first') }}
               </button>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
               <button class="page-link" @click="currentPage--" :disabled="currentPage === 1">
-                Previous
+                {{ $t('admin.bookings.previous') }}
               </button>
             </li>
             
@@ -183,12 +183,12 @@
             
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
               <button class="page-link" @click="currentPage++" :disabled="currentPage === totalPages">
-                Next
+                {{ $t('admin.bookings.next') }}
               </button>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
               <button class="page-link" @click="currentPage = totalPages" :disabled="currentPage === totalPages">
-                Last
+                {{ $t('admin.bookings.last') }}
               </button>
             </li>
           </ul>
@@ -254,16 +254,17 @@ const filteredBookings = computed(() => {
   
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    bookings = bookings.filter(b => 
-      b.name.toLowerCase().includes(query) || 
-      b.phone.toLowerCase().includes(query)
-    )
+    bookings = bookings.filter(b => {
+      const name = (b.name || '').toString().toLowerCase()
+      const phone = (b.phone || '').toString().toLowerCase()
+      return name.includes(query) || phone.includes(query)
+    })
   }
   
   // Apply sorting
   bookings.sort((a, b) => {
-    let aVal = a[sortField.value]
-    let bVal = b[sortField.value]
+    let aVal = a[sortField.value] || ''
+    let bVal = b[sortField.value] || ''
     
     // Handle special cases
     if (sortField.value === 'date') {
@@ -279,6 +280,12 @@ const filteredBookings = computed(() => {
     if (sortField.value === 'timestamp' && aVal && bVal) {
       aVal = new Date(aVal)
       bVal = new Date(bVal)
+    }
+    
+    // Handle string comparison
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      aVal = aVal.toLowerCase()
+      bVal = bVal.toLowerCase()
     }
     
     if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1
@@ -359,20 +366,32 @@ const convertDateToComparable = (dateStr, isYMD = false) => {
 
 const convertTimeToComparable = (timeStr) => {
   if (!timeStr) return 0
-  const [hours, minutes] = timeStr.split(':').map(Number)
-  return hours * 60 + minutes
+  try {
+    const [hours, minutes] = timeStr.split(':').map(Number)
+    if (isNaN(hours) || isNaN(minutes)) return 0
+    return hours * 60 + minutes
+  } catch (error) {
+    console.warn('Time conversion error:', error, 'for time:', timeStr)
+    return 0
+  }
 }
 
 const formatDate = (dateStr) => {
-  if (!dateStr) return ''
-  const [day, month, year] = dateStr.split('/')
-  const date = new Date(year, month - 1, day)
-  return date.toLocaleDateString('en-US', { 
-    weekday: 'short',
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  if (!dateStr) return 'N/A'
+  try {
+    const [day, month, year] = dateStr.split('/')
+    if (!day || !month || !year) return 'N/A'
+    const date = new Date(year, month - 1, day)
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  } catch (error) {
+    console.warn('Date formatting error:', error, 'for date:', dateStr)
+    return dateStr || 'N/A'
+  }
 }
 
 const formatTimestamp = (timestamp) => {
