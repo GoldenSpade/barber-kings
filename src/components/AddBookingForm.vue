@@ -2,6 +2,7 @@
   <div class="add-booking-form">
     <div class="row justify-content-center">
       <div class="col-lg-8">
+        
         <!-- Form -->
         <form @submit.prevent="handleSubmit" class="position-relative">
           <!-- Loading Overlay -->
@@ -159,19 +160,6 @@
             </button>
           </div>
         </form>
-
-        <!-- Success/Error Messages -->
-        <div v-if="message" class="mt-4">
-          <div 
-            class="alert alert-dismissible fade show"
-            :class="messageType === 'success' ? 'alert-success' : 'alert-danger'"
-            role="alert"
-          >
-            <i :class="messageType === 'success' ? 'bi bi-check-circle' : 'bi bi-exclamation-triangle'" class="me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" @click="clearMessage"></button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -199,8 +187,6 @@ const form = ref({
 
 // Form state
 const isSubmitting = ref(false)
-const message = ref('')
-const messageType = ref('success')
 
 // Date limits
 const minDate = computed(() => {
@@ -395,20 +381,18 @@ const resetForm = () => {
 
 const showMessage = (text, type) => {
   console.log('Showing message:', text, 'Type:', type)
-  message.value = text
-  messageType.value = type
   
-  // Auto-hide success messages after 5 seconds
+  // Используем alert для надежного отображения сообщений
   if (type === 'success') {
-    setTimeout(() => {
-      clearMessage()
-    }, 5000)
+    alert(`✅ ${text}`)
+  } else {
+    alert(`❌ ${text}`)
   }
 }
 
 const clearMessage = () => {
-  message.value = ''
-  messageType.value = 'success'
+  // Функция оставлена для совместимости, но больше ничего не делает
+  console.log('clearMessage called (now using alerts)')
 }
 
 // Watch for changes in date or location to clear time selection
