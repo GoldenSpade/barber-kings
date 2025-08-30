@@ -428,7 +428,7 @@ const resetFilters = () => {
 }
 
 const refreshData = async () => {
-  await bookingStore.fetchBookedSlots()
+  await bookingStore.fetchBookedSlots(true, true) // isAdmin = true, forceRefresh = true
 }
 
 const editBooking = (booking) => {

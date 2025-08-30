@@ -160,8 +160,8 @@ const changeLanguage = (lang) => {
 onMounted(async () => {
   // Initialize calendar first
   bookingStore.initializeCalendar()
-  // Then load bookings data when admin page is mounted
-  await bookingStore.fetchBookedSlots()
+  // Then load bookings data when admin page is mounted with admin privileges
+  await bookingStore.fetchBookedSlots(true) // isAdmin = true for full data access
 })
 </script>
 

@@ -325,8 +325,18 @@ export const useBookingStore = defineStore('booking', () => {
   const validateBookingsData = (bookings) => {
     if (!bookings || !Array.isArray(bookings)) return false
     
-    // Проверяем, что у записей есть основные поля
-    const validBookings = bookings.filter(booking => 
+    console.log('Validating bookings data:', bookings.length, 'records')
+    
+    // Проверяем базовые требования - должны быть хотя бы location, date, time
+    const basicValidBookings = bookings.filter(booking => 
+      booking && 
+      booking.location && 
+      booking.date && 
+      booking.time
+    )
+    
+    // Проверяем полные записи с именем и телефоном (только для админки)
+    const fullValidBookings = bookings.filter(booking => 
       booking && 
       booking.name && 
       booking.phone && 
@@ -335,10 +345,14 @@ export const useBookingStore = defineStore('booking', () => {
       booking.time
     )
     
-    const completenessRatio = validBookings.length / bookings.length
-    console.log(`Data validation: ${validBookings.length}/${bookings.length} complete bookings (${Math.round(completenessRatio * 100)}%)`)
+    const basicRatio = basicValidBookings.length / bookings.length
+    const fullRatio = fullValidBookings.length / bookings.length
     
-    return completenessRatio >= 0.8 // Считаем данные корректными если 80%+ записей полные
+    console.log(`Data validation: ${basicValidBookings.length}/${bookings.length} basic valid (${Math.round(basicRatio * 100)}%), ${fullValidBookings.length}/${bookings.length} full valid (${Math.round(fullRatio * 100)}%)`)
+    
+    // Принимаем данные если есть хотя бы базовая информация у 70%+ записей
+    // или полная информация у 50%+ записей
+    return basicRatio >= 0.7 || fullRatio >= 0.5
   }
 
   // Загружаем занятые слоты из Google Таблицы
