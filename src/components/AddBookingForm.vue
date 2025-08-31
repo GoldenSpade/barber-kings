@@ -346,6 +346,7 @@ const handleSubmit = async () => {
     )
     bookingStore.selectedDate = new Date(bookingData.date + 'T00:00:00').getTime()
     bookingStore.selectedTime = bookingData.time
+    bookingStore.selectedStatus = bookingData.status
     
     // Используем submitBooking из store (который управляет лоадером)
     const result = await bookingStore.submitBooking()

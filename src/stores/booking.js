@@ -7,6 +7,7 @@ export const useBookingStore = defineStore('booking', () => {
   const selectedLocation = ref(null)
   const selectedDate = ref(null)
   const selectedTime = ref(null)
+  const selectedStatus = ref('Pending')
   const currentWeekStart = ref(new Date())
   
   // Get user's timezone dynamically
@@ -332,7 +333,7 @@ export const useBookingStore = defineStore('booking', () => {
         location: bookingData.location,
         date: bookingData.date,
         time: bookingData.time,
-        status: 'Pending'
+        status: selectedStatus.value
       })
       
       // Используем JSONP для обхода CORS
@@ -417,6 +418,7 @@ export const useBookingStore = defineStore('booking', () => {
     selectedLocation.value = null
     selectedDate.value = null
     selectedTime.value = null
+    selectedStatus.value = 'Pending'
     bookingForm.value = {
       name: '',
       phone: ''
@@ -621,6 +623,7 @@ export const useBookingStore = defineStore('booking', () => {
     selectedLocation,
     selectedDate,
     selectedTime,
+    selectedStatus,
     currentWeekStart,
     userTimezone,
     bookingForm,
