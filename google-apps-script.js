@@ -4,6 +4,16 @@
 // ID вашей Google Таблицы (замените на свой ID)
 const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
 
+// Функция для генерации короткого ID (аналог nanoid)
+function generateShortId() {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  let result = ''
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 function doGet(e) {
   try {
     // Проверяем действие
@@ -25,28 +35,30 @@ function doGet(e) {
     const bookings = []
     
     // Начинаем с индекса 1, чтобы пропустить заголовки
+    // Новая структура: A=ID, B=Timestamp, C=Name, D=Phone, E=Location, F=Date, G=Time, H=Status
     for (let i = 1; i < data.length; i++) {
       const row = data[i]
-      // Проверяем что строка не пустая
-      if (row[1] && row[3] && row[4] && row[5]) { // Name, Location, Date, Time
+      // Проверяем что строка не пустая (ID, Name, Location, Date, Time)
+      if (row[0] && row[2] && row[4] && row[5] && row[6]) {
         if (isAdmin) {
           // Для админки возвращаем полную информацию
           bookings.push({
-            timestamp: row[0],  // Timestamp
-            name: row[1],       // Name
-            phone: row[2],      // Phone  
-            location: row[3],   // Location
-            date: row[4],       // Date  
-            time: row[5],       // Time
-            status: row[6] || 'Pending' // Status (по умолчанию Pending)
+            id: row[0],         // ID
+            timestamp: row[1],  // Timestamp
+            name: row[2],       // Name
+            phone: row[3],      // Phone  
+            location: row[4],   // Location
+            date: row[5],       // Date  
+            time: row[6],       // Time
+            status: row[7] || 'Pending' // Status (по умолчанию Pending)
           })
         } else {
           // Для обычных пользователей - только необходимые данные
           bookings.push({
-            location: row[3], // Location
-            date: row[4],     // Date  
-            time: row[5],     // Time
-            status: row[6]    // Status
+            location: row[4], // Location
+            date: row[5],     // Date  
+            time: row[6],     // Time
+            status: row[7]    // Status
           })
         }
       }
@@ -114,19 +126,23 @@ function handleAddBooking(e) {
     // Открываем таблицу
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
     
+    // Генерируем уникальный ID для заказа
+    const bookingId = generateShortId()
+    
     // Создаем timestamp
     const timestamp = new Date()
     
     // Подготавливаем данные для записи в таблицу
-    // Порядок: Timestamp, Name, Phone, Location, Date, Time, Status
+    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status
     const rowData = [
-      timestamp, // A - Timestamp (автоматический)
-      name, // B - Name
-      "'" + phone, // C - Phone (с апострофом для принудительного текстового формата)
-      location, // D - Location
-      "'" + date, // E - Date (с апострофом для принудительного текстового формата)
-      "'" + time, // F - Time (с апострофом для принудительного текстового формата)
-      status, // G - Status
+      bookingId, // A - ID (уникальный идентификатор)
+      timestamp, // B - Timestamp (автоматический)
+      name, // C - Name
+      "'" + phone, // D - Phone (с апострофом для принудительного текстового формата)
+      location, // E - Location
+      "'" + date, // F - Date (с апострофом для принудительного текстового формата)
+      "'" + time, // G - Time (с апострофом для принудительного текстового формата)
+      status, // H - Status
     ]
     
     // Добавляем строку в конец таблицы
@@ -134,7 +150,8 @@ function handleAddBooking(e) {
     
     const result = {
       success: true,
-      message: 'Booking added successfully'
+      message: 'Booking added successfully',
+      id: bookingId
     }
     
     // Поддержка JSONP
@@ -177,6 +194,9 @@ function doPost(e) {
     // Открываем таблицу
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
 
+    // Генерируем уникальный ID для заказа
+    const bookingId = generateShortId()
+
     // Создаем timestamp
     const timestamp = new Date()
 
@@ -186,25 +206,27 @@ function doPost(e) {
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
 
     // Подготавливаем данные для записи в таблицу
-    // Порядок: Timestamp, Name, Phone, Location, Date, Time, Status
+    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status
     const rowData = [
-      timestamp, // A - Timestamp (автоматический)
-      data.name, // B - Name
-      "'" + data.phone, // C - Phone (с апострофом для принудительного текстового формата)
-      data.location, // D - Location
-      "'" + dateString, // E - Date (с апострофом для принудительного текстового формата)
-      "'" + timeString, // F - Time (с апострофом для принудительного текстового формата)
-      status, // G - Status (из формы или "Pending")
+      bookingId, // A - ID (уникальный идентификатор)
+      timestamp, // B - Timestamp (автоматический)
+      data.name, // C - Name
+      "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
+      data.location, // E - Location
+      "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
+      "'" + timeString, // G - Time (с апострофом для принудительного текстового формата)
+      status, // H - Status (из формы или "Pending")
     ]
 
     // Добавляем строку в конец таблицы
     sheet.appendRow(rowData)
 
-    // Возвращаем успешный ответ
+    // Возвращаем успешный ответ с ID созданной записи
     return ContentService.createTextOutput(
       JSON.stringify({
         success: true,
         message: 'Booking saved successfully',
+        id: bookingId
       })
     ).setMimeType(ContentService.MimeType.JSON)
   } catch (error) {
@@ -224,15 +246,25 @@ function updateBookingStatus(e) {
     const data = JSON.parse(e.postData.contents)
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
     
-    // Находим строку по уникальным данным
+    // Проверяем наличие ID
+    if (!data.id) {
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          success: false,
+          message: 'Booking ID is required'
+        })
+      ).setMimeType(ContentService.MimeType.JSON)
+    }
+    
+    // Находим строку по ID
     const allData = sheet.getDataRange().getValues()
     
     for (let i = 1; i < allData.length; i++) {
       const row = allData[i]
-      // Ищем по комбинации имени, даты и времени
-      if (row[1] === data.name && row[4] === data.date && row[5] === data.time) {
-        // Обновляем статус (колонка G, индекс 6)
-        sheet.getRange(i + 1, 7).setValue(data.newStatus)
+      // Ищем по ID (колонка A, индекс 0)
+      if (row[0] === data.id) {
+        // Обновляем статус (колонка H, индекс 7)
+        sheet.getRange(i + 1, 8).setValue(data.newStatus)
         
         return ContentService.createTextOutput(
           JSON.stringify({

@@ -50,7 +50,9 @@ export default {
     successMessage: 'Thank you! Your booking has been received. We will contact you for confirmation.',
     previousWeek: 'Previous Week',
     nextWeek: 'Next Week',
-    occupied: 'Occupied'
+    occupied: 'Occupied',
+    refresh: 'Refresh',
+    loadingCalendar: 'Loading available times...'
   },
   
   // Locations

@@ -324,37 +324,91 @@ export const useBookingStore = defineStore('booking', () => {
       }
       
       
-      // Отправляем данные в Google Таблицу
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData),
-        mode: 'no-cors' // Необходимо для Google Apps Script
+      // Отправляем данные в Google Таблицу через JSONP (как GET с параметрами)
+      const params = new URLSearchParams({
+        action: 'add',
+        name: bookingData.name,
+        phone: bookingData.phone,
+        location: bookingData.location,
+        date: bookingData.date,
+        time: bookingData.time,
+        status: 'Pending'
       })
       
-      // При mode: 'no-cors' мы не можем получить response, 
-      // поэтому считаем отправку успешной
-      console.log('Booking submitted successfully')
+      // Используем JSONP для обхода CORS
+      const callbackName = `jsonp_callback_${Date.now()}_${Math.random().toString(36).substring(7)}`
       
-      // Сбрасываем форму после успешной отправки
-      resetBooking()
-      
-      return {
-        success: true,
-        message: 'Thank you! Your booking has been received. We will contact you for confirmation.'
-      }
+      return new Promise((resolve, reject) => {
+        // Создаем глобальную callback функцию
+        window[callbackName] = function(data) {
+          // Очищаем script элемент
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
+          delete window[callbackName]
+          
+          // Останавливаем лоадер
+          isSubmittingBooking.value = false
+          
+          if (data.success) {
+            console.log('Booking submitted successfully, ID:', data.id)
+            
+            // Сбрасываем форму после успешной отправки
+            resetBooking()
+            
+            // Обновляем данные с сервера для синхронизации со всеми клиентами
+            fetchBookedSlots(true, true) // isAdmin=true, forceRefresh=true
+            
+            resolve({
+              success: true,
+              message: 'Thank you! Your booking has been received. We will contact you for confirmation.',
+              id: data.id
+            })
+          } else {
+            reject(new Error(data.message || 'Unknown error occurred'))
+          }
+        }
+        
+        // Создаем script элемент
+        const script = document.createElement('script')
+        script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}&callback=${callbackName}`
+        
+        script.onerror = () => {
+          if (script && script.parentNode) {
+            document.head.removeChild(script)
+          }
+          delete window[callbackName]
+          // Останавливаем лоадер при ошибке
+          isSubmittingBooking.value = false
+          reject(new Error('Network error'))
+        }
+        
+        // Timeout для запроса
+        setTimeout(() => {
+          if (window[callbackName]) {
+            if (script && script.parentNode) {
+              document.head.removeChild(script)
+            }
+            delete window[callbackName]
+            // Останавливаем лоадер при таймауте
+            isSubmittingBooking.value = false
+            reject(new Error('Request timeout'))
+          }
+        }, 10000)
+        
+        document.head.appendChild(script)
+      })
       
     } catch (error) {
       console.error('Error submitting booking:', error)
+      
+      // Останавливаем лоадер при ошибке
+      isSubmittingBooking.value = false
       
       return {
         success: false,
         message: 'Sorry, there was an error submitting your booking. Please try again.'
       }
-    } finally {
-      isSubmittingBooking.value = false
     }
   }
 
@@ -388,9 +442,10 @@ export const useBookingStore = defineStore('booking', () => {
       booking.time
     )
     
-    // Проверяем полные записи с именем и телефоном (только для админки)
+    // Проверяем полные записи с именем, телефоном и ID (только для админки)
     const fullValidBookings = bookings.filter(booking => 
       booking && 
+      booking.id &&
       booking.name && 
       booking.phone && 
       booking.location && 

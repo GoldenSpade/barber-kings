@@ -103,32 +103,36 @@
                 class="time-slot mb-1 p-2 rounded"
                 :class="getSlotClass(day, slot)"
               >
-                <div v-if="getBookingForSlot(day, slot)" class="booking-info-vertical text-center">
+                <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center">
                   <div class="time-label fw-medium mb-1">{{ slot }}</div>
-                  <div class="customer-name text-dark fw-bold mb-1">
-                    <i class="bi bi-person-fill me-1"></i>
-                    {{ getBookingForSlot(day, slot).name }}
-                  </div>
-                  <div 
-                    class="customer-phone text-muted small phone-clickable mb-1" 
-                    @click="copyPhoneToClipboard(getBookingForSlot(day, slot).phone)"
-                    :title="$t('admin.calendar.clickToCopyPhone')"
-                  >
-                    <i class="bi bi-telephone-fill me-1"></i>
-                    {{ getBookingForSlot(day, slot).phone }}
-                    <i class="bi bi-clipboard ms-1 copy-icon"></i>
-                  </div>
-                  <div v-if="getBookingForSlot(day, slot).location" class="booking-location text-muted small mb-1">
-                    <i class="bi bi-geo-alt me-1"></i>
-                    {{ getLocationName(getBookingForSlot(day, slot).location) }}
-                  </div>
-                  <div v-if="getBookingForSlot(day, slot).status" class="booking-status">
-                    <span 
-                      class="badge" 
-                      :class="getStatusBadgeClass(getBookingForSlot(day, slot).status)"
+                  
+                  <!-- Show all bookings for this slot -->
+                  <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2" :class="{ 'border-top pt-2': index > 0 }">
+                    <div class="customer-name text-dark fw-bold mb-1">
+                      <i class="bi bi-person-fill me-1"></i>
+                      {{ booking.name }}
+                    </div>
+                    <div 
+                      class="customer-phone text-muted small phone-clickable mb-1" 
+                      @click="copyPhoneToClipboard(booking.phone)"
+                      :title="$t('admin.calendar.clickToCopyPhone')"
                     >
-                      {{ getBookingForSlot(day, slot).status }}
-                    </span>
+                      <i class="bi bi-telephone-fill me-1"></i>
+                      {{ booking.phone }}
+                      <i class="bi bi-clipboard ms-1 copy-icon"></i>
+                    </div>
+                    <div v-if="booking.location" class="booking-location text-muted small mb-1">
+                      <i class="bi bi-geo-alt me-1"></i>
+                      {{ getLocationName(booking.location) }}
+                    </div>
+                    <div v-if="booking.status" class="booking-status">
+                      <span 
+                        class="badge" 
+                        :class="getStatusBadgeClass(booking.status)"
+                      >
+                        {{ booking.status }}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div v-else class="d-flex justify-content-center align-items-center">
@@ -258,18 +262,18 @@ const nextWeek = () => {
   bookingStore.nextWeek()
 }
 
-// Get booking for specific slot
-const getBookingForSlot = (day, slot) => {
-  // Return null if data is not yet loaded
+// Get bookings for specific slot (can return multiple bookings)
+const getBookingsForSlot = (day, slot) => {
+  // Return empty array if data is not yet loaded
   if (!bookingStore.bookedSlots || !Array.isArray(bookingStore.bookedSlots) || bookingStore.bookedSlots.length === 0) {
-    return null
+    return []
   }
   
   const date = new Date(day.date)
   const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   
-  // Find booking that matches date and time
-  const booking = bookingStore.bookedSlots.find(booking => {
+  // Find all bookings that match date and time
+  const bookings = bookingStore.bookedSlots.filter(booking => {
     const matchesDate = booking.date === dateString
     const matchesTime = booking.time === slot
     
@@ -282,15 +286,21 @@ const getBookingForSlot = (day, slot) => {
     return matchesDate && matchesTime
   })
   
-  return booking
+  return bookings
+}
+
+// Get booking for specific slot (backwards compatibility - returns first booking)
+const getBookingForSlot = (day, slot) => {
+  const bookings = getBookingsForSlot(day, slot)
+  return bookings.length > 0 ? bookings[0] : null
 }
 
 // Get CSS class for time slot
 const getSlotClass = (day, slot) => {
-  const booking = getBookingForSlot(day, slot)
+  const bookings = getBookingsForSlot(day, slot)
   return {
-    'occupied': booking,
-    'available': !booking
+    'occupied': bookings.length > 0,
+    'available': bookings.length === 0
   }
 }
 
@@ -433,6 +443,14 @@ const copyPhoneToClipboard = async (phone) => {
   font-size: 0.75rem;
   width: 100%;
   padding: 0.25rem;
+}
+
+.single-booking {
+  position: relative;
+}
+
+.single-booking.border-top {
+  border-top: 1px solid rgba(0,0,0,0.1) !important;
 }
 
 .customer-name {

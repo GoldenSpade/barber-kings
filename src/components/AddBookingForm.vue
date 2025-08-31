@@ -217,8 +217,8 @@ const form = ref({
   status: 'Pending'
 })
 
-// Form state
-const isSubmitting = ref(false)
+// Form state - используем состояние из store
+const isSubmitting = computed(() => bookingStore.isSubmittingBooking)
 
 // Custom phone validator
 const phoneValidator = helpers.withMessage(
@@ -324,112 +324,47 @@ const handleSubmit = async () => {
     return
   }
   
-  isSubmitting.value = true
   clearMessage()
   
   try {
-    // Convert date format from YYYY-MM-DD to DD/MM/YYYY for Google Sheets
-    const [year, month, day] = form.value.date.split('-')
-    const formattedDate = `${day}/${month}/${year}`
-    
+    // Сначала сохраним данные формы, так как submitBooking сбросит форму
     const bookingData = {
       name: form.value.name.trim(),
-      phone: form.value.phone.trim(), // Апостроф добавляется на стороне Google Apps Script
+      phone: form.value.phone.trim(),
       location: form.value.location,
-      date: formattedDate,
+      date: form.value.date, // оставляем в формате YYYY-MM-DD, submitBooking сам конвертирует
       time: form.value.time,
       status: form.value.status
     }
     
-    const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+    // Временно заполняем store данными для submitBooking
+    bookingStore.bookingForm.name = bookingData.name
+    bookingStore.bookingForm.phone = bookingData.phone
+    bookingStore.selectedLocation = bookingStore.locations.find(loc => 
+      loc.nameKey?.replace('locations.', '').replace('.name', '') === bookingData.location || 
+      loc.name === bookingData.location
+    )
+    bookingStore.selectedDate = new Date(bookingData.date + 'T00:00:00').getTime()
+    bookingStore.selectedTime = bookingData.time
     
-    if (GOOGLE_SCRIPT_URL) {
-      // Используем JSONP для обхода CORS ограничений
-      const callbackName = 'addBooking_' + Date.now() + '_' + Math.random().toString(36).substring(7)
-      
-      return new Promise((resolve, reject) => {
-        // Очищаем возможные старые callback функции
-        Object.keys(window).forEach(key => {
-          if (key.startsWith('addBooking_') && typeof window[key] === 'function') {
-            delete window[key]
-          }
-        })
-        
-        // Создаем глобальную callback функцию
-        window[callbackName] = function(data) {
-          // Очищаем script элемент
-          if (script && script.parentNode) {
-            document.head.removeChild(script)
-          }
-          delete window[callbackName]
-          
-          if (data.success) {
-            // Reset form fields first
-            resetFormFields()
-            // Then show success message
-            showMessage($t('admin.addBooking.successMessage'), 'success')
-            resolve()
-          } else {
-            showMessage($t('admin.addBooking.errorMessage') + ': ' + data.message, 'error')
-            reject(new Error(data.message))
-          }
-        }
-        
-        // Создаем script элемент для JSONP запроса
-        const script = document.createElement('script')
-        const queryParams = new URLSearchParams({
-          callback: callbackName,
-          action: 'add',
-          name: bookingData.name,
-          phone: bookingData.phone,
-          location: bookingData.location,
-          date: bookingData.date,
-          time: bookingData.time,
-          status: bookingData.status
-        })
-        
-        script.src = `${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`
-        script.onerror = () => {
-          if (script && script.parentNode) {
-            document.head.removeChild(script)
-          }
-          delete window[callbackName]
-          showMessage($t('admin.addBooking.errorMessage'), 'error')
-          reject(new Error('JSONP request failed'))
-        }
-        
-        // Добавляем timeout для очистки
-        setTimeout(() => {
-          if (window[callbackName]) {
-            if (script && script.parentNode) {
-              document.head.removeChild(script)
-            }
-            delete window[callbackName]
-            reject(new Error('Request timeout'))
-          }
-        }, 10000)
-        
-        document.head.appendChild(script)
-      })
-    } else {
-      // Simulate adding to local state for development
-      console.log('Adding booking:', bookingData)
-      // Reset form fields first
+    // Используем submitBooking из store (который управляет лоадером)
+    const result = await bookingStore.submitBooking()
+    
+    if (result.success) {
+      // Сбрасываем форму вручную (так как store сбросил свою)
       resetFormFields()
-      // Then show success message
       showMessage($t('admin.addBooking.successMessage'), 'success')
+      console.log('Booking added with ID:', result.id)
+    } else {
+      showMessage($t('admin.addBooking.errorMessage') + ': ' + result.message, 'error')
+      throw new Error(result.message)
     }
     
-    // Refresh the bookings data with admin flag after a short delay
-    setTimeout(async () => {
-      await bookingStore.fetchBookedSlots(true)
-    }, 100)
+    // Данные обновятся автоматически через submitBooking в store
     
   } catch (error) {
     console.error('Error adding booking:', error)
     showMessage($t('admin.addBooking.errorMessage'), 'error')
-  } finally {
-    isSubmitting.value = false
   }
 }
 

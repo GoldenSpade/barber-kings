@@ -50,7 +50,9 @@ export default {
     successMessage: 'Hvala! Vaša rezervacija je primljena. Kontaktirat ćemo vas za potvrdu.',
     previousWeek: 'Prethodna Tjedni',
     nextWeek: 'Sljedeći Tjedan',
-    occupied: 'Zauzeto'
+    occupied: 'Zauzeto',
+    refresh: 'Osvježi',
+    loadingCalendar: 'Učitavaju se dostupni termini...'
   },
   
   // Locations

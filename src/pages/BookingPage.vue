@@ -159,7 +159,18 @@
                 >
                   <i class="bi bi-chevron-left"></i>
                 </button>
-                <h5 class="mb-0">{{ formattedDateRange }}</h5>
+                <div class="d-flex align-items-center gap-3">
+                  <h5 class="mb-0">{{ formattedDateRange }}</h5>
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    @click="refreshCalendar"
+                    :disabled="bookingStore.isLoadingBookedSlots"
+                    title="Refresh calendar data"
+                  >
+                    <i class="bi bi-arrow-clockwise me-1" :class="{ 'spin': bookingStore.isLoadingBookedSlots }"></i>
+                    {{ $t('booking.refresh') }}
+                  </button>
+                </div>
                 <button
                   class="btn btn-link text-dark"
                   @click="bookingStore.nextWeek"
@@ -171,8 +182,16 @@
               </div>
 
               <!-- Week Days -->
-              <div class="calendar-wrapper">
-                <div class="calendar-grid">
+              <div class="calendar-wrapper position-relative">
+                <!-- Loading Overlay -->
+                <div 
+                  v-if="bookingStore.isLoadingBookedSlots" 
+                  class="calendar-loading-overlay"
+                >
+                  <Loader size="medium" :message="$t('booking.loadingCalendar')" />
+                </div>
+                
+                <div class="calendar-grid" :class="{ 'opacity-50': bookingStore.isLoadingBookedSlots }">
                   <div class="row text-center">
                     <div class="col" v-for="day in translatedWeekDays" :key="day.date">
                       <div class="day-column">
@@ -510,6 +529,15 @@ const getSlotClass = (day, slot) => {
   }
 }
 
+// Refresh calendar data manually
+const refreshCalendar = async () => {
+  try {
+    await bookingStore.fetchBookedSlots(false, true) // isAdmin=false, forceRefresh=true
+  } catch (error) {
+    console.error('Error refreshing calendar:', error)
+  }
+}
+
 // Initialize calendar on mount
 onMounted(async () => {
   bookingStore.initializeCalendar()
@@ -674,6 +702,20 @@ onMounted(async () => {
 
 .calendar-grid {
   width: 100%;
+}
+
+.calendar-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
 }
 
 .day-column {
@@ -865,5 +907,15 @@ onMounted(async () => {
   .calendar-grid .col {
     min-width: 80px;
   }
+}
+
+/* Refresh button animation */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>
