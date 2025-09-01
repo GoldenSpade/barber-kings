@@ -138,9 +138,8 @@ export const useBookingStore = defineStore('booking', () => {
         
         // Фильтруем занятые слоты для текущей даты и локации
         const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
-        const currentLocation = selectedLocation.value?.nameKey ? 
-          selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
-          selectedLocation.value?.name
+        // Используем полное название локации для сопоставления с API
+        const currentLocation = selectedLocation.value?.name
         
         timeSlots = allSlots.filter(slot => {
           // Check if this specific slot is booked
@@ -385,9 +384,7 @@ export const useBookingStore = defineStore('booking', () => {
       const bookingData = {
         name: bookingForm.value.name,
         phone: bookingForm.value.phone, // Апостроф добавляется на стороне Google Apps Script
-        location: selectedLocation.value.nameKey ? 
-          selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
-          selectedLocation.value.name,
+        location: selectedLocation.value.name,
         service: selectedService.value.nameKey ? 
           selectedService.value.nameKey.replace('services.', '').replace('.name', '') : 
           selectedService.value.name,

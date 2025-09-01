@@ -35,7 +35,7 @@ function doGet(e) {
     const bookings = []
     
     // Начинаем с индекса 1, чтобы пропустить заголовки
-    // Новая структура: A=ID, B=Timestamp, C=Name, D=Phone, E=Location, F=Date, G=Time, H=Status
+    // Новая структура: A=ID, B=Timestamp, C=Name, D=Phone, E=Location, F=Date, G=Time, H=Status, I=Service
     for (let i = 1; i < data.length; i++) {
       const row = data[i]
       // Проверяем что строка не пустая (ID, Name, Location, Date, Time)
@@ -50,7 +50,8 @@ function doGet(e) {
             location: row[4],   // Location
             date: row[5],       // Date  
             time: row[6],       // Time
-            status: row[7] || 'Pending' // Status (по умолчанию Pending)
+            status: row[7] || 'Pending', // Status (по умолчанию Pending)
+            service: row[8] || '' // Service (новое поле)
           })
         } else {
           // Для обычных пользователей - только необходимые данные
@@ -58,7 +59,8 @@ function doGet(e) {
             location: row[4], // Location
             date: row[5],     // Date  
             time: row[6],     // Time
-            status: row[7]    // Status
+            status: row[7],   // Status
+            service: row[8] || '' // Service (новое поле)
           })
         }
       }
@@ -117,6 +119,7 @@ function handleAddBooking(e) {
     const date = e.parameter.date
     const time = e.parameter.time
     const status = e.parameter.status || 'Pending'
+    const service = e.parameter.service || ''
     
     // Проверяем обязательные поля
     if (!name || !phone || !location || !date || !time) {
@@ -133,7 +136,7 @@ function handleAddBooking(e) {
     const timestamp = new Date()
     
     // Подготавливаем данные для записи в таблицу
-    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status
+    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status, Service
     const rowData = [
       bookingId, // A - ID (уникальный идентификатор)
       timestamp, // B - Timestamp (автоматический)
@@ -143,6 +146,7 @@ function handleAddBooking(e) {
       "'" + date, // F - Date (с апострофом для принудительного текстового формата)
       "'" + time, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status
+      service, // I - Service (тип услуги)
     ]
     
     // Добавляем строку в конец таблицы
@@ -204,9 +208,10 @@ function doPost(e) {
     const dateString = data.date    // DD/MM/YYYY
     const timeString = data.time    // HH:MM
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
+    const service = data.service || ''  // Тип услуги из формы
 
     // Подготавливаем данные для записи в таблицу
-    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status
+    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status, Service
     const rowData = [
       bookingId, // A - ID (уникальный идентификатор)
       timestamp, // B - Timestamp (автоматический)
@@ -216,6 +221,7 @@ function doPost(e) {
       "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
       "'" + timeString, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status (из формы или "Pending")
+      service, // I - Service (тип услуги)
     ]
 
     // Добавляем строку в конец таблицы
@@ -263,7 +269,7 @@ function updateBookingStatus(e) {
       const row = allData[i]
       // Ищем по ID (колонка A, индекс 0)
       if (row[0] === data.id) {
-        // Обновляем статус (колонка H, индекс 7)
+        // Обновляем статус (колонка H, индекс 7) - Service теперь в колонке I
         sheet.getRange(i + 1, 8).setValue(data.newStatus)
         
         return ContentService.createTextOutput(
