@@ -56,7 +56,7 @@
     <!-- Progress Steps -->
     <div class="container mb-4">
       <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
           <div class="d-flex align-items-center justify-content-between">
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 1 }">1</span>
@@ -65,11 +65,16 @@
             <div class="step-line"></div>
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 2 }">2</span>
-              <span class="step-text">{{ $t('booking.steps.time') }}</span>
+              <span class="step-text">{{ $t('booking.steps.service') }}</span>
             </div>
             <div class="step-line"></div>
             <div class="step-item">
               <span class="step-number" :class="{ active: bookingStore.currentStep >= 3 }">3</span>
+              <span class="step-text">{{ $t('booking.steps.time') }}</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+              <span class="step-number" :class="{ active: bookingStore.currentStep >= 4 }">4</span>
               <span class="step-text">{{ $t('booking.steps.details') }}</span>
             </div>
           </div>
@@ -157,38 +162,51 @@
         </div>
       </div>
 
-      <!-- Step 2: Time Selection -->
+      <!-- Step 2: Service Selection -->
       <div v-if="bookingStore.currentStep === 2" class="step-content">
-        <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
-
-        <!-- Selected Location Card -->
-        <div class="row justify-content-center mb-4">
-          <div class="col-lg-10">
-            <div class="selected-location-card">
-              <div class="card-content text-center p-4">
-                <h5 class="fw-bold text-dark mb-2">{{ getSelectedLocationName() }}</h5>
-                <p class="text-muted mb-2">
-                  <i class="bi bi-geo-alt me-1"></i>{{ getSelectedLocationAddress() }}
-                </p>
-                <p class="text-muted mb-2">
-                  <i class="bi bi-scissors me-1"></i>{{ $t('booking.haircut') }} ({{
-                    $t('booking.duration')
-                  }})
-                </p>
-                <p class="text-muted mb-0">
-                  <i class="bi bi-clock me-1"></i
-                  >{{ $t('booking.timezone', { timezone: bookingStore.formattedTimezone }) }}
-                </p>
+        <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseService') }}</h2>
+        
+        <div class="row justify-content-center">
+          <div class="col-md-6" v-for="service in translatedServices" :key="service.id">
+            <div
+              class="service-card h-100"
+              :class="{ selected: bookingStore.selectedService?.id === service.id }"
+              @click="bookingStore.selectService(service)"
+            >
+              <div class="card-content p-4">
+                <div class="service-icon mb-3 text-center">
+                  <i class="bi bi-scissors"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-3 text-center">{{ service.name }}</h5>
+                <p class="text-muted mb-3 text-center">{{ service.description }}</p>
+                <div class="service-duration text-center mb-4">
+                  <span class="badge bg-brand text-white">{{ formatDuration(service.duration) }}</span>
+                </div>
+                <button class="btn btn-brand w-100">
+                  {{ $t('booking.choose') }}
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Step 3: Time Selection -->
+      <div v-if="bookingStore.currentStep === 3" class="step-content">
+        <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
+        
+        <!-- Debug info -->
+        <div class="text-center mb-3">
+          <small class="text-muted">Loaded bookings: {{ bookingsCount }}</small>
+        </div>
+
+
 
         <div class="row justify-content-center">
           <div class="col-lg-10">
             <div class="bg-white rounded shadow p-4">
-              <!-- Calendar Navigation -->
-              <div class="d-flex justify-content-between align-items-center mb-4">
+              <!-- Calendar Navigation - Desktop Only -->
+              <div class="d-none d-md-flex justify-content-between align-items-center mb-4">
                 <button
                   class="btn btn-link text-dark"
                   @click="bookingStore.previousWeek"
@@ -199,15 +217,6 @@
                 </button>
                 <div class="d-flex align-items-center gap-3">
                   <h5 class="mb-0">{{ formattedDateRange }}</h5>
-                  <button
-                    class="btn btn-sm btn-outline-primary"
-                    @click="refreshCalendar"
-                    :disabled="bookingStore.isLoadingBookedSlots"
-                    title="Refresh calendar data"
-                  >
-                    <i class="bi bi-arrow-clockwise me-1" :class="{ 'spin': bookingStore.isLoadingBookedSlots }"></i>
-                    {{ $t('booking.refresh') }}
-                  </button>
                 </div>
                 <button
                   class="btn btn-link text-dark"
@@ -229,47 +238,109 @@
                   <Loader size="medium" :message="$t('booking.loadingCalendar')" />
                 </div>
                 
-                <div class="calendar-grid" :class="{ 'opacity-50': bookingStore.isLoadingBookedSlots }">
+                <!-- Desktop Calendar -->
+                <div class="calendar-grid d-none d-md-block" :class="{ 'opacity-50': bookingStore.isLoadingBookedSlots }">
                   <div class="row text-center">
                     <div class="col" v-for="day in translatedWeekDays" :key="day.date">
                       <div class="day-column">
-                    <div class="day-header mb-3">
-                      <div class="day-name small text-muted">{{ day.dayName }}</div>
-                      <div class="day-number fw-bold">{{ day.dayNumber }}</div>
-                      <div class="day-month small text-muted">{{ day.month }}</div>
-                    </div>
-                    <div class="time-slots">
-                      <div v-if="day.available">
-                        <div
-                          v-for="time in day.allTimeSlots"
-                          :key="time"
-                          class="time-slot mb-1 p-2 rounded"
-                          :class="getSlotClass(day, time)"
-                        >
-                          <button
-                            v-if="!isSlotBooked(day, time)"
-                            class="btn btn-outline-secondary btn-sm w-100"
-                            :class="{
-                              'btn-success':
-                                bookingStore.selectedTime === time &&
-                                bookingStore.selectedDate === day.date,
-                            }"
-                            @click="bookingStore.selectTime(day.date, time)"
-                          >
-                            {{ time }}
-                          </button>
-                          <div v-else class="d-flex justify-content-center align-items-center">
-                            <span class="fw-medium time-label">{{ time }}</span>
+                        <div class="day-header mb-3">
+                          <div class="day-name small text-muted">{{ day.dayName }}</div>
+                          <div class="day-number fw-bold">{{ day.dayNumber }}</div>
+                          <div class="day-month small text-muted">{{ day.month }}</div>
+                        </div>
+                        <div class="time-slots">
+                          <div v-if="day.available">
+                                                                                        <div
+                                v-for="time in day.allTimeSlots"
+                                :key="time"
+                                class="time-slot mb-1 p-2 rounded"
+                                :class="getSlotClass(day, time)"
+                              >
+                                <button
+                                  v-if="!isSlotBooked(day, time)"
+                                  class="btn btn-outline-secondary btn-sm w-100"
+                                  :class="{
+                                    'btn-success':
+                                      bookingStore.selectedTime === time &&
+                                      bookingStore.selectedDate === day.date,
+                                    'btn-disabled': !isSlotAvailableForService(day, time)
+                                  }"
+                                  @click="bookingStore.selectTime(day.date, time)"
+                                  :disabled="!isSlotAvailableForService(day, time)"
+                                >
+                                  {{ getTimeRange(time) }}
+                                </button>
+                              <div v-else class="d-flex justify-content-center align-items-center">
+                                <span class="fw-medium time-label">{{ time }}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div v-else class="text-muted small text-center">
+                            <div class="reason-text">{{ day.reason }}</div>
                           </div>
                         </div>
-                      </div>
-                      <div v-else class="text-muted small text-center">
-                        <div class="reason-text">{{ day.reason }}</div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+                
+                <!-- Mobile Calendar - Single Day -->
+                <div class="mobile-calendar d-md-none" :class="{ 'opacity-50': bookingStore.isLoadingBookedSlots }">
+                  <!-- Mobile Date Navigation -->
+                  <div class="mobile-date-navigation mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <button
+                        class="btn btn-date-nav"
+                        @click="previousDay"
+                        :disabled="!canGoToPreviousDay"
+                      >
+                        <i class="bi bi-chevron-left"></i>
+                      </button>
+                      <div class="selected-date-display">
+                        <h5 class="fw-bold mb-0">{{ getSelectedDayDate() }}</h5>
+                      </div>
+                      <button
+                        class="btn btn-date-nav"
+                        @click="nextDay"
+                        :disabled="!canGoToNextDay"
+                      >
+                        <i class="bi bi-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Mobile Time Slots - Single Column with Scroll -->
+                  <div class="mobile-time-slots-container">
+                    <div v-if="getSelectedDay().available" class="time-slots-scroll">
+                      <div 
+                        v-for="time in getSelectedDay().allTimeSlots"
+                        :key="time"
+                        class="time-slot-mobile mb-2"
+                      >
+                        <button
+                          v-if="!isSlotBooked(getSelectedDay(), time) && isSlotAvailableForService(getSelectedDay(), time)"
+                          class="btn btn-time-slot w-100"
+                          :class="{
+                            'btn-success':
+                              bookingStore.selectedTime === time &&
+                              bookingStore.selectedDate === getSelectedDay().date
+                          }"
+                          @click="bookingStore.selectTime(getSelectedDay().date, time)"
+                        >
+                          {{ getTimeRange(time) }}
+                        </button>
+                        <div v-else-if="isSlotBooked(getSelectedDay(), time)" class="time-slot-occupied">
+                          <span class="fw-medium">{{ time }}</span>
+                        </div>
+                        <div v-else class="time-slot-unavailable">
+                          <span class="fw-medium">{{ time }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-muted text-center">
+                      <div class="reason-text">{{ getSelectedDay().reason }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -277,22 +348,25 @@
         </div>
       </div>
 
-      <!-- Step 3: Contact Form -->
-      <div v-if="bookingStore.currentStep === 3" class="step-content">
+      <!-- Step 4: Contact Form -->
+      <div v-if="bookingStore.currentStep === 4" class="step-content">
         <h2 class="text-center mb-5 fw-bold">{{ $t('booking.contactDetails') }}</h2>
 
         <div class="row justify-content-center">
           <div class="col-md-6">
             <!-- Booking Confirmation -->
-            <div class="bg-white rounded shadow p-4 mb-4">
-              <h6 class="fw-bold mb-3">{{ $t('booking.timeConfirmation') }}</h6>
-              <div class="booking-details">
-                <p class="mb-2">
-                  <strong>{{ $t('booking.haircut') }} ({{ $t('booking.duration') }})</strong>
-                </p>
-                <p class="text-muted mb-0">
-                  {{ bookingStore.formatBookingDate }} ({{ bookingStore.formattedTimezone }})
-                </p>
+            <div class="booking-summary mb-4">
+              <div class="summary-item">
+                <span class="summary-label">{{ $t('booking.service') }}:</span>
+                <span class="summary-value">{{ getSelectedServiceName() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">{{ $t('booking.location') }}:</span>
+                <span class="summary-value">{{ getSelectedLocationAddress() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">{{ $t('booking.dateTime') }}:</span>
+                <span class="summary-value">{{ formatBookingDateTime() }}</span>
               </div>
             </div>
 
@@ -370,12 +444,13 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
+import { getAllServices, formatDuration } from '@/config/services'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
 
@@ -421,6 +496,25 @@ const translatedLocations = computed(() => {
   }))
 })
 
+// Computed services with translations
+const translatedServices = computed(() => {
+  try {
+    return getAllServices().map((service) => ({
+      ...service,
+      name: $t(service.nameKey),
+      description: $t(service.descriptionKey),
+    }))
+  } catch (error) {
+    console.error('Error loading services:', error)
+    return []
+  }
+})
+
+// Debug computed for bookings
+const bookingsCount = computed(() => {
+  return bookingStore.bookedSlots.length
+})
+
 // Computed calendar days with translations
 const translatedWeekDays = computed(() => {
   // Use locale from above
@@ -446,7 +540,7 @@ const translatedWeekDays = computed(() => {
       dayName: dayNames[new Date(day.date).getDay()],
       month: monthNames[new Date(day.date).getMonth()],
       reason: translatedReason,
-      allTimeSlots: generateAllTimeSlots(), // Добавляем все слоты времени
+      allTimeSlots: day.timeSlots || generateAllTimeSlots(), // Use filtered slots from store or fallback to all slots
     }
   })
 })
@@ -503,6 +597,35 @@ const getSelectedLocationAddress = () => {
     : bookingStore.selectedLocation.address
 }
 
+const getSelectedServiceName = () => {
+  if (!bookingStore.selectedService) return ''
+  return bookingStore.selectedService.nameKey
+    ? $t(bookingStore.selectedService.nameKey)
+    : bookingStore.selectedService.name
+}
+
+const getSelectedServiceDuration = () => {
+  if (!bookingStore.selectedService) return 30
+  return bookingStore.selectedService.duration
+}
+
+const formatBookingDateTime = () => {
+  if (!bookingStore.selectedDate || !bookingStore.selectedTime) return ''
+  
+  const date = new Date(bookingStore.selectedDate)
+  const monthNames = locale.value === 'hr' 
+    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  
+  const month = monthNames[date.getMonth()]
+  const day = date.getDate().toString().padStart(2, '0')
+  const year = date.getFullYear()
+  
+  const timeRange = getTimeRange(bookingStore.selectedTime)
+  
+  return `${month} ${day}, ${year}, ${timeRange}`
+}
+
 const formattedDateRange = computed(() => {
   const start = new Date(bookingStore.currentWeekStart)
   const end = new Date(start)
@@ -537,19 +660,87 @@ const generateAllTimeSlots = () => {
   return slots
 }
 
+// Helper function to check if a time slot is available for the selected service
+const isSlotAvailableForService = (day, startTime) => {
+  if (!bookingStore.selectedService) return true
+  
+  const serviceDuration = bookingStore.selectedService.duration
+  const slotsNeeded = serviceDuration / 30 // Convert minutes to 30-minute slots
+  
+  // Get all time slots
+  const allSlots = generateAllTimeSlots()
+  const startIndex = allSlots.indexOf(startTime)
+  
+  if (startIndex === -1) return false
+  
+  // Check if we have enough consecutive slots available
+  for (let i = 0; i < slotsNeeded; i++) {
+    const slotIndex = startIndex + i
+    if (slotIndex >= allSlots.length) return false // Not enough time left in the day
+    
+    const slotTime = allSlots[slotIndex]
+    if (isSlotBooked(day, slotTime)) return false // One of the required slots is booked
+  }
+  
+  return true
+}
+
+// Helper function to get time range for display
+const getTimeRange = (startTime) => {
+  if (!bookingStore.selectedService) return startTime
+  
+  const serviceDuration = bookingStore.selectedService.duration
+  const allSlots = generateAllTimeSlots()
+  const startIndex = allSlots.indexOf(startTime)
+  
+  if (startIndex === -1) return startTime
+  
+  const endIndex = startIndex + (serviceDuration / 30) - 1
+  if (endIndex >= allSlots.length) return startTime
+  
+  const endTime = allSlots[endIndex]
+  return `${startTime} - ${endTime}`
+}
+
 // Check if a slot is booked
 const isSlotBooked = (day, slot) => {
   const date = new Date(day.date)
   const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
-  const currentLocation = bookingStore.selectedLocation?.nameKey ? 
-    bookingStore.selectedLocation.nameKey.replace('locations.', '').replace('.name', '') : 
-    bookingStore.selectedLocation?.name
+  
+  // Get current location name
+  let currentLocation = ''
+  if (bookingStore.selectedLocation?.nameKey) {
+    currentLocation = bookingStore.selectedLocation.nameKey.replace('locations.', '').replace('.name', '')
+  } else if (bookingStore.selectedLocation?.name) {
+    // Map location names to database format
+    if (bookingStore.selectedLocation.name.includes('Martinkovac')) {
+      currentLocation = 'downtown'
+    } else if (bookingStore.selectedLocation.name.includes('Adamićeva')) {
+      currentLocation = 'podil'
+    } else {
+      currentLocation = bookingStore.selectedLocation.name
+    }
+  }
 
-  return bookingStore.bookedSlots.some(booking => 
-    booking.date === dateString && 
-    booking.time === slot && 
-    booking.location === currentLocation
-  )
+  console.log(`Checking slot ${slot} on ${dateString} at ${currentLocation}`)
+  console.log('Available bookings:', bookingStore.bookedSlots)
+
+  const isBooked = bookingStore.bookedSlots.some(booking => {
+    const matches = booking.date === dateString && 
+                   booking.time === slot && 
+                   booking.location === currentLocation
+    if (matches) {
+      console.log(`Found matching booking:`, booking)
+    }
+    return matches
+  })
+  
+  // Debug logging
+  if (isBooked) {
+    console.log(`Slot ${slot} on ${dateString} at ${currentLocation} is booked`)
+  }
+  
+  return isBooked
 }
 
 // Get CSS class for time slot
@@ -578,6 +769,9 @@ const isCurrentDay = (dayName) => {
   return currentDayName === dayName
 }
 
+// Mobile calendar state
+const selectedDayIndex = ref(0)
+
 // Handle URL parameters for direct booking
 const handleUrlParams = () => {
   const urlParams = new URLSearchParams(window.location.search)
@@ -593,11 +787,60 @@ const handleUrlParams = () => {
   }
 }
 
+// Mobile calendar helpers
+const getSelectedDay = () => {
+  return translatedWeekDays.value[selectedDayIndex.value] || translatedWeekDays.value[0]
+}
+
+const getSelectedDayName = () => {
+  const day = getSelectedDay()
+  return day ? day.dayName : ''
+}
+
+const getSelectedDayDate = () => {
+  const day = getSelectedDay()
+  if (!day) return ''
+  const date = new Date(day.date)
+  const monthNames = locale.value === 'hr' 
+    ? ['Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip', 'Srp', 'Kol', 'Ruj', 'Lis', 'Stu', 'Pro']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
+}
+
+const canGoToPreviousDay = computed(() => {
+  return selectedDayIndex.value > 0
+})
+
+const canGoToNextDay = computed(() => {
+  return selectedDayIndex.value < translatedWeekDays.value.length - 1
+})
+
+const previousDay = () => {
+  if (canGoToPreviousDay.value) {
+    selectedDayIndex.value--
+  }
+}
+
+const nextDay = () => {
+  if (canGoToNextDay.value) {
+    selectedDayIndex.value++
+  }
+}
+
 // Initialize calendar on mount
 onMounted(async () => {
+  console.log('Initializing booking page...')
   bookingStore.initializeCalendar()
-  // Загружаем занятые слоты при загрузке страницы
-  await bookingStore.fetchBookedSlots()
+  
+  try {
+    console.log('Fetching booked slots...')
+    // Загружаем занятые слоты при загрузке страницы
+    await bookingStore.fetchBookedSlots()
+    console.log('Booked slots loaded:', bookingStore.bookedSlots.length)
+  } catch (error) {
+    console.error('Error fetching booked slots:', error)
+  }
+  
   // Handle URL parameters for direct booking
   handleUrlParams()
 })
@@ -714,6 +957,44 @@ onMounted(async () => {
   padding-bottom: 1rem;
 }
 
+/* Service Cards */
+.service-card {
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background-color: white;
+  min-height: 250px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-color: #2c3e33;
+}
+
+.service-card.selected {
+  border-color: #2c3e33;
+  box-shadow: 0 0 0 3px rgba(44, 62, 51, 0.2);
+  background-color: #f8f9fa;
+}
+
+.service-icon {
+  font-size: 2.5rem;
+  color: #2c3e33;
+}
+
+.service-duration .badge {
+  background-color: #2c3e33 !important;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+}
+
 /* Working Hours Section */
 .working-hours-section {
   flex-grow: 1;
@@ -750,6 +1031,123 @@ onMounted(async () => {
   color: #2c3e33;
   font-weight: 600;
 }
+
+/* Mobile Calendar */
+.mobile-calendar {
+  padding: 1rem;
+}
+
+/* Mobile Date Navigation */
+.mobile-date-navigation {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.btn-date-nav {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #2c3e33;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-date-nav:hover:not(:disabled) {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+}
+
+.btn-date-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selected-date-display {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.selected-date-display h5 {
+  color: #2c3e33;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Mobile Time Slots Container */
+.mobile-time-slots-container {
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.time-slots-scroll {
+  padding: 1rem;
+}
+
+.time-slot-mobile {
+  margin-bottom: 0.5rem;
+}
+
+.btn-time-slot {
+  background-color: white;
+  border: 2px solid #e9ecef;
+  color: #2c3e33;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-time-slot:hover:not(:disabled) {
+  border-color: #2c3e33;
+  background-color: #f8f9fa;
+}
+
+.btn-time-slot.btn-success {
+  background-color: #2c3e33 !important;
+  border-color: #2c3e33 !important;
+  color: white !important;
+}
+
+.btn-time-slot.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #6c757d !important;
+}
+
+.time-slot-occupied {
+  background-color: #ffebee;
+  border: 2px solid #e57373;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: #d32f2f;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.time-slot-unavailable {
+  background-color: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+
 
 /* Selected Location Card */
 .selected-location-card {
@@ -806,14 +1204,24 @@ onMounted(async () => {
 }
 
 .time-slots button {
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 6px;
+  white-space: nowrap;
+  min-width: 80px;
 }
 
 .time-slots .btn-success {
   background-color: #2c3e33 !important;
   border-color: #2c3e33 !important;
+}
+
+.time-slots .btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #6c757d !important;
 }
 
 /* Time Slot Styles */
@@ -878,11 +1286,40 @@ onMounted(async () => {
   box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
 }
 
-.booking-details {
-  background-color: #f8f9fa;
-  padding: 1rem;
+/* Booking Summary */
+.booking-summary {
+  background-color: white;
   border-radius: 8px;
-  border-left: 4px solid #2c3e33;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+
+.summary-value {
+  color: #2c3e33;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: right;
+  flex: 1;
+  margin-left: 1rem;
 }
 
 /* Booking Form Loading */
@@ -927,7 +1364,7 @@ onMounted(async () => {
   }
 
   .step-text {
-    font-size: 0.8rem;
+    display: none;
   }
 
   .location-card {

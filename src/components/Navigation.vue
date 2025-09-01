@@ -6,16 +6,7 @@
       <div class="row w-100 align-items-center d-none d-lg-flex">
         <!-- Left Links -->
         <div class="col-4 d-flex justify-content-start">
-          <router-link
-            :to="{ name: 'home' }"
-            class="nav-link text-dark fw-semibold fs-6 me-5"
-            >{{ $t('nav.home').toUpperCase() }}</router-link
-          >
-          <router-link
-            :to="{ name: 'about' }"
-            class="nav-link text-dark fw-semibold fs-6"
-            >{{ $t('nav.about').toUpperCase() }}</router-link
-          >
+          <!-- Removed home link -->
         </div>
 
         <!-- Center Logo -->
@@ -29,11 +20,7 @@
 
         <!-- Right Links -->
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <router-link
-            class="nav-link text-dark fw-semibold fs-6 me-4"
-            :to="{ name: 'booking' }"
-            >{{ $t('nav.booking').toUpperCase() }}</router-link
-          >
+          <!-- Removed booking link -->
           
           <!-- Language Switcher -->
           <div class="dropdown">
@@ -96,21 +83,7 @@
         <!-- Collapsible Mobile Menu -->
         <div class="collapse navbar-collapse" id="mobileNav">
           <div class="navbar-nav text-center mt-3">
-            <router-link
-              :to="{ name: 'home' }"
-              class="nav-link text-dark fw-semibold py-2"
-              >{{ $t('nav.home').toUpperCase() }}</router-link
-            >
-            <router-link
-              :to="{ name: 'about' }"
-              class="nav-link text-dark fw-semibold py-2"
-              >{{ $t('nav.about').toUpperCase() }}</router-link
-            >
-            <router-link
-              :to="{ name: 'booking' }"
-              class="nav-link text-dark fw-semibold py-2"
-              >{{ $t('nav.booking').toUpperCase() }}</router-link
-            >
+            <!-- Removed home and booking links -->
             
             <!-- Mobile Language Switcher -->
             <div class="mt-3">

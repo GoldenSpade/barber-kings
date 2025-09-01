@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import AboutPage from '@/pages/AboutPage.vue'
 import BookingPage from '@/pages/BookingPage.vue'
 import AdminPage from '@/pages/AdminPage.vue'
 
@@ -15,14 +14,7 @@ const router = createRouter({
         title: 'Barber Kings - Premium Barbershop & Grooming'
       }
     },
-    {
-      path: '/about',
-      name: 'about',
-      component: AboutPage,
-      meta: {
-        title: 'About Us - Barber Kings'
-      }
-    },
+
     {
       path: '/booking',
       name: 'booking',

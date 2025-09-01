@@ -4,9 +4,9 @@
 
     <!-- Hero Section -->
     <div class="hero-section bg-light">
-      <div class="container h-100 d-flex flex-column justify-content-between">
+      <div class="container h-100 d-flex flex-column justify-content-center">
         <!-- Main Content -->
-        <div class="row flex-grow-1 align-items-center">
+        <div class="row align-items-center">
           <div class="col-12">
             <div class="text-center py-5">
               <!-- Large WELCOME text -->
@@ -38,20 +38,6 @@
                   {{ $t('home.bookNow') }}
                 </button>
               </router-link>
-            </div>
-          </div>
-        </div>
-
-        <!-- Barbershop Image -->
-        <div class="row">
-          <div class="col-12">
-            <div class="barbershop-image mb-4 mb-md-4 mb-lg-4">
-              <img
-                src="@/assets/barbershop-photo.jpg"
-                alt="Barbershop Interior"
-                class="img-fluid w-100 rounded shadow"
-                style="height: 500px; object-fit: cover"
-              />
             </div>
           </div>
         </div>

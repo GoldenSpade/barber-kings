@@ -17,7 +17,8 @@ export default {
   home: {
     welcome: 'WELCOME',
     description: 'Where tradition meets precision. Expert cuts, classic shaves, and modern style crafted by masters of the trade.',
-    bookNow: 'BOOK NOW'
+    bookNow: 'BOOK NOW',
+    ourLocations: 'Our Locations'
   },
   
   // Booking page
@@ -25,10 +26,15 @@ export default {
     back: 'Back',
     steps: {
       locations: 'Locations',
+      service: 'Service',
       time: 'Time', 
       details: 'Details'
     },
+    chooseService: 'Choose Your Service',
     chooseLocation: 'Choose Location',
+    service: 'Service',
+    location: 'Location',
+    dateTime: 'Date & Time',
     chooseTime: 'Choose Your Time',
     contactDetails: 'Contact Details',
     timeConfirmation: 'Time Confirmation',
@@ -63,6 +69,22 @@ export default {
       friday: 'Friday',
       saturday: 'Saturday',
       sunday: 'Sunday'
+    }
+  },
+  
+  // Services
+  services: {
+    mensHaircut: {
+      name: "Men's Haircut",
+      description: 'Classic and modern haircuts for men'
+    },
+    mensHaircutBeard: {
+      name: "Men's Haircut + Beard Trim",
+      description: 'Haircut with professional beard trimming and shaping'
+    },
+    womensHaircut: {
+      name: "Women's Haircut",
+      description: 'Professional haircuts for women'
     }
   },
   

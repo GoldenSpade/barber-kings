@@ -5,6 +5,7 @@ export const useBookingStore = defineStore('booking', () => {
   // State
   const currentStep = ref(1)
   const selectedLocation = ref(null)
+  const selectedService = ref(null)
   const selectedDate = ref(null)
   const selectedTime = ref(null)
   const selectedStatus = ref('Pending')
@@ -98,6 +99,8 @@ export const useBookingStore = defineStore('booking', () => {
 
   // Getters
   const weekDays = computed(() => {
+    // Add dependency on selectedService to make it reactive
+    const currentService = selectedService.value
     const days = []
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -140,11 +143,34 @@ export const useBookingStore = defineStore('booking', () => {
           selectedLocation.value?.name
         
         timeSlots = allSlots.filter(slot => {
+          // Check if this specific slot is booked
           const isBooked = bookedSlots.value.some(booking => 
             booking.date === dateString && 
             booking.time === slot && 
             booking.location === currentLocation
           )
+          
+          // If we have a selected service, check if there are enough consecutive slots available
+          if (selectedService.value && !isBooked) {
+            const serviceDuration = selectedService.value.duration
+            const slotsNeeded = serviceDuration / 30
+            const slotIndex = allSlots.indexOf(slot)
+            
+            // Check if we have enough consecutive slots available
+            for (let i = 0; i < slotsNeeded; i++) {
+              const checkIndex = slotIndex + i
+              if (checkIndex >= allSlots.length) return false // Not enough time left in the day
+              
+              const checkSlot = allSlots[checkIndex]
+              const isSlotBooked = bookedSlots.value.some(booking => 
+                booking.date === dateString && 
+                booking.time === checkSlot && 
+                booking.location === currentLocation
+              )
+              if (isSlotBooked) return false // One of the required slots is booked
+            }
+          }
+          
           return !isBooked
         })
       }
@@ -237,10 +263,15 @@ export const useBookingStore = defineStore('booking', () => {
     currentStep.value = 2
   }
 
+  const selectService = (service) => {
+    selectedService.value = service
+    currentStep.value = 3
+  }
+
   const selectTime = (date, time) => {
     selectedDate.value = date
     selectedTime.value = time
-    currentStep.value = 3
+    currentStep.value = 4
   }
 
   const goToPreviousStep = () => {
@@ -299,6 +330,10 @@ export const useBookingStore = defineStore('booking', () => {
       errors.push('Please select a location')
     }
     
+    if (!selectedService.value) {
+      errors.push('Please select a service')
+    }
+    
     if (!selectedDate.value) {
       errors.push('Please select a date')
     }
@@ -339,6 +374,13 @@ export const useBookingStore = defineStore('booking', () => {
       // Время остается в стандартном формате HH:MM
       const formattedTime = selectedTime.value
       
+      // Calculate end time based on service duration
+      const serviceDuration = selectedService.value.duration
+      const allSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+      const startIndex = allSlots.indexOf(formattedTime)
+      const endIndex = startIndex + (serviceDuration / 30) - 1
+      const endTime = endIndex < allSlots.length ? allSlots[endIndex] : formattedTime
+      
       // Подготавливаем данные для отправки
       const bookingData = {
         name: bookingForm.value.name,
@@ -346,8 +388,13 @@ export const useBookingStore = defineStore('booking', () => {
         location: selectedLocation.value.nameKey ? 
           selectedLocation.value.nameKey.replace('locations.', '').replace('.name', '') : 
           selectedLocation.value.name,
+        service: selectedService.value.nameKey ? 
+          selectedService.value.nameKey.replace('services.', '').replace('.name', '') : 
+          selectedService.value.name,
         date: formattedDate,
-        time: formattedTime
+        time: formattedTime,
+        endTime: endTime,
+        duration: serviceDuration
       }
       
       
@@ -357,8 +404,11 @@ export const useBookingStore = defineStore('booking', () => {
         name: bookingData.name,
         phone: bookingData.phone,
         location: bookingData.location,
+        service: bookingData.service,
         date: bookingData.date,
         time: bookingData.time,
+        endTime: bookingData.endTime,
+        duration: bookingData.duration,
         status: selectedStatus.value
       })
       
@@ -510,8 +560,33 @@ export const useBookingStore = defineStore('booking', () => {
     
     const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
     
+    console.log('Google Script URL:', GOOGLE_SCRIPT_URL)
+    
     if (!GOOGLE_SCRIPT_URL) {
-      console.warn('GOOGLE_SCRIPT_URL not configured')
+      console.warn('GOOGLE_SCRIPT_URL not configured, using mock data')
+      // Use mock data for testing
+      const mockBookings = [
+        {
+          id: 1,
+          name: 'John Doe',
+          phone: '123456789',
+          location: 'downtown',
+          date: '02/09/2025',
+          time: '14:00',
+          status: 'Confirmed'
+        },
+        {
+          id: 2,
+          name: 'Jane Smith',
+          phone: '987654321',
+          location: 'podil',
+          date: '03/09/2025',
+          time: '15:30',
+          status: 'Pending'
+        }
+      ]
+      bookedSlots.value = mockBookings
+      console.log('Using mock bookings data:', mockBookings)
       return Promise.resolve()
     }
     
@@ -545,6 +620,8 @@ export const useBookingStore = defineStore('booking', () => {
             delete window[callbackName]
             currentCallback = null
             
+            console.log('Received data from Google Apps Script:', data)
+            
             if (data.success && data.bookings) {
               // Валидируем полноту данных
               const isDataComplete = validateBookingsData(data.bookings)
@@ -552,6 +629,7 @@ export const useBookingStore = defineStore('booking', () => {
               if (isDataComplete || attempt >= MAX_ATTEMPTS) {
                 bookedSlots.value = data.bookings
                 console.log(`Successfully loaded ${data.bookings.length} bookings`)
+                console.log('Bookings data:', data.bookings)
                 resolveRequest(data)
               } else {
                 console.log('Incomplete data received, retrying...')
@@ -561,6 +639,7 @@ export const useBookingStore = defineStore('booking', () => {
               }
             } else {
               console.error('Error fetching booked slots:', data.message || 'Unknown error')
+              console.error('Full response:', data)
               if (attempt < MAX_ATTEMPTS) {
                 setTimeout(() => {
                   tryFetch().then(resolveRequest).catch(rejectRequest)
@@ -647,6 +726,7 @@ export const useBookingStore = defineStore('booking', () => {
     // State
     currentStep,
     selectedLocation,
+    selectedService,
     selectedDate,
     selectedTime,
     selectedStatus,
@@ -670,6 +750,7 @@ export const useBookingStore = defineStore('booking', () => {
     
     // Actions
     selectLocation,
+    selectService,
     selectTime,
     goToPreviousStep,
     previousWeek,
