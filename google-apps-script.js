@@ -38,16 +38,8 @@ function doGet(e) {
       // Проверяем что строка не пустая (id, Name, Location, Date, Time)
       if (row[0] && row[2] && row[4] && row[5] && row[6]) {
         
-        // Преобразуем location в короткое название для клиента
-        let locationKey = ''
-        const fullLocation = row[4] // "Barber Kings Adamiceva" или "Barber Kings Martinkovac"
-        if (fullLocation.includes('Adami')) {
-          locationKey = 'Adamiceva'
-        } else if (fullLocation.includes('Martinkovac')) {
-          locationKey = 'Martinkovac'
-        } else {
-          locationKey = fullLocation
-        }
+        // Теперь в таблице location уже хранится в коротком виде
+        const locationKey = row[4] // "Adamiceva" или "Martinkovac"
         
         if (isAdmin) {
           // Для админки возвращаем полную информацию
@@ -56,7 +48,7 @@ function doGet(e) {
             timestamp: row[1],  // Timestamp
             name: row[2],       // Name
             phone: row[3],      // Phone  
-            location: row[4],   // Location (полное название)
+            location: row[4],   // Location (короткое название: Martinkovac, Adamiceva)
             date: row[5],       // Date  
             time: row[6],       // Time
             status: row[7] || 'Pending', // Status (по умолчанию Pending)
@@ -144,13 +136,8 @@ function handleAddBooking(e) {
     // Создаем timestamp
     const timestamp = new Date()
     
-    // Преобразуем location из короткого названия в полное название
-    let fullLocationName = location
-    if (location === 'Adamiceva') {
-      fullLocationName = 'Barber Kings Adamiceva'
-    } else if (location === 'Martinkovac') {
-      fullLocationName = 'Barber Kings Martinkovac'
-    }
+    // Сохраняем location в коротком виде (без преобразования в полное название)
+    const shortLocationName = location // Martinkovac или Adamiceva
 
     // Подготавливаем данные для записи в таблицу
     // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
@@ -159,7 +146,7 @@ function handleAddBooking(e) {
       timestamp, // B - Timestamp (автоматический)
       name, // C - Name
       "'" + phone, // D - Phone (с апострофом для принудительного текстового формата)
-      fullLocationName, // E - Location (полное название)
+      shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
       "'" + date, // F - Date (с апострофом для принудительного текстового формата)
       "'" + time, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status
@@ -227,13 +214,8 @@ function doPost(e) {
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
     const service = data.service || ''  // Тип услуги из формы
 
-    // Преобразуем location из короткого названия в полное название
-    let fullLocationName = data.location
-    if (data.location === 'Adamiceva') {
-      fullLocationName = 'Barber Kings Adamiceva'
-    } else if (data.location === 'Martinkovac') {
-      fullLocationName = 'Barber Kings Martinkovac'
-    }
+    // Сохраняем location в коротком виде (без преобразования в полное название)
+    const shortLocationName = data.location // Martinkovac или Adamiceva
 
     // Подготавливаем данные для записи в таблицу
     // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
@@ -242,7 +224,7 @@ function doPost(e) {
       timestamp, // B - Timestamp (автоматический)
       data.name, // C - Name
       "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
-      fullLocationName, // E - Location (полное название)
+      shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
       "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
       "'" + timeString, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status (из формы или "Pending")
