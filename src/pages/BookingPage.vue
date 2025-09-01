@@ -195,9 +195,17 @@
       <div v-if="bookingStore.currentStep === 3" class="step-content">
         <h2 class="text-center mb-3 fw-bold">{{ $t('booking.chooseTime') }}</h2>
         
-        <!-- Debug info -->
-        <div class="text-center mb-3">
-          <small class="text-muted">Loaded bookings: {{ bookingsCount }}</small>
+        <!-- Selected Location Info -->
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-6">
+            <div class="selected-location-info p-3 text-center">
+              <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="bi bi-geo-alt-fill me-2 text-brand"></i>
+                <h6 class="mb-0 fw-bold text-dark">{{ getSelectedLocationName() }}</h6>
+              </div>
+              <p class="text-muted mb-0 small">{{ getSelectedLocationAddress() }}</p>
+            </div>
+          </div>
         </div>
 
 
@@ -1164,6 +1172,11 @@ onMounted(async () => {
 
 .selected-location-card .card-content {
   width: 100%;
+}
+
+/* Selected Location Info */
+.selected-location-info {
+  /* Transparent background, no borders or shadows */
 }
 
 /* Calendar Styles */
