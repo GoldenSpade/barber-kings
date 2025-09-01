@@ -12,6 +12,15 @@ export default {
     loadingSlots: 'Učitavaju se dostupni termini...',
     submittingBooking: 'Šalje se vaša rezervacija...'
   },
+
+  // Slot availability messages
+  slots: {
+    available: 'Dostupno: {duration} min ({start} - {end})',
+    occupied: 'Zauzeto',
+    notEnoughTime: 'Nedovoljno vremena do kraja dana (potrebno {duration} min)',
+    conflictWith: 'Konflikt s rezervacijom u {time}',
+    needConsecutive: 'Potrebno {slots} uzastopnih slobodnih termina za ovu uslugu'
+  },
   
   // Home page
   home: {

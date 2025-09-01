@@ -12,6 +12,15 @@ export default {
     loadingSlots: 'Loading available slots...',
     submittingBooking: 'Submitting your booking...'
   },
+
+  // Slot availability messages
+  slots: {
+    available: 'Available: {duration} min ({start} - {end})',
+    occupied: 'Occupied',
+    notEnoughTime: 'Not enough time until end of day (need {duration} min)',
+    conflictWith: 'Conflict with booking at {time}',
+    needConsecutive: 'Need {slots} consecutive free slots for this service'
+  },
   
   // Home page
   home: {

@@ -119,6 +119,8 @@ function handleAddBooking(e) {
     const location = e.parameter.location
     const date = e.parameter.date
     const time = e.parameter.time
+    const endTime = e.parameter.endTime
+    const duration = parseInt(e.parameter.duration) || 30
     const status = e.parameter.status || 'Pending'
     const service = e.parameter.service || ''
     
@@ -139,22 +141,41 @@ function handleAddBooking(e) {
     // Сохраняем location в коротком виде (без преобразования в полное название)
     const shortLocationName = location // Martinkovac или Adamiceva
 
-    // Подготавливаем данные для записи в таблицу
-    // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
-    const rowData = [
-      bookingId, // A - id (уникальный идентификатор)
-      timestamp, // B - Timestamp (автоматический)
-      name, // C - Name
-      "'" + phone, // D - Phone (с апострофом для принудительного текстового формата)
-      shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
-      "'" + date, // F - Date (с апострофом для принудительного текстового формата)
-      "'" + time, // G - Time (с апострофом для принудительного текстового формата)
-      status, // H - Status
-      service, // I - Service (тип услуги)
-    ]
+    // Вычисляем все слоты, которые занимает услуга
+    const allSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+    const startIndex = allSlots.indexOf(time)
+    const slotsNeeded = Math.ceil(duration / 30) // Количество 30-минутных слотов
     
-    // Добавляем строку в конец таблицы
-    sheet.appendRow(rowData)
+    // Создаем записи для всех занятых слотов
+    const rowsToAdd = []
+    for (let i = 0; i < slotsNeeded; i++) {
+      const slotIndex = startIndex + i
+      if (slotIndex < allSlots.length) {
+        const slotTime = allSlots[slotIndex]
+        
+        // Подготавливаем данные для записи в таблицу
+        // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
+        const rowData = [
+          bookingId, // A - id (одинаковый для всех слотов одной услуги)
+          timestamp, // B - Timestamp (автоматический)
+          name, // C - Name
+          "'" + phone, // D - Phone (с апострофом для принудительного текстового формата)
+          shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
+          "'" + date, // F - Date (с апострофом для принудительного текстового формата)
+          "'" + slotTime, // G - Time (время каждого слота)
+          status, // H - Status
+          service, // I - Service (тип услуги)
+        ]
+        rowsToAdd.push(rowData)
+      }
+    }
+    
+    // Добавляем все строки в таблицу
+    if (rowsToAdd.length > 0) {
+      // Добавляем строки одним вызовом для лучшей производительности
+      const range = sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, rowsToAdd[0].length)
+      range.setValues(rowsToAdd)
+    }
     
     const result = {
       success: true,
@@ -211,28 +232,48 @@ function doPost(e) {
     // Дата и время уже отформатированы на фронтенде в стандартном формате
     const dateString = data.date    // DD/MM/YYYY
     const timeString = data.time    // HH:MM
+    const duration = parseInt(data.duration) || 30
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
     const service = data.service || ''  // Тип услуги из формы
 
     // Сохраняем location в коротком виде (без преобразования в полное название)
     const shortLocationName = data.location // Martinkovac или Adamiceva
 
-    // Подготавливаем данные для записи в таблицу
-    // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
-    const rowData = [
-      bookingId, // A - id (уникальный идентификатор)
-      timestamp, // B - Timestamp (автоматический)
-      data.name, // C - Name
-      "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
-      shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
-      "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
-      "'" + timeString, // G - Time (с апострофом для принудительного текстового формата)
-      status, // H - Status (из формы или "Pending")
-      service, // I - Service (тип услуги)
-    ]
+    // Вычисляем все слоты, которые занимает услуга
+    const allSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+    const startIndex = allSlots.indexOf(timeString)
+    const slotsNeeded = Math.ceil(duration / 30) // Количество 30-минутных слотов
+    
+    // Создаем записи для всех занятых слотов
+    const rowsToAdd = []
+    for (let i = 0; i < slotsNeeded; i++) {
+      const slotIndex = startIndex + i
+      if (slotIndex < allSlots.length) {
+        const slotTime = allSlots[slotIndex]
+        
+        // Подготавливаем данные для записи в таблицу
+        // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
+        const rowData = [
+          bookingId, // A - id (одинаковый для всех слотов одной услуги)
+          timestamp, // B - Timestamp (автоматический)
+          data.name, // C - Name
+          "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
+          shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
+          "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
+          "'" + slotTime, // G - Time (время каждого слота)
+          status, // H - Status (из формы или "Pending")
+          service, // I - Service (тип услуги)
+        ]
+        rowsToAdd.push(rowData)
+      }
+    }
 
-    // Добавляем строку в конец таблицы
-    sheet.appendRow(rowData)
+    // Добавляем все строки в таблицу
+    if (rowsToAdd.length > 0) {
+      // Добавляем строки одним вызовом для лучшей производительности
+      const range = sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, rowsToAdd[0].length)
+      range.setValues(rowsToAdd)
+    }
 
     // Возвращаем успешный ответ с ID созданной записи
     return ContentService.createTextOutput(

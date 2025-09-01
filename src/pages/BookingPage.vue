@@ -263,6 +263,7 @@
                               :key="time"
                               class="time-slot mb-1 p-2 rounded"
                               :class="getSlotClass(day, time)"
+                              :title="getSlotTitle(day, time)"
                             >
                               <button
                                 v-if="!isSlotBooked(day, time) && isSlotAvailableForService(day, time)"
@@ -322,6 +323,7 @@
                         v-for="time in generateAllTimeSlots()"
                         :key="time"
                         class="time-slot-mobile mb-2"
+                        :title="getSlotTitle(getSelectedDay(), time)"
                       >
                         <button
                           v-if="!isSlotBooked(getSelectedDay(), time) && isSlotAvailableForService(getSelectedDay(), time)"
@@ -670,7 +672,7 @@ const isSlotAvailableForService = (day, startTime) => {
   if (!bookingStore.selectedService) return true
   
   const serviceDuration = bookingStore.selectedService.duration
-  const slotsNeeded = serviceDuration / 30 // Convert minutes to 30-minute slots
+  const slotsNeeded = Math.ceil(serviceDuration / 30) // Convert minutes to 30-minute slots
   
   // Get all time slots
   const allSlots = generateAllTimeSlots()
@@ -695,6 +697,63 @@ const getTimeRange = (startTime) => {
   // Always return just the start time, no ranges
   return startTime
 }
+
+// Get localized title for slot availability
+const getSlotTitle = (day, slot) => {
+  const isBooked = isSlotBooked(day, slot)
+  const isAvailable = isSlotAvailableForService(day, slot)
+  
+  if (isBooked) {
+    return $t('slots.occupied')
+  }
+  
+  if (!isAvailable && bookingStore.selectedService) {
+    const serviceDuration = bookingStore.selectedService.duration
+    const slotsNeeded = Math.ceil(serviceDuration / 30)
+    
+    // Check if there's enough time until end of day
+    const allSlots = generateAllTimeSlots()
+    const startIndex = allSlots.indexOf(slot)
+    const endIndex = startIndex + slotsNeeded - 1
+    
+    if (endIndex >= allSlots.length) {
+      return $t('slots.notEnoughTime', { duration: serviceDuration })
+    }
+    
+    // Check which specific slot is conflicting
+    for (let i = 0; i < slotsNeeded; i++) {
+      const slotIndex = startIndex + i
+      if (slotIndex < allSlots.length) {
+        const checkSlot = allSlots[slotIndex]
+        if (isSlotBooked(day, checkSlot)) {
+          return $t('slots.conflictWith', { time: checkSlot })
+        }
+      }
+    }
+    
+    return $t('slots.needConsecutive', { slots: slotsNeeded })
+  }
+  
+  if (bookingStore.selectedService) {
+    const serviceDuration = bookingStore.selectedService.duration
+    const slotsNeeded = Math.ceil(serviceDuration / 30)
+    const allSlots = generateAllTimeSlots()
+    const startIndex = allSlots.indexOf(slot)
+    const endIndex = startIndex + slotsNeeded - 1
+    
+    if (endIndex < allSlots.length) {
+      const endTime = allSlots[endIndex]
+      return $t('slots.available', { 
+        duration: serviceDuration, 
+        start: slot, 
+        end: endTime 
+      })
+    }
+  }
+  
+  return $t('slots.available', { duration: '30', start: slot, end: slot })
+}
+
 
 // Check if a slot is booked
 const isSlotBooked = (day, slot) => {
@@ -827,6 +886,7 @@ const nextDay = () => {
     selectedDayIndex.value++
   }
 }
+
 
 // Initialize calendar on mount
 onMounted(async () => {
