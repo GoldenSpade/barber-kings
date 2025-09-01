@@ -258,28 +258,26 @@
                         </div>
                         <div class="time-slots">
                           <div v-if="day.available">
-                                                                                        <div
-                                v-for="time in day.allTimeSlots"
-                                :key="time"
-                                class="time-slot mb-1 p-2 rounded"
-                                :class="getSlotClass(day, time)"
+                            <div
+                              v-for="time in generateAllTimeSlots()"
+                              :key="time"
+                              class="time-slot mb-1 p-2 rounded"
+                              :class="getSlotClass(day, time)"
+                            >
+                              <button
+                                v-if="!isSlotBooked(day, time) && isSlotAvailableForService(day, time)"
+                                class="btn btn-outline-secondary btn-sm w-100"
+                                :class="{
+                                  'btn-success':
+                                    bookingStore.selectedTime === time &&
+                                    bookingStore.selectedDate === day.date
+                                }"
+                                @click="bookingStore.selectTime(day.date, time)"
                               >
-                                <button
-                                  v-if="!isSlotBooked(day, time)"
-                                  class="btn btn-outline-secondary btn-sm w-100"
-                                  :class="{
-                                    'btn-success':
-                                      bookingStore.selectedTime === time &&
-                                      bookingStore.selectedDate === day.date,
-                                    'btn-disabled': !isSlotAvailableForService(day, time)
-                                  }"
-                                  @click="bookingStore.selectTime(day.date, time)"
-                                  :disabled="!isSlotAvailableForService(day, time)"
-                                >
-                                  {{ getTimeRange(time) }}
-                                </button>
-                              <div v-else class="d-flex justify-content-center align-items-center">
-                                <span class="fw-medium time-label">{{ time }}</span>
+                                {{ time }}
+                              </button>
+                              <div v-else class="time-label fw-medium">
+                                {{ time }}
                               </div>
                             </div>
                           </div>
@@ -321,7 +319,7 @@
                   <div class="mobile-time-slots-container">
                     <div v-if="getSelectedDay().available" class="time-slots-scroll">
                       <div 
-                        v-for="time in getSelectedDay().allTimeSlots"
+                        v-for="time in generateAllTimeSlots()"
                         :key="time"
                         class="time-slot-mobile mb-2"
                       >
@@ -335,7 +333,7 @@
                           }"
                           @click="bookingStore.selectTime(getSelectedDay().date, time)"
                         >
-                          {{ getTimeRange(time) }}
+                          {{ time }}
                         </button>
                         <div v-else-if="isSlotBooked(getSelectedDay(), time)" class="time-slot-occupied">
                           <span class="fw-medium">{{ time }}</span>
@@ -547,8 +545,7 @@ const translatedWeekDays = computed(() => {
       ...day,
       dayName: dayNames[new Date(day.date).getDay()],
       month: monthNames[new Date(day.date).getMonth()],
-      reason: translatedReason,
-      allTimeSlots: day.timeSlots || generateAllTimeSlots(), // Use filtered slots from store or fallback to all slots
+      reason: translatedReason
     }
   })
 })
@@ -707,13 +704,20 @@ const isSlotBooked = (day, slot) => {
   // Get current location name
   let currentLocation = ''
   if (bookingStore.selectedLocation?.nameKey) {
-    currentLocation = bookingStore.selectedLocation.nameKey.replace('locations.', '').replace('.name', '')
+    const locationKey = bookingStore.selectedLocation.nameKey.replace('locations.', '').replace('.name', '')
+    if (locationKey === 'downtown') {
+      currentLocation = 'Martinkovac'
+    } else if (locationKey === 'podil') {
+      currentLocation = 'Adamiceva'
+    } else {
+      currentLocation = locationKey
+    }
   } else if (bookingStore.selectedLocation?.name) {
-    // Map location names to database format
+    // Map location names to short format
     if (bookingStore.selectedLocation.name.includes('Martinkovac')) {
-      currentLocation = 'downtown'
-    } else if (bookingStore.selectedLocation.name.includes('Adamićeva')) {
-      currentLocation = 'podil'
+      currentLocation = 'Martinkovac'
+    } else if (bookingStore.selectedLocation.name.includes('Adami')) {
+      currentLocation = 'Adamiceva'
     } else {
       currentLocation = bookingStore.selectedLocation.name
     }
@@ -1211,6 +1215,11 @@ onMounted(async () => {
   border-radius: 6px;
   white-space: nowrap;
   min-width: 80px;
+  height: 28px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .time-slots .btn-success {
@@ -1231,6 +1240,9 @@ onMounted(async () => {
   border: 1px solid #f0f0f0;
   transition: all 0.2s ease;
   font-size: 0.85rem;
+  height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 .time-slot.occupied {
@@ -1274,6 +1286,11 @@ onMounted(async () => {
 .time-label {
   color: #2c3e33;
   font-size: 0.8rem;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .reason-text {

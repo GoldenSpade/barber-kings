@@ -38,13 +38,13 @@ function doGet(e) {
       // Проверяем что строка не пустая (id, Name, Location, Date, Time)
       if (row[0] && row[2] && row[4] && row[5] && row[6]) {
         
-        // Преобразуем location в нужный формат для клиента
+        // Преобразуем location в короткое название для клиента
         let locationKey = ''
-        const fullLocation = row[4] // "Barber Kings Adamićeva" или "Barber Kings Martinkovac"
-        if (fullLocation.includes('Adamićeva')) {
-          locationKey = 'podil'
+        const fullLocation = row[4] // "Barber Kings Adamiceva" или "Barber Kings Martinkovac"
+        if (fullLocation.includes('Adami')) {
+          locationKey = 'Adamiceva'
         } else if (fullLocation.includes('Martinkovac')) {
-          locationKey = 'downtown'
+          locationKey = 'Martinkovac'
         } else {
           locationKey = fullLocation
         }
@@ -63,9 +63,9 @@ function doGet(e) {
             service: row[8] || '' // Service
           })
         } else {
-          // Для обычных пользователей - только необходимые данные с преобразованным location
+          // Для обычных пользователей - только необходимые данные с короткими названиями
           bookings.push({
-            location: locationKey, // Location key для сопоставления (podil, downtown)
+            location: locationKey, // Location key (Martinkovac, Adamiceva)
             date: row[5],     // Date  
             time: row[6],     // Time
             status: row[7],   // Status
@@ -144,11 +144,11 @@ function handleAddBooking(e) {
     // Создаем timestamp
     const timestamp = new Date()
     
-    // Преобразуем location из ключа в полное название
+    // Преобразуем location из короткого названия в полное название
     let fullLocationName = location
-    if (location === 'podil') {
-      fullLocationName = 'Barber Kings Adamićeva'
-    } else if (location === 'downtown') {
+    if (location === 'Adamiceva') {
+      fullLocationName = 'Barber Kings Adamiceva'
+    } else if (location === 'Martinkovac') {
       fullLocationName = 'Barber Kings Martinkovac'
     }
 
@@ -227,11 +227,11 @@ function doPost(e) {
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
     const service = data.service || ''  // Тип услуги из формы
 
-    // Преобразуем location из ключа в полное название
+    // Преобразуем location из короткого названия в полное название
     let fullLocationName = data.location
-    if (data.location === 'podil') {
-      fullLocationName = 'Barber Kings Adamićeva'
-    } else if (data.location === 'downtown') {
+    if (data.location === 'Adamiceva') {
+      fullLocationName = 'Barber Kings Adamiceva'
+    } else if (data.location === 'Martinkovac') {
       fullLocationName = 'Barber Kings Martinkovac'
     }
 

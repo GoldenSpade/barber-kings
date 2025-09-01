@@ -65,8 +65,8 @@ export const useBookingStore = defineStore('booking', () => {
       phoneKey: 'locations.podil.phone',
       hoursKey: 'locations.podil.hours',
       // Keep original properties for backward compatibility
-      name: 'Barber Kings Adamićeva',
-      address: 'Adamićeva ul. 34A, 51000, Rijeka',
+      name: 'Barber Kings Adamiceva',
+      address: 'Adamiceva ul. 34A, 51000, Rijeka',
       description: 'Professional barber services in the heart of Rijeka',
       phone: '091 948 1514',
       url: '/booking?location=2&step=2',
@@ -138,40 +138,19 @@ export const useBookingStore = defineStore('booking', () => {
         
         // Фильтруем занятые слоты для текущей даты и локации
         const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
-        // Используем полное название локации для сопоставления с API
-        const currentLocation = selectedLocation.value?.name
-        
-        timeSlots = allSlots.filter(slot => {
-          // Check if this specific slot is booked
-          const isBooked = bookedSlots.value.some(booking => 
-            booking.date === dateString && 
-            booking.time === slot && 
-            booking.location === currentLocation
-          )
-          
-          // If we have a selected service, check if there are enough consecutive slots available
-          if (selectedService.value && !isBooked) {
-            const serviceDuration = selectedService.value.duration
-            const slotsNeeded = serviceDuration / 30
-            const slotIndex = allSlots.indexOf(slot)
-            
-            // Check if we have enough consecutive slots available
-            for (let i = 0; i < slotsNeeded; i++) {
-              const checkIndex = slotIndex + i
-              if (checkIndex >= allSlots.length) return false // Not enough time left in the day
-              
-              const checkSlot = allSlots[checkIndex]
-              const isSlotBooked = bookedSlots.value.some(booking => 
-                booking.date === dateString && 
-                booking.time === checkSlot && 
-                booking.location === currentLocation
-              )
-              if (isSlotBooked) return false // One of the required slots is booked
-            }
+        // Преобразуем название локации для сопоставления с API
+        let currentLocation = selectedLocation.value?.name
+        if (currentLocation) {
+          if (currentLocation.includes('Martinkovac')) {
+            currentLocation = 'Martinkovac'
+          } else if (currentLocation.includes('Adami')) {
+            currentLocation = 'Adamiceva'
           }
-          
-          return !isBooked
-        })
+        }
+        
+        // Не фильтруем слоты, а просто используем все слоты
+        // Логика отображения (занят/свободен) будет обрабатываться в компоненте
+        timeSlots = allSlots
       }
       
       days.push({
@@ -380,11 +359,19 @@ export const useBookingStore = defineStore('booking', () => {
       const endIndex = startIndex + (serviceDuration / 30) - 1
       const endTime = endIndex < allSlots.length ? allSlots[endIndex] : formattedTime
       
+      // Преобразуем location в короткое название для отправки
+      let locationKey = selectedLocation.value.name
+      if (locationKey.includes('Martinkovac')) {
+        locationKey = 'Martinkovac'
+      } else if (locationKey.includes('Adami')) {
+        locationKey = 'Adamiceva'
+      }
+
       // Подготавливаем данные для отправки
       const bookingData = {
         name: bookingForm.value.name,
         phone: bookingForm.value.phone, // Апостроф добавляется на стороне Google Apps Script
-        location: selectedLocation.value.name,
+        location: locationKey,
         service: selectedService.value.nameKey ? 
           selectedService.value.nameKey.replace('services.', '').replace('.name', '') : 
           selectedService.value.name,

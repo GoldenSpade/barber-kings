@@ -42,8 +42,8 @@
           <label class="form-label fw-bold">{{ $t('admin.calendar.filterLocation') }}</label>
           <select v-model="selectedLocationFilter" class="form-select">
             <option value="">{{ $t('admin.calendar.allLocations') }}</option>
-            <option value="downtown">Downtown</option>
-            <option value="podil">Podil</option>
+            <option value="Martinkovac">Martinkovac</option>
+            <option value="Adamiceva">Adamiceva</option>
           </select>
         </div>
         <div class="col-md-6 text-end mt-3 mt-md-0">
@@ -320,13 +320,10 @@ const getStatusBadgeClass = (status) => {
   }
 }
 
-// Get location name from location key
+// Get location name from location key  
 const getLocationName = (locationKey) => {
-  const locationMap = {
-    'downtown': 'Downtown',
-    'podil': 'Podil'
-  }
-  return locationMap[locationKey] || locationKey
+  // Теперь возвращаем как есть, так как используем короткие названия
+  return locationKey
 }
 
 // Loading state
