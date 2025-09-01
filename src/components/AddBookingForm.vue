@@ -196,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, helpers } from '@vuelidate/validators'
@@ -273,13 +273,9 @@ const maxDate = computed(() => {
 // Available time slots
 const availableTimeSlots = computed(() => {
   const slots = []
-  for (let hour = 9; hour <= 21; hour++) {
-    if (hour < 21) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-      slots.push(`${hour.toString().padStart(2, '0')}:30`)
-    } else {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-    }
+  for (let hour = 9; hour <= 20; hour++) {
+    slots.push(`${hour.toString().padStart(2, '0')}:00`)
+    slots.push(`${hour.toString().padStart(2, '0')}:30`)
   }
   return slots
 })
@@ -414,9 +410,28 @@ watch([() => form.value.date, () => form.value.location], (newValues, oldValues)
   }
 })
 
+// Handle pre-fill form data from calendar
+const handlePrefillForm = (event) => {
+  const { date, time } = event.detail
+  
+  // Pre-fill the form
+  selectedDate.value = date
+  selectedTime.value = time
+  
+  console.log('Pre-filled booking form:', { date, time })
+}
+
 // Load booked slots when component mounts
 onMounted(async () => {
   await bookingStore.fetchBookedSlots(true)
+  
+  // Add event listener for form pre-fill
+  window.addEventListener('prefill-booking-form', handlePrefillForm)
+})
+
+onUnmounted(() => {
+  // Clean up event listener
+  window.removeEventListener('prefill-booking-form', handlePrefillForm)
 })
 </script>
 

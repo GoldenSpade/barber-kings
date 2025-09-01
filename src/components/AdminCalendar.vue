@@ -135,8 +135,9 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="d-flex justify-content-center align-items-center">
+                <div v-else class="empty-slot-clickable position-relative" @click="handleEmptySlotClick(day, slot)">
                   <span class="fw-medium time-label">{{ slot }}</span>
+                  <i class="bi bi-plus-circle add-icon"></i>
                 </div>
               </div>
             </div>
@@ -171,13 +172,9 @@ onMounted(async () => {
 // Generate all possible time slots for admin view
 const allTimeSlots = computed(() => {
   const slots = []
-  for (let hour = 9; hour <= 21; hour++) {
-    if (hour < 21) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-      slots.push(`${hour.toString().padStart(2, '0')}:30`)
-    } else {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-    }
+  for (let hour = 9; hour <= 20; hour++) {
+    slots.push(`${hour.toString().padStart(2, '0')}:00`)
+    slots.push(`${hour.toString().padStart(2, '0')}:30`)
   }
   return slots
 })
@@ -375,6 +372,27 @@ const copyPhoneToClipboard = async (phone) => {
     document.body.removeChild(textArea)
   }
 }
+
+// Handle click on empty slot to add booking
+const handleEmptySlotClick = (day, slot) => {
+  // Format the date for the booking form
+  const date = new Date(day.date)
+  const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  
+  // Navigate to Add Booking tab with pre-filled date and time
+  // We'll emit an event to parent component to handle tab switching
+  console.log(`Adding booking for ${dateString} at ${slot}`)
+  
+  // For now, we'll use window navigation to the Add Booking tab
+  // In the future, this could be improved with proper component communication
+  window.dispatchEvent(new CustomEvent('admin-add-booking', {
+    detail: {
+      date: dateString,
+      time: slot,
+      dayDate: day.date
+    }
+  }))
+}
 </script>
 
 <style scoped>
@@ -475,6 +493,44 @@ const copyPhoneToClipboard = async (phone) => {
 .phone-clickable:hover {
   background-color: rgba(44, 62, 51, 0.1);
   color: #2c3e33 !important;
+}
+
+/* Empty slot clickable styles */
+.empty-slot-clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-slot-clickable:hover {
+  /* Remove background color on hover */
+  transform: none;
+}
+
+.empty-slot-clickable .time-label {
+  /* Center the time text */
+  text-align: center;
+  width: 100%;
+}
+
+.empty-slot-clickable .add-icon {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: #2c3e33;
+  font-size: 0.8rem;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.empty-slot-clickable:hover .add-icon {
+  opacity: 1;
 }
 
 .copy-icon {

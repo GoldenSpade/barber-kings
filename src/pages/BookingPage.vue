@@ -656,13 +656,9 @@ const formattedDateRange = computed(() => {
 // Helper function to generate all time slots
 const generateAllTimeSlots = () => {
   const slots = []
-  for (let hour = 9; hour <= 21; hour++) {
-    if (hour < 21) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-      slots.push(`${hour.toString().padStart(2, '0')}:30`)
-    } else {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-    }
+  for (let hour = 9; hour <= 20; hour++) {
+    slots.push(`${hour.toString().padStart(2, '0')}:00`)
+    slots.push(`${hour.toString().padStart(2, '0')}:30`)
   }
   return slots
 }

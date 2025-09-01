@@ -85,14 +85,10 @@ export const useBookingStore = defineStore('booking', () => {
   // Helper function to generate time slots
   const generateTimeSlots = () => {
     const slots = []
-    // From 9:00 to 21:00 (9 PM) with 30-minute intervals
-    for (let hour = 9; hour <= 21; hour++) {
-      if (hour < 21) {
-        slots.push(`${hour.toString().padStart(2, '0')}:00`)
-        slots.push(`${hour.toString().padStart(2, '0')}:30`)
-      } else {
-        slots.push(`${hour.toString().padStart(2, '0')}:00`) // Last slot at 21:00
-      }
+    // From 9:00 to 20:30 with 30-minute intervals
+    for (let hour = 9; hour <= 20; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`)
+      slots.push(`${hour.toString().padStart(2, '0')}:30`)
     }
     return slots
   }
@@ -133,7 +129,7 @@ export const useBookingStore = defineStore('booking', () => {
         available = false
         reason = 'Closed'
       } else {
-        // Generate time slots for available days (9:00-21:00, 30min intervals)
+        // Generate time slots for available days (9:00-20:30, 30min intervals)
         const allSlots = generateTimeSlots()
         
         // Фильтруем занятые слоты для текущей даты и локации
@@ -354,7 +350,7 @@ export const useBookingStore = defineStore('booking', () => {
       
       // Calculate end time based on service duration
       const serviceDuration = selectedService.value.duration
-      const allSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+      const allSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30']
       const startIndex = allSlots.indexOf(formattedTime)
       const endIndex = startIndex + (serviceDuration / 30) - 1
       const endTime = endIndex < allSlots.length ? allSlots[endIndex] : formattedTime

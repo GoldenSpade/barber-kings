@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdminCalendar from '@/components/AdminCalendar.vue'
 import AddBookingForm from '@/components/AddBookingForm.vue'
@@ -157,11 +157,54 @@ const changeLanguage = (lang) => {
   localStorage.setItem('locale', lang)
 }
 
+// Store reference to AddBookingForm component to pre-fill data
+const addBookingFormRef = ref(null)
+
+// Handle admin-add-booking event from calendar
+const handleAddBookingFromCalendar = (event) => {
+  const { date, time } = event.detail
+  
+  // Switch to Add Booking tab
+  const addBookingTab = document.getElementById('add-booking-tab')
+  const addBookingTabContent = document.getElementById('add-booking')
+  
+  if (addBookingTab && addBookingTabContent) {
+    // Remove active class from current tab
+    const currentActiveTab = document.querySelector('.nav-link.active')
+    const currentActiveContent = document.querySelector('.tab-pane.show.active')
+    
+    if (currentActiveTab) currentActiveTab.classList.remove('active')
+    if (currentActiveContent) {
+      currentActiveContent.classList.remove('show', 'active')
+    }
+    
+    // Activate Add Booking tab
+    addBookingTab.classList.add('active')
+    addBookingTabContent.classList.add('show', 'active')
+    
+    // Pre-fill form data after a small delay to ensure component is rendered
+    setTimeout(() => {
+      // Dispatch event to AddBookingForm to pre-fill the data
+      window.dispatchEvent(new CustomEvent('prefill-booking-form', {
+        detail: { date, time }
+      }))
+    }, 100)
+  }
+}
+
 onMounted(async () => {
   // Initialize calendar first
   bookingStore.initializeCalendar()
   // Then load bookings data when admin page is mounted with admin privileges
   await bookingStore.fetchBookedSlots(true) // isAdmin = true for full data access
+  
+  // Add event listener for calendar booking requests
+  window.addEventListener('admin-add-booking', handleAddBookingFromCalendar)
+})
+
+onUnmounted(() => {
+  // Clean up event listener
+  window.removeEventListener('admin-add-booking', handleAddBookingFromCalendar)
 })
 </script>
 
