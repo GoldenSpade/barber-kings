@@ -121,6 +121,10 @@
                       {{ booking.phone }}
                       <i class="bi bi-clipboard ms-1 copy-icon"></i>
                     </div>
+                    <div v-if="booking.service" class="booking-service text-muted small mb-1">
+                      <i class="bi bi-scissors me-1"></i>
+                      {{ getServiceName(booking.service) }}
+                    </div>
                     <div v-if="booking.location" class="booking-location text-muted small mb-1">
                       <i class="bi bi-geo-alt me-1"></i>
                       {{ getLocationName(booking.location) }}
@@ -323,6 +327,17 @@ const getLocationName = (locationKey) => {
   return locationKey
 }
 
+const getServiceName = (serviceKey) => {
+  // Преобразуем ключ услуги в читаемое название
+  const serviceNames = {
+    'mensHaircut': $t('services.mensHaircut.name'),
+    'mensHaircutBeard': $t('services.mensHaircutBeard.name'),
+    'womensHaircut': $t('services.womensHaircut.name')
+  }
+  
+  return serviceNames[serviceKey] || serviceKey
+}
+
 // Loading state
 const isLoading = computed(() => bookingStore.isLoadingBookedSlots)
 
@@ -479,6 +494,11 @@ const handleEmptySlotClick = (day, slot) => {
 }
 
 .booking-location {
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.booking-service {
   font-size: 0.7rem;
   line-height: 1.2;
 }
