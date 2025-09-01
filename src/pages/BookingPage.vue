@@ -2,15 +2,15 @@
   <div class="booking-page bg-light">
     <!-- Logo Header -->
     <div class="py-4 bg-white">
-      <div class="container">
+      <div class="container position-relative">
         <div class="row align-items-center">
           <!-- Logo -->
-          <div class="col-12 col-md-8 text-center text-md-start">
+          <div class="col-12 text-center">
             <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
           </div>
 
           <!-- Language Switcher -->
-          <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
+          <div class="position-absolute top-0 end-0 p-3">
             <div class="dropdown d-inline-block">
               <button
                 class="btn btn-outline-secondary btn-sm dropdown-toggle"
@@ -94,17 +94,61 @@
         <div v-else class="row justify-content-center">
           <div class="col-md-5 mb-4" v-for="location in translatedLocations" :key="location.id">
             <div
-              class="service-card h-100"
+              class="location-card h-100"
               :class="{ selected: bookingStore.selectedLocation?.id === location.id }"
-              :style="{ backgroundImage: `url(${locationImages[location.id]})` }"
               @click="bookingStore.selectLocation(location)"
             >
-              <div class="card-overlay"></div>
-              <div class="card-content text-center p-4">
-                <h5 class="fw-bold text-white mb-3">{{ location.name }}</h5>
-                <p class="text-white mb-3">{{ location.address }}</p>
-                <p class="text-white small mb-4">{{ location.description }}</p>
-                <button class="btn btn-outline-light w-100 mt-auto">
+              <div class="card-content p-4">
+                <h5 class="fw-bold text-dark mb-4 text-center">{{ location.name }}</h5>
+                
+                <!-- Address -->
+                <div class="address-section mb-4 text-center">
+                  <div class="d-flex align-items-center justify-content-center mb-2">
+                    <i class="bi bi-geo-alt-fill me-2 text-brand"></i>
+                    <span class="fw-bold text-dark">{{ $t('booking.address') }}</span>
+                  </div>
+                  <p class="text-muted mb-0">{{ location.address }}</p>
+                </div>
+                
+                <!-- Working Hours -->
+                <div class="working-hours-section">
+                  <div class="d-flex align-items-center justify-content-center mb-3">
+                    <i class="bi bi-clock-fill me-2 text-brand"></i>
+                    <span class="fw-bold text-dark">{{ $t('booking.workingHours') }}</span>
+                  </div>
+                  <div class="hours-list">
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('monday') }">
+                      <span class="day-name">{{ $t('booking.days.monday') }}:</span>
+                      <span class="hours">{{ location.hours.monday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('tuesday') }">
+                      <span class="day-name">{{ $t('booking.days.tuesday') }}:</span>
+                      <span class="hours">{{ location.hours.tuesday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('wednesday') }">
+                      <span class="day-name">{{ $t('booking.days.wednesday') }}:</span>
+                      <span class="hours">{{ location.hours.wednesday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('thursday') }">
+                      <span class="day-name">{{ $t('booking.days.thursday') }}:</span>
+                      <span class="hours">{{ location.hours.thursday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('friday') }">
+                      <span class="day-name">{{ $t('booking.days.friday') }}:</span>
+                      <span class="hours">{{ location.hours.friday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('saturday') }">
+                      <span class="day-name">{{ $t('booking.days.saturday') }}:</span>
+                      <span class="hours">{{ location.hours.saturday }}</span>
+                    </div>
+                    <div class="hour-item d-flex justify-content-between align-items-center mb-1" :class="{ 'current-day': isCurrentDay('sunday') }">
+                      <span class="day-name">{{ $t('booking.days.sunday') }}:</span>
+                      <span class="hours">{{ location.hours.sunday }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <button class="btn btn-brand w-100 mt-4">
                   {{ $t('booking.choose') }}
                 </button>
               </div>
@@ -120,24 +164,18 @@
         <!-- Selected Location Card -->
         <div class="row justify-content-center mb-4">
           <div class="col-lg-10">
-            <div
-              class="selected-location-card"
-              :style="{
-                backgroundImage: `url(${locationImages[bookingStore.selectedLocation.id]})`,
-              }"
-            >
-              <div class="card-overlay"></div>
+            <div class="selected-location-card">
               <div class="card-content text-center p-4">
-                <h5 class="fw-bold text-white mb-2">{{ getSelectedLocationName() }}</h5>
-                <p class="text-white mb-2">
+                <h5 class="fw-bold text-dark mb-2">{{ getSelectedLocationName() }}</h5>
+                <p class="text-muted mb-2">
                   <i class="bi bi-geo-alt me-1"></i>{{ getSelectedLocationAddress() }}
                 </p>
-                <p class="text-white mb-2">
+                <p class="text-muted mb-2">
                   <i class="bi bi-scissors me-1"></i>{{ $t('booking.haircut') }} ({{
                     $t('booking.duration')
                   }})
                 </p>
-                <p class="text-white mb-0">
+                <p class="text-muted mb-0">
                   <i class="bi bi-clock me-1"></i
                   >{{ $t('booking.timezone', { timezone: bookingStore.formattedTimezone }) }}
                 </p>
@@ -340,8 +378,6 @@ import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
-import address1 from '@/assets/address-1.jpg'
-import address2 from '@/assets/address-2.jpg'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
@@ -373,11 +409,7 @@ const rules = computed(() => ({
 // Setup validation
 const v$ = useVuelidate(rules, bookingStore.bookingForm)
 
-// Location images mapping
-const locationImages = {
-  1: address1,
-  2: address2,
-}
+
 
 // Computed locations with translations
 const translatedLocations = computed(() => {
@@ -538,11 +570,36 @@ const refreshCalendar = async () => {
   }
 }
 
+// Check if current day matches the given day
+const isCurrentDay = (dayName) => {
+  const today = new Date()
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+  const currentDayName = dayNames[today.getDay()]
+  return currentDayName === dayName
+}
+
+// Handle URL parameters for direct booking
+const handleUrlParams = () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const locationId = urlParams.get('location')
+  const step = urlParams.get('step')
+  
+  if (locationId && step) {
+    const location = bookingStore.locations.find(loc => loc.id === parseInt(locationId))
+    if (location) {
+      bookingStore.selectLocation(location)
+      bookingStore.currentStep = parseInt(step)
+    }
+  }
+}
+
 // Initialize calendar on mount
 onMounted(async () => {
   bookingStore.initializeCalendar()
   // Загружаем занятые слоты при загрузке страницы
   await bookingStore.fetchBookedSlots()
+  // Handle URL parameters for direct booking
+  handleUrlParams()
 })
 </script>
 
@@ -592,73 +649,106 @@ onMounted(async () => {
   margin-top: 20px;
 }
 
-/* Service Cards */
-.service-card {
-  border: 2px solid transparent;
+/* Location Cards */
+.location-card {
+  border: 2px solid #e9ecef;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
-  background-size: cover;
-  background-position: top center;
-  background-repeat: no-repeat;
-  min-height: 350px;
+  background-color: white;
+  min-height: 400px;
   position: relative;
   display: flex;
-  align-items: flex-end;
-}
-
-.card-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-  transition: opacity 0.3s ease;
+  align-items: stretch;
 }
 
 .card-content {
-  position: relative;
-  z-index: 2;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.card-content h5,
-.card-content p {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.service-card:hover {
+.location-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  border-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-color: #2c3e33;
 }
 
-.service-card:hover .card-overlay {
-  opacity: 0.9;
+.location-card.selected {
+  border-color: #2c3e33;
+  box-shadow: 0 0 0 3px rgba(44, 62, 51, 0.2);
+  background-color: #f8f9fa;
 }
 
-.service-card.selected {
-  border-color: #fff;
-  box-shadow: 0 0 0 3px #2c3e33;
-}
-
-.service-card.selected .card-overlay {
-  background: linear-gradient(to bottom, rgba(44, 62, 51, 0.4), rgba(44, 62, 51, 0.8));
-}
-
-.service-card .btn {
+.location-card .btn {
   transition: all 0.3s ease;
+  margin-top: auto;
 }
 
-.service-card:hover .btn,
-.service-card.selected .btn {
-  background-color: white;
-  border-color: white;
-  color: #2c3e33;
+.location-card.selected .btn {
   font-weight: bold;
+}
+
+/* Brand Color */
+.text-brand {
+  color: #2c3e33 !important;
+}
+
+.btn-brand {
+  background-color: #2c3e33 !important;
+  border-color: #2c3e33 !important;
+  color: white !important;
+}
+
+.btn-brand:hover {
+  background-color: #1a2520 !important;
+  border-color: #1a2520 !important;
+  color: white !important;
+}
+
+/* Address Section */
+.address-section {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+/* Working Hours Section */
+.working-hours-section {
+  flex-grow: 1;
+}
+
+.hours-list {
+  font-size: 0.8rem;
+}
+
+.hour-item {
+  padding: 0.15rem 0;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.hour-item.current-day {
+  background-color: rgba(44, 62, 51, 0.1);
+  border-left: 3px solid #2c3e33;
+  padding-left: 0.5rem;
+}
+
+.day-name {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.hours {
+  color: #2c3e33;
+  font-weight: 600;
+}
+
+.hour-item.current-day .day-name,
+.hour-item.current-day .hours {
+  color: #2c3e33;
+  font-weight: 600;
 }
 
 /* Selected Location Card */
@@ -666,33 +756,16 @@ onMounted(async () => {
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  background-size: cover;
-  background-position: top center;
-  background-repeat: no-repeat;
-  min-height: 350px;
+  background-color: white;
+  min-height: 120px;
   position: relative;
   display: flex;
   align-items: center;
-}
-
-.selected-location-card .card-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, rgba(44, 62, 51, 0.4), rgba(44, 62, 51, 0.8));
+  border: 2px solid #2c3e33;
 }
 
 .selected-location-card .card-content {
-  position: relative;
-  z-index: 2;
   width: 100%;
-}
-
-.selected-location-card .card-content h5,
-.selected-location-card .card-content p {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* Calendar Styles */
@@ -857,7 +930,7 @@ onMounted(async () => {
     font-size: 0.8rem;
   }
 
-  .service-card {
+  .location-card {
     margin-bottom: 1rem;
   }
 

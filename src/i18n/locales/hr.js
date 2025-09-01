@@ -52,20 +52,51 @@ export default {
     nextWeek: 'Sljedeći Tjedan',
     occupied: 'Zauzeto',
     refresh: 'Osvježi',
-    loadingCalendar: 'Učitavaju se dostupni termini...'
+    loadingCalendar: 'Učitavaju se dostupni termini...',
+    workingHours: 'Radno vrijeme',
+    address: 'Adresa',
+    days: {
+      monday: 'Ponedjeljak',
+      tuesday: 'Utorak',
+      wednesday: 'Srijeda',
+      thursday: 'Četvrtak',
+      friday: 'Petak',
+      saturday: 'Subota',
+      sunday: 'Nedjelja'
+    }
   },
   
   // Locations
   locations: {
     downtown: {
-      name: 'Downtown Barber Kings',
-      address: '25 Trg Nezavisnosti, Zagreb',
-      description: 'Centralna lokacija s punim spektrom usluga'
+      name: 'Barber Kings Martinkovac',
+      address: 'Martinkovac ul. 127, 51000, Rijeka',
+      description: 'Nalazi se u Marti Retail Park',
+      phone: '091 985 2998',
+      hours: {
+        monday: '9:00 - 21:00',
+        tuesday: '9:00 - 21:00',
+        wednesday: '9:00 - 21:00',
+        thursday: '9:00 - 21:00',
+        friday: '9:00 - 21:00',
+        saturday: '9:00 - 21:00',
+        sunday: 'Zatvoreno'
+      }
     },
     podil: {
-      name: 'Barber Kings Podil', 
-      address: '15 Podil Četvrt, Zagreb',
-      description: 'Ugodna atmosfera u povijesnoj četvrti'
+      name: 'Barber Kings Adamićeva',
+      address: 'Adamićeva ul. 34A, 51000, Rijeka',
+      description: 'Profesionalne berberske usluge u srcu Rijeke',
+      phone: '091 948 1514',
+      hours: {
+        monday: '8:00 - 17:00',
+        tuesday: '8:00 - 17:00',
+        wednesday: '8:00 - 17:00',
+        thursday: '8:00 - 17:00',
+        friday: '8:00 - 17:00',
+        saturday: '8:00 - 13:00',
+        sunday: 'Zatvoreno'
+      }
     }
   },
   

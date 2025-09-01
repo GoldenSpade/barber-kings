@@ -52,20 +52,51 @@ export default {
     nextWeek: 'Next Week',
     occupied: 'Occupied',
     refresh: 'Refresh',
-    loadingCalendar: 'Loading available times...'
+    loadingCalendar: 'Loading available times...',
+    workingHours: 'Working Hours',
+    address: 'Address',
+    days: {
+      monday: 'Monday',
+      tuesday: 'Tuesday',
+      wednesday: 'Wednesday',
+      thursday: 'Thursday',
+      friday: 'Friday',
+      saturday: 'Saturday',
+      sunday: 'Sunday'
+    }
   },
   
   // Locations
   locations: {
     downtown: {
-      name: 'Downtown Barber Kings',
-      address: '25 Independence Square, Kyiv', 
-      description: 'Central location with full range of services'
+      name: 'Barber Kings Martinkovac',
+      address: 'Martinkovac ul. 127, 51000, Rijeka',
+      description: 'Located in Marti Retail Park',
+      phone: '091 985 2998',
+      hours: {
+        monday: '9 AM - 9 PM',
+        tuesday: '9 AM - 9 PM',
+        wednesday: '9 AM - 9 PM',
+        thursday: '9 AM - 9 PM',
+        friday: '9 AM - 9 PM',
+        saturday: '9 AM - 9 PM',
+        sunday: 'Closed'
+      }
     },
     podil: {
-      name: 'Barber Kings Podil',
-      address: '15 Podil District, Kyiv',
-      description: 'Cozy atmosphere in historic district'  
+      name: 'Barber Kings Adamićeva',
+      address: 'Adamićeva ul. 34A, 51000, Rijeka',
+      description: 'Professional barber services in the heart of Rijeka',
+      phone: '091 948 1514',
+      hours: {
+        monday: '8 AM - 5 PM',
+        tuesday: '8 AM - 5 PM',
+        wednesday: '8 AM - 5 PM',
+        thursday: '8 AM - 5 PM',
+        friday: '8 AM - 5 PM',
+        saturday: '8 AM - 1 PM',
+        sunday: 'Closed'
+      }
     }
   },
   
