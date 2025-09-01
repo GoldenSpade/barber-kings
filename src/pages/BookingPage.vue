@@ -167,7 +167,7 @@
         <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseService') }}</h2>
         
         <div class="row justify-content-center">
-          <div class="col-md-6" v-for="service in translatedServices" :key="service.id">
+          <div class="col-md-6 mb-4" v-for="service in translatedServices" :key="service.id">
             <div
               class="service-card h-100"
               :class="{ selected: bookingStore.selectedService?.id === service.id }"
