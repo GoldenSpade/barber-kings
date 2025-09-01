@@ -1,6 +1,3 @@
-// Google Apps Script код для интеграции с Google Таблицей
-// Этот файл нужно скопировать в Google Apps Script проект
-
 // ID вашей Google Таблицы (замените на свой ID)
 const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
 
@@ -35,32 +32,44 @@ function doGet(e) {
     const bookings = []
     
     // Начинаем с индекса 1, чтобы пропустить заголовки
-    // Новая структура: A=ID, B=Timestamp, C=Name, D=Phone, E=Location, F=Date, G=Time, H=Status, I=Service
+    // Структура: A=id, B=Timestamp, C=Name, D=Phone, E=Location, F=Date, G=Time, H=Status, I=Service
     for (let i = 1; i < data.length; i++) {
       const row = data[i]
-      // Проверяем что строка не пустая (ID, Name, Location, Date, Time)
+      // Проверяем что строка не пустая (id, Name, Location, Date, Time)
       if (row[0] && row[2] && row[4] && row[5] && row[6]) {
+        
+        // Преобразуем location в нужный формат для клиента
+        let locationKey = ''
+        const fullLocation = row[4] // "Barber Kings Adamićeva" или "Barber Kings Martinkovac"
+        if (fullLocation.includes('Adamićeva')) {
+          locationKey = 'podil'
+        } else if (fullLocation.includes('Martinkovac')) {
+          locationKey = 'downtown'
+        } else {
+          locationKey = fullLocation
+        }
+        
         if (isAdmin) {
           // Для админки возвращаем полную информацию
           bookings.push({
-            id: row[0],         // ID
+            id: row[0],         // id
             timestamp: row[1],  // Timestamp
             name: row[2],       // Name
             phone: row[3],      // Phone  
-            location: row[4],   // Location
+            location: row[4],   // Location (полное название)
             date: row[5],       // Date  
             time: row[6],       // Time
             status: row[7] || 'Pending', // Status (по умолчанию Pending)
-            service: row[8] || '' // Service (новое поле)
+            service: row[8] || '' // Service
           })
         } else {
-          // Для обычных пользователей - только необходимые данные
+          // Для обычных пользователей - только необходимые данные с преобразованным location
           bookings.push({
-            location: row[4], // Location
+            location: locationKey, // Location key для сопоставления (podil, downtown)
             date: row[5],     // Date  
             time: row[6],     // Time
             status: row[7],   // Status
-            service: row[8] || '' // Service (новое поле)
+            service: row[8] || '' // Service
           })
         }
       }
@@ -135,14 +144,22 @@ function handleAddBooking(e) {
     // Создаем timestamp
     const timestamp = new Date()
     
+    // Преобразуем location из ключа в полное название
+    let fullLocationName = location
+    if (location === 'podil') {
+      fullLocationName = 'Barber Kings Adamićeva'
+    } else if (location === 'downtown') {
+      fullLocationName = 'Barber Kings Martinkovac'
+    }
+
     // Подготавливаем данные для записи в таблицу
-    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status, Service
+    // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
     const rowData = [
-      bookingId, // A - ID (уникальный идентификатор)
+      bookingId, // A - id (уникальный идентификатор)
       timestamp, // B - Timestamp (автоматический)
       name, // C - Name
       "'" + phone, // D - Phone (с апострофом для принудительного текстового формата)
-      location, // E - Location
+      fullLocationName, // E - Location (полное название)
       "'" + date, // F - Date (с апострофом для принудительного текстового формата)
       "'" + time, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status
@@ -210,14 +227,22 @@ function doPost(e) {
     const status = data.status || 'Pending'  // Статус из формы или по умолчанию "Pending"
     const service = data.service || ''  // Тип услуги из формы
 
+    // Преобразуем location из ключа в полное название
+    let fullLocationName = data.location
+    if (data.location === 'podil') {
+      fullLocationName = 'Barber Kings Adamićeva'
+    } else if (data.location === 'downtown') {
+      fullLocationName = 'Barber Kings Martinkovac'
+    }
+
     // Подготавливаем данные для записи в таблицу
-    // Порядок: ID, Timestamp, Name, Phone, Location, Date, Time, Status, Service
+    // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
     const rowData = [
-      bookingId, // A - ID (уникальный идентификатор)
+      bookingId, // A - id (уникальный идентификатор)
       timestamp, // B - Timestamp (автоматический)
       data.name, // C - Name
       "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
-      data.location, // E - Location
+      fullLocationName, // E - Location (полное название)
       "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
       "'" + timeString, // G - Time (с апострофом для принудительного текстового формата)
       status, // H - Status (из формы или "Pending")
@@ -267,9 +292,9 @@ function updateBookingStatus(e) {
     
     for (let i = 1; i < allData.length; i++) {
       const row = allData[i]
-      // Ищем по ID (колонка A, индекс 0)
+      // Ищем по id (колонка A, индекс 0)
       if (row[0] === data.id) {
-        // Обновляем статус (колонка H, индекс 7) - Service теперь в колонке I
+        // Обновляем статус (колонка H, индекс 7)
         sheet.getRange(i + 1, 8).setValue(data.newStatus)
         
         return ContentService.createTextOutput(

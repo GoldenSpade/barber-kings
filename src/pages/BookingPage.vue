@@ -695,19 +695,8 @@ const isSlotAvailableForService = (day, startTime) => {
 
 // Helper function to get time range for display
 const getTimeRange = (startTime) => {
-  if (!bookingStore.selectedService) return startTime
-  
-  const serviceDuration = bookingStore.selectedService.duration
-  const allSlots = generateAllTimeSlots()
-  const startIndex = allSlots.indexOf(startTime)
-  
-  if (startIndex === -1) return startTime
-  
-  const endIndex = startIndex + (serviceDuration / 30) - 1
-  if (endIndex >= allSlots.length) return startTime
-  
-  const endTime = allSlots[endIndex]
-  return `${startTime} - ${endTime}`
+  // Always return just the start time, no ranges
+  return startTime
 }
 
 // Check if a slot is booked
