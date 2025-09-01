@@ -70,11 +70,36 @@
                   @blur="v$.location.$touch"
                 >
                   <option value="">{{ $t('admin.addBooking.selectLocation') }}</option>
-                  <option value="downtown">Downtown Barber Kings</option>
-                  <option value="podil">Barber Kings Podil</option>
+                  <option value="Martinkovac">{{ $t('locations.downtown.name') }}</option>
+                  <option value="Adamiceva">{{ $t('locations.podil.name') }}</option>
                 </select>
                 <div v-if="v$.location.$error" class="invalid-feedback">
                   <div v-for="error in v$.location.$errors" :key="error.$uid">
+                    {{ error.$message }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">{{ $t('admin.addBooking.service') }} *</label>
+                <select
+                  class="form-select"
+                  :class="{ 'is-invalid': v$.service.$error }"
+                  v-model="form.service"
+                  :disabled="isSubmitting"
+                  @blur="v$.service.$touch"
+                >
+                  <option value="">{{ $t('admin.addBooking.selectService') }}</option>
+                  <option 
+                    v-for="service in availableServices" 
+                    :key="service.id"
+                    :value="service.id"
+                  >
+                    {{ $t(service.nameKey) }} ({{ service.duration }} min)
+                  </option>
+                </select>
+                <div v-if="v$.service.$error" class="invalid-feedback">
+                  <div v-for="error in v$.service.$errors" :key="error.$uid">
                     {{ error.$message }}
                   </div>
                 </div>
@@ -106,7 +131,7 @@
                     class="form-select"
                     :class="{ 'is-invalid': v$.time.$error }"
                     v-model="form.time"
-                    :disabled="isSubmitting || !form.date || !form.location"
+                    :disabled="isSubmitting || !form.date || !form.location || !form.service"
                     @blur="v$.time.$touch"
                   >
                     <option value="">{{ $t('admin.addBooking.selectTime') }}</option>
@@ -201,17 +226,22 @@ import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
+import { services, getServiceById } from '@/config/services'
 import Loader from '@/components/Loader.vue'
 
 const { t: $t } = useI18n()
 
 const bookingStore = useBookingStore()
 
+// Make services available in template
+const availableServices = ref(services)
+
 // Form data
 const form = ref({
   name: '',
   phone: '',
   location: '',
+  service: '',
   date: '',
   time: '',
   status: 'Pending'
@@ -243,6 +273,9 @@ const rules = computed(() => ({
   },
   location: {
     required: helpers.withMessage(() => $t('validation.locationRequired'), required)
+  },
+  service: {
+    required: helpers.withMessage(() => $t('validation.serviceRequired'), required)
   },
   date: {
     required: helpers.withMessage(() => $t('validation.dateRequired'), required)
@@ -290,13 +323,44 @@ const isSlotBooked = (slot) => {
   
   // Normalize location names for comparison
   const normalizeLocation = (location) => {
-    if (location === 'downtown' || location === 'Downtown Barber Kings') return 'downtown'
-    if (location === 'podil' || location === 'Barber Kings Podil') return 'podil'
-    return location.toLowerCase()
+    if (location === 'Martinkovac' || location === 'downtown' || location === 'Downtown Barber Kings') return 'Martinkovac'
+    if (location === 'Adamiceva' || location === 'podil' || location === 'Barber Kings Podil') return 'Adamiceva'
+    return location
   }
   
   const currentLocation = normalizeLocation(form.value.location)
   
+  // Check if selected service needs multiple slots
+  let slotsNeeded = 1
+  if (form.value.service) {
+    const selectedServiceConfig = getServiceById(parseInt(form.value.service))
+    if (selectedServiceConfig) {
+      slotsNeeded = selectedServiceConfig.duration / 30
+    }
+  }
+  
+  // For multi-slot services, check if any of the required consecutive slots are booked
+  const allSlots = availableTimeSlots.value
+  const currentSlotIndex = allSlots.indexOf(slot)
+  
+  if (slotsNeeded > 1 && currentSlotIndex >= 0) {
+    for (let i = 0; i < slotsNeeded; i++) {
+      const checkSlotIndex = currentSlotIndex + i
+      if (checkSlotIndex >= allSlots.length) return true // Not enough slots available
+      
+      const checkSlot = allSlots[checkSlotIndex]
+      const isBooked = bookingStore.bookedSlots.some(booking => {
+        const bookingLocation = normalizeLocation(booking.location || '')
+        return booking.date === formattedDate && 
+               booking.time === checkSlot && 
+               bookingLocation === currentLocation
+      })
+      if (isBooked) return true
+    }
+    return false
+  }
+  
+  // Single slot check (default behavior)
   return bookingStore.bookedSlots.some(booking => {
     const bookingLocation = normalizeLocation(booking.location || '')
     return booking.date === formattedDate && 
@@ -328,6 +392,7 @@ const handleSubmit = async () => {
       name: form.value.name.trim(),
       phone: form.value.phone.trim(),
       location: form.value.location,
+      service: form.value.service,
       date: form.value.date, // оставляем в формате YYYY-MM-DD, submitBooking сам конвертирует
       time: form.value.time,
       status: form.value.status
@@ -336,10 +401,24 @@ const handleSubmit = async () => {
     // Временно заполняем store данными для submitBooking
     bookingStore.bookingForm.name = bookingData.name
     bookingStore.bookingForm.phone = bookingData.phone
+    
+    // Map short location names to store locations
+    const locationMapping = {
+      'Martinkovac': 'downtown',
+      'Adamiceva': 'podil'
+    }
+    const storeLocationKey = locationMapping[bookingData.location] || bookingData.location
+    
     bookingStore.selectedLocation = bookingStore.locations.find(loc => 
-      loc.nameKey?.replace('locations.', '').replace('.name', '') === bookingData.location || 
+      loc.nameKey?.replace('locations.', '').replace('.name', '') === storeLocationKey || 
       loc.name === bookingData.location
     )
+    
+    // Set selected service in store
+    const selectedServiceConfig = getServiceById(parseInt(bookingData.service))
+    if (selectedServiceConfig) {
+      bookingStore.selectedService = selectedServiceConfig
+    }
     bookingStore.selectedDate = new Date(bookingData.date + 'T00:00:00').getTime()
     bookingStore.selectedTime = bookingData.time
     bookingStore.selectedStatus = bookingData.status
@@ -371,6 +450,7 @@ const resetFormFields = () => {
     name: '',
     phone: '',
     location: '',
+    service: '',
     date: '',
     time: '',
     status: 'Pending'
@@ -400,11 +480,11 @@ const clearMessage = () => {
   console.log('clearMessage called (now using alerts)')
 }
 
-// Watch for changes in date or location to clear time selection
-watch([() => form.value.date, () => form.value.location], (newValues, oldValues) => {
+// Watch for changes in date, location, or service to clear time selection
+watch([() => form.value.date, () => form.value.location, () => form.value.service], (newValues, oldValues) => {
   // Only clear message if this is a user interaction, not a programmatic reset
-  if (oldValues[0] && oldValues[1]) {
-    // Clear selected time when date or location changes
+  if ((oldValues[0] && oldValues[1]) || oldValues[2]) {
+    // Clear selected time when date, location, or service changes
     form.value.time = ''
     clearMessage()
   }
@@ -414,11 +494,20 @@ watch([() => form.value.date, () => form.value.location], (newValues, oldValues)
 const handlePrefillForm = (event) => {
   const { date, time } = event.detail
   
-  // Pre-fill the form
-  selectedDate.value = date
-  selectedTime.value = time
+  // Convert date from dd/MM/yyyy to yyyy-MM-dd format for HTML date input
+  const convertDateFormat = (dateStr) => {
+    if (dateStr.includes('/')) {
+      const [day, month, year] = dateStr.split('/')
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    }
+    return dateStr
+  }
   
-  console.log('Pre-filled booking form:', { date, time })
+  // Pre-fill the form
+  form.value.date = convertDateFormat(date)
+  form.value.time = time
+  
+  console.log('Pre-filled booking form:', { date: form.value.date, time })
 }
 
 // Load booked slots when component mounts
