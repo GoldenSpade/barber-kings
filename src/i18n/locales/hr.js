@@ -26,7 +26,23 @@ export default {
     welcome: 'DOBRODOŠLI',
     description: 'Gdje se tradicija susreće s preciznošću. Stručno šišanje, klasično brijanje i moderni stil koji stvaraju majstori zanata.',
     bookNow: 'REZERVIRAJ SADA',
-    ourLocations: 'Naše Lokacije'
+    ourLocations: 'Naše Lokacije',
+    locations: 'LOKACIJE',
+    hours: 'RADNO VRIJEME',
+    pricing: 'CIJENE',
+    bookAppointment: 'REZERVIRAJ TERMIN',
+    pricingServices: {
+      regular: 'REDOVNE',
+      discounts: 'POPUSTI',
+      haircut: 'Šišanje',
+      haircutWash: 'Šišanje i pranje',
+      haircutBeardTrim: 'Šišanje i uređenje brade',
+      haircutBeardTrimWash: 'Šišanje, uređenje brade i pranje',
+      beardTrim: 'Uređenje brade',
+      studentHaircut: 'Studentsko šišanje',
+      kidsHaircut: 'Dječje šišanje',
+      seniorHaircut: 'Umirovljeničko šišanje'
+    }
   },
   
   // Booking page

@@ -26,7 +26,23 @@ export default {
     welcome: 'WELCOME',
     description: 'Where tradition meets precision. Expert cuts, classic shaves, and modern style crafted by masters of the trade.',
     bookNow: 'BOOK NOW',
-    ourLocations: 'Our Locations'
+    ourLocations: 'Our Locations',
+    locations: 'LOCATIONS',
+    hours: 'HOURS',
+    pricing: 'PRICING',
+    bookAppointment: 'BOOK APPOINTMENT',
+    pricingServices: {
+      regular: 'REGULAR',
+      discounts: 'DISCOUNTS',
+      haircut: 'Haircut',
+      haircutWash: 'Haircut & Wash',
+      haircutBeardTrim: 'Haircut & Beard Trim',
+      haircutBeardTrimWash: 'Haircut & Beard Trim & Wash',
+      beardTrim: 'Beard Trim',
+      studentHaircut: 'Student Haircut',
+      kidsHaircut: 'Kids Haircut',
+      seniorHaircut: 'Senior Haircut'
+    }
   },
   
   // Booking page

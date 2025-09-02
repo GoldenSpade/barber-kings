@@ -48,79 +48,86 @@
     <div class="locations-section bg-white py-5">
       <div class="container">
         <div class="row">
-          <div class="col-12">
-            <h2 class="display-4 fw-bold text-dark mb-5 text-left" style="font-size: 3rem; letter-spacing: 2px;">
-              LOCATIONS
+          <div class="col-12 text-center">
+            <h2 class="display-4 fw-bold text-dark mb-5" style="font-size: 3rem; letter-spacing: 2px;">
+              {{ $t('home.locations') }}
             </h2>
             
-            <!-- Location 1 -->
-            <div class="location-item d-flex align-items-start mb-4">
-              <div class="location-icon me-3">
-                <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+            <div class="row justify-content-center mb-5">
+              <!-- Location 1 -->
+              <div class="col-md-6 mb-4">
+                <div class="location-item d-flex align-items-center justify-content-center">
+                  <div class="location-icon me-3">
+                    <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                  </div>
+                  <div class="location-info text-center">
+                    <h5 class="fw-bold text-dark mb-1">{{ $t('locations.downtown.address') }}</h5>
+                    <p class="text-muted mb-0">({{ $t('locations.downtown.description') }})</p>
+                  </div>
+                </div>
               </div>
-              <div class="location-info">
-                <h5 class="fw-bold text-dark mb-1">{{ $t('locations.downtown.address') }}</h5>
-                <p class="text-muted mb-0">({{ $t('locations.downtown.description') }})</p>
-              </div>
-            </div>
 
-            <!-- Location 2 -->
-            <div class="location-item d-flex align-items-start mb-5">
-              <div class="location-icon me-3">
-                <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
-              </div>
-              <div class="location-info">
-                <h5 class="fw-bold text-dark mb-1">{{ $t('locations.podil.address') }}</h5>
-                <p class="text-muted mb-0">({{ $t('locations.podil.description') }})</p>
+              <!-- Location 2 -->
+              <div class="col-md-6 mb-4">
+                <div class="location-item d-flex align-items-center justify-content-center">
+                  <div class="location-icon me-3">
+                    <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                  </div>
+                  <div class="location-info text-center">
+                    <h5 class="fw-bold text-dark mb-1">{{ $t('locations.podil.address') }}</h5>
+                    <p class="text-muted mb-0">({{ $t('locations.podil.description') }})</p>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Hours Section -->
-            <h2 class="display-4 fw-bold text-dark mb-4 text-left" style="font-size: 3rem; letter-spacing: 2px;">
-              HOURS
+            <h2 class="display-4 fw-bold text-dark mb-5" style="font-size: 3rem; letter-spacing: 2px;">
+              {{ $t('home.hours') }}
             </h2>
             
-            <div class="hours-list">
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Monday</span>
-                <span>9:00 to 21:00</span>
+            <div class="row justify-content-center">
+              <!-- Column 1 -->
+              <div class="col-md-6 mb-4">
+                <div class="hours-column">
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                </div>
               </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Tuesday</span>
-                <span>9:00 to 21:00</span>
-              </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Wednesday</span>
-                <span>9:00 to 21:00</span>
-              </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Thursday</span>
-                <span>9:00 to 21:00</span>
-              </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Friday</span>
-                <span>9:00 to 21:00</span>
-              </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Saturday</span>
-                <span>9:00 to 21:00</span>
-              </div>
-              <div class="d-flex justify-content-between py-2">
-                <span class="fw-bold">Sunday</span>
-                <span class="text-danger fw-bold">CLOSED</span>
+              
+              <!-- Column 2 -->
+              <div class="col-md-6 mb-4">
+                <div class="hours-column">
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.saturday') }}</span>
+                    <span>9:00 to 21:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
+                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- View Prices Button -->
-            <div class="text-left mt-5">
-              <button
-                class="btn btn-outline-dark btn-lg px-5 py-3 fw-bold"
-                style="letter-spacing: 2px; border-width: 2px;"
-                @click="scrollToPricing"
-              >
-                VIEW PRICES
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -132,7 +139,7 @@
         <div class="row">
           <div class="col-12">
             <h2 class="display-4 fw-bold text-white text-center mb-5" style="font-size: 3rem; letter-spacing: 2px;">
-              PRICING
+              {{ $t('home.pricing') }}
             </h2>
             
             <div class="row">
@@ -140,31 +147,31 @@
               <div class="col-md-6">
                 <div class="pricing-column">
                   <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    REGULAR
+                    {{ $t('home.pricingServices.regular') }}
                   </h3>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Haircut</span>
+                    <span>{{ $t('home.pricingServices.haircut') }}</span>
                     <span class="fw-bold">€35,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Haircut & Wash</span>
+                    <span>{{ $t('home.pricingServices.haircutWash') }}</span>
                     <span class="fw-bold">€40,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Haircut & Beard Trim</span>
+                    <span>{{ $t('home.pricingServices.haircutBeardTrim') }}</span>
                     <span class="fw-bold">€45,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Haircut & Beard Trim & Wash</span>
+                    <span>{{ $t('home.pricingServices.haircutBeardTrimWash') }}</span>
                     <span class="fw-bold">€50,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2">
-                    <span>Beard Trim</span>
+                    <span>{{ $t('home.pricingServices.beardTrim') }}</span>
                     <span class="fw-bold">from €15,-</span>
                   </div>
                 </div>
@@ -174,21 +181,21 @@
               <div class="col-md-6">
                 <div class="pricing-column">
                   <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    DISCOUNTS
+                    {{ $t('home.pricingServices.discounts') }}
                   </h3>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Student Haircut</span>
+                    <span>{{ $t('home.pricingServices.studentHaircut') }}</span>
                     <span class="fw-bold">€30,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>Kids Haircut</span>
+                    <span>{{ $t('home.pricingServices.kidsHaircut') }}</span>
                     <span class="fw-bold">€30,-</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2">
-                    <span>Senior Haircut</span>
+                    <span>{{ $t('home.pricingServices.seniorHaircut') }}</span>
                     <span class="fw-bold">€30,-</span>
                   </div>
                 </div>
@@ -202,7 +209,7 @@
                   class="btn btn-light btn-lg px-5 py-3 fw-bold text-dark"
                   style="letter-spacing: 2px;"
                 >
-                  BOOK APPOINTMENT
+                  {{ $t('home.bookAppointment') }}
                 </button>
               </router-link>
             </div>
@@ -218,13 +225,6 @@
 <script setup>
 import Navigation from '@/components/Navigation.vue'
 import Footer from '@/components/Footer.vue'
-
-const scrollToPricing = () => {
-  const pricingElement = document.getElementById('pricing')
-  if (pricingElement) {
-    pricingElement.scrollIntoView({ behavior: 'smooth' })
-  }
-}
 </script>
 
 <style scoped>
@@ -238,7 +238,9 @@ const scrollToPricing = () => {
 }
 
 .locations-section {
-  background-color: #e9ecef !important;
+  background-image: url('@/assets/main-page-locations-bg.jpg');
+  background-repeat: repeat;
+  position: relative;
 }
 
 .location-item {
@@ -249,8 +251,9 @@ const scrollToPricing = () => {
   min-width: 50px;
 }
 
-.hours-list {
-  max-width: 400px;
+.hours-column {
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .pricing-section {
@@ -310,7 +313,7 @@ const scrollToPricing = () => {
     margin-right: 0 !important;
   }
   
-  .hours-list {
+  .hours-column {
     max-width: 100%;
   }
 }
