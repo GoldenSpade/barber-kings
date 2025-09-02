@@ -124,18 +124,6 @@
                       <i class="bi bi-scissors me-1"></i>
                       {{ getServiceName(booking.service) }}
                     </div>
-                    <div v-if="booking.location" class="booking-location text-muted small mb-1">
-                      <i class="bi bi-geo-alt me-1"></i>
-                      {{ getLocationName(booking.location) }}
-                    </div>
-                    <div v-if="booking.status" class="booking-status">
-                      <span 
-                        class="badge" 
-                        :class="getStatusBadgeClass(booking.status)"
-                      >
-                        {{ booking.status }}
-                      </span>
-                    </div>
                   </div>
                 </div>
                 <div v-else class="empty-slot-clickable position-relative" @click="handleEmptySlotClick(day, slot)">
@@ -297,28 +285,6 @@ const getSlotClass = (day, slot) => {
     'occupied': bookings.length > 0,
     'available': bookings.length === 0
   }
-}
-
-// Get CSS class for status badge
-const getStatusBadgeClass = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'confirmed':
-      return 'bg-success'
-    case 'pending':
-      return 'bg-warning text-dark'
-    case 'completed':
-      return 'bg-info'
-    case 'cancelled':
-      return 'bg-danger'
-    default:
-      return 'bg-secondary'
-  }
-}
-
-// Get location name from location key  
-const getLocationName = (locationKey) => {
-  // Теперь возвращаем как есть, так как используем короткие названия
-  return locationKey
 }
 
 const getServiceName = (serviceKey) => {
@@ -499,15 +465,11 @@ const handleBookingClick = (booking) => {
   line-height: 1.2;
 }
 
-.booking-location {
-  font-size: 0.7rem;
-  line-height: 1.2;
-}
-
 .booking-service {
   font-size: 0.7rem;
   line-height: 1.2;
 }
+
 
 .phone-clickable {
   cursor: pointer;
@@ -578,7 +540,6 @@ const handleBookingClick = (booking) => {
 }
 
 .booking-clickable:hover {
-  background-color: rgba(44, 62, 51, 0.1);
   transform: scale(1.02);
 }
 
@@ -586,11 +547,6 @@ const handleBookingClick = (booking) => {
 .time-label {
   min-width: 50px;
   color: #2c3e33;
-}
-
-.booking-status .badge {
-  font-size: 0.6rem;
-  padding: 0.2rem 0.4rem;
 }
 
 .legend {
@@ -715,15 +671,6 @@ const handleBookingClick = (booking) => {
     word-break: break-all;
   }
   
-  .booking-location {
-    font-size: 0.6rem;
-    line-height: 1.2;
-  }
-  
-  .booking-status .badge {
-    font-size: 0.55rem;
-    padding: 0.15rem 0.3rem;
-  }
   
   .time-label {
     min-width: 40px;
@@ -778,10 +725,6 @@ const handleBookingClick = (booking) => {
     word-break: break-all;
   }
   
-  .booking-location {
-    font-size: 0.55rem;
-    line-height: 1.1;
-  }
   
   .time-label {
     font-size: 0.65rem;
