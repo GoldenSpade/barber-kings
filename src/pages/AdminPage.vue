@@ -43,6 +43,13 @@
               </ul>
             </div>
             
+            <button 
+              @click="handleLogout" 
+              class="btn btn-outline-danger me-2"
+              :title="$t('auth.logout')"
+            >
+              <i class="bi bi-box-arrow-right me-2"></i>{{ $t('auth.logout') }}
+            </button>
             <router-link to="/" class="btn btn-outline-secondary">
               <i class="bi bi-house me-2"></i>{{ $t('admin.backToSite') }}
             </router-link>
@@ -216,12 +223,16 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AdminCalendar from '@/components/AdminCalendar.vue'
 import AddBookingForm from '@/components/AddBookingForm.vue'
 import { useBookingStore } from '@/stores/booking'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
 const bookingStore = useBookingStore()
+const authStore = useAuthStore()
 const { t: $t, locale } = useI18n()
 const selectedBooking = ref(null)
 const isSavingChanges = ref(false)
@@ -231,6 +242,12 @@ const isDeletingBooking = ref(false)
 const changeLanguage = (lang) => {
   locale.value = lang
   localStorage.setItem('locale', lang)
+}
+
+// Logout functionality
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
 }
 
 // Handle click on empty slot to show add booking modal

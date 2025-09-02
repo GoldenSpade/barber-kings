@@ -130,6 +130,23 @@ export default {
     }
   },
 
+  // Authentication
+  auth: {
+    adminLogin: 'Prijava Admina',
+    enterCredentials: 'Unesite svoje podatke za pristup admin panelu',
+    username: 'Korisničko ime',
+    password: 'Lozinka',
+    usernamePlaceholder: 'Unesite korisničko ime',
+    passwordPlaceholder: 'Unesite lozinku',
+    signIn: 'Prijavi se',
+    signingIn: 'Prijavljujem...',
+    backToSite: 'Povratak na stranicu',
+    fillAllFields: 'Molimo unesite sve podatke',
+    loginFailed: 'Prijava neuspješna. Provjerite podatke.',
+    logout: 'Odjavi se',
+    sessionExpired: 'Sesija je istekla. Molimo prijavite se ponovno.'
+  },
+
   // Footer
   footer: {
     copyright: 'Autorska prava © 2025 Barber Kings. Sva prava zadržana.'

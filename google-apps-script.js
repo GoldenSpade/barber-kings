@@ -36,6 +36,11 @@ function doGet(e) {
       return handleDeleteBooking(e)
     }
 
+    if (action === 'verifyUser') {
+      // Обрабатываем проверку пользователя для авторизации
+      return handleUserVerification(e)
+    }
+
     // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
 
@@ -597,6 +602,99 @@ function handleDeleteBooking(e) {
       success: false,
       message: 'Error deleting booking: ' + error.toString(),
     }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+
+// Функция для проверки пользователя при авторизации
+function handleUserVerification(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const username = e.parameter.username
+    const passwordHash = e.parameter.passwordHash
+
+    // Проверяем обязательные поля
+    if (!username || !passwordHash) {
+      throw new Error('Missing required fields: username and passwordHash')
+    }
+
+    console.log('Verifying user:', username)
+
+    // Открываем таблицу и получаем лист Users
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
+    const usersSheet = spreadsheet.getSheetByName('Users')
+    
+    if (!usersSheet) {
+      throw new Error('Users sheet not found')
+    }
+
+    // Получаем все данные из листа Users
+    const userData = usersSheet.getDataRange().getValues()
+    
+    // Ищем пользователя (начинаем с индекса 1, чтобы пропустить заголовки)
+    // Ожидаемая структура: A=username, B=passwordHash, C=role, D=status
+    let userFound = false
+    let userRole = 'admin'
+    
+    for (let i = 1; i < userData.length; i++) {
+      const row = userData[i]
+      const storedUsername = row[0]
+      const storedPasswordHash = row[1]
+      const storedRole = row[2] || 'admin'
+      const storedStatus = row[3] || 'active'
+      
+      // Проверяем совпадение логина, пароля и статуса
+      if (storedUsername === username && 
+          storedPasswordHash === passwordHash && 
+          storedStatus === 'active') {
+        userFound = true
+        userRole = storedRole
+        break
+      }
+    }
+
+    const result = {
+      success: userFound,
+      message: userFound ? 'User authenticated successfully' : 'Invalid credentials',
+      user: userFound ? {
+        username: username,
+        role: userRole
+      } : null
+    }
+
+    console.log('User verification result:', result)
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error verifying user: ' + error.toString(),
+      user: null
+    }
+
+    console.error('User verification error:', errorResult.message)
 
     // Поддержка JSONP для ошибок
     const callback = e.parameter.callback

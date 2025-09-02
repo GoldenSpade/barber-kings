@@ -130,6 +130,23 @@ export default {
     }
   },
 
+  // Authentication
+  auth: {
+    adminLogin: 'Admin Login',
+    enterCredentials: 'Enter your credentials to access the admin panel',
+    username: 'Username',
+    password: 'Password',
+    usernamePlaceholder: 'Enter your username',
+    passwordPlaceholder: 'Enter your password',
+    signIn: 'Sign In',
+    signingIn: 'Signing In...',
+    backToSite: 'Back to Site',
+    fillAllFields: 'Please fill in all fields',
+    loginFailed: 'Login failed. Please check your credentials.',
+    logout: 'Logout',
+    sessionExpired: 'Session expired. Please log in again.'
+  },
+
   // Footer
   footer: {
     copyright: 'Copyright © 2025 Barber Kings. All rights reserved.'
