@@ -200,6 +200,12 @@ export default {
       clickToCopyPhone: 'Click to copy phone number',
       phoneCopied: 'Phone {phone} copied to clipboard!'
     },
+    editBooking: {
+      title: 'Edit Booking',
+      name: 'Name',
+      phone: 'Phone',
+      status: 'Status'
+    },
     addBooking: {
       title: 'Add New Booking',
       customerInfo: 'Customer Information',

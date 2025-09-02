@@ -492,7 +492,7 @@ watch([() => form.value.date, () => form.value.location, () => form.value.servic
 
 // Handle pre-fill form data from calendar
 const handlePrefillForm = (event) => {
-  const { date, time } = event.detail
+  const { date, time, location } = event.detail
   
   // Convert date from dd/MM/yyyy to yyyy-MM-dd format for HTML date input
   const convertDateFormat = (dateStr) => {
@@ -506,8 +506,11 @@ const handlePrefillForm = (event) => {
   // Pre-fill the form
   form.value.date = convertDateFormat(date)
   form.value.time = time
+  if (location) {
+    form.value.location = location
+  }
   
-  console.log('Pre-filled booking form:', { date: form.value.date, time })
+  console.log('Pre-filled booking form:', { date: form.value.date, time, location })
 }
 
 // Load booked slots when component mounts

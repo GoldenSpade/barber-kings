@@ -200,6 +200,12 @@ export default {
       clickToCopyPhone: 'Kliknite za kopiranje broja telefona',
       phoneCopied: 'Telefon {phone} kopiran u međuspremnik!'
     },
+    editBooking: {
+      title: 'Uredi rezervaciju',
+      name: 'Ime',
+      phone: 'Telefon',
+      status: 'Status'
+    },
     addBooking: {
       title: 'Dodaj novu rezervaciju',
       customerInfo: 'Informacije o korisniku',

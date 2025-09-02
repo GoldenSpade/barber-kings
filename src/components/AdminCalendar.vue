@@ -40,7 +40,7 @@
       <div class="row align-items-center">
         <div class="col-md-6">
           <label class="form-label fw-bold">{{ $t('admin.calendar.filterLocation') }}</label>
-          <select v-model="selectedLocationFilter" class="form-select">
+          <select v-model="selectedLocationFilter" class="form-select" data-location-filter>
             <option value="">{{ $t('admin.calendar.allLocations') }}</option>
             <option value="Martinkovac">Martinkovac</option>
             <option value="Adamiceva">Adamiceva</option>
@@ -107,14 +107,14 @@
                   <div class="time-label fw-medium mb-1">{{ slot }}</div>
                   
                   <!-- Show all bookings for this slot -->
-                  <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2" :class="{ 'border-top pt-2': index > 0 }">
+                  <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2 booking-clickable" :class="{ 'border-top pt-2': index > 0 }" @click="handleBookingClick(booking)">
                     <div class="customer-name text-dark fw-bold mb-1">
                       <i class="bi bi-person-fill me-1"></i>
                       {{ booking.name }}
                     </div>
                     <div 
                       class="customer-phone text-muted small phone-clickable mb-1" 
-                      @click="copyPhoneToClipboard(booking.phone)"
+                      @click.stop="copyPhoneToClipboard(booking.phone)"
                       :title="$t('admin.calendar.clickToCopyPhone')"
                     >
                       <i class="bi bi-telephone-fill me-1"></i>
@@ -408,6 +408,18 @@ const handleEmptySlotClick = (day, slot) => {
     }
   }))
 }
+
+// Handle click on existing booking to edit it
+const handleBookingClick = (booking) => {
+  console.log('Editing booking:', booking)
+  
+  // Emit event to parent component to show edit modal
+  window.dispatchEvent(new CustomEvent('admin-edit-booking', {
+    detail: {
+      booking: booking
+    }
+  }))
+}
 </script>
 
 <style scoped>
@@ -561,6 +573,19 @@ const handleEmptySlotClick = (day, slot) => {
 
 .phone-clickable:hover .copy-icon {
   opacity: 1;
+}
+
+/* Booking clickable styles */
+.booking-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.booking-clickable:hover {
+  background-color: rgba(44, 62, 51, 0.1);
+  transform: scale(1.02);
 }
 
 
