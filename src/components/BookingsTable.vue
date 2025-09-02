@@ -19,7 +19,6 @@
               <option value="Pending">Pending</option>
               <option value="Confirmed">Confirmed</option>
               <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
         </div>
@@ -440,7 +439,6 @@ const getStatusBadgeClass = (status) => {
     Pending: 'bg-warning text-dark',
     Confirmed: 'bg-success',
     Completed: 'bg-primary',
-    Cancelled: 'bg-danger',
   }
   return statusClass[status] || 'bg-warning text-dark'
 }

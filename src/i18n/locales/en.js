@@ -258,8 +258,7 @@ export default {
       statuses: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed',
-        cancelled: 'Cancelled'
+        completed: 'Completed'
       },
       locations: {
         allLocations: 'All Locations',
