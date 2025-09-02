@@ -210,7 +210,9 @@ export default {
       status: 'Status',
       deleteBooking: 'Ukloni rezervaciju',
       cancel: 'Odustani',
-      saveChanges: 'Spremi promjene'
+      saveChanges: 'Spremi promjene',
+      saving: 'Spremam...',
+      deleting: 'Uklanjam...'
     },
     addBooking: {
       title: 'Dodaj novu rezervaciju',

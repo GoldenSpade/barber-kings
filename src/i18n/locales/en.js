@@ -210,7 +210,9 @@ export default {
       status: 'Status',
       deleteBooking: 'Delete Booking',
       cancel: 'Cancel',
-      saveChanges: 'Save Changes'
+      saveChanges: 'Save Changes',
+      saving: 'Saving...',
+      deleting: 'Deleting...'
     },
     addBooking: {
       title: 'Add New Booking',

@@ -179,8 +179,11 @@
                     type="button"
                     class="btn btn-danger"
                     @click="confirmDeleteBooking"
+                    :disabled="isDeletingBooking"
                   >
-                    <i class="bi bi-trash me-2"></i>{{ $t('admin.editBooking.deleteBooking') }}
+                    <span v-if="isDeletingBooking" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <i v-else class="bi bi-trash me-2"></i>
+                    {{ isDeletingBooking ? $t('admin.editBooking.deleting') : $t('admin.editBooking.deleteBooking') }}
                   </button>
                   
                   <div class="d-flex gap-2">
@@ -194,8 +197,11 @@
                     <button
                       type="submit"
                       class="btn btn-success"
+                      :disabled="isSavingChanges"
                     >
-                      <i class="bi bi-check-lg me-2"></i>{{ $t('admin.editBooking.saveChanges') }}
+                      <span v-if="isSavingChanges" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <i v-else class="bi bi-check-lg me-2"></i>
+                      {{ isSavingChanges ? $t('admin.editBooking.saving') : $t('admin.editBooking.saveChanges') }}
                     </button>
                   </div>
                 </div>
@@ -218,6 +224,8 @@ import { useBookingStore } from '@/stores/booking'
 const bookingStore = useBookingStore()
 const { t: $t, locale } = useI18n()
 const selectedBooking = ref(null)
+const isSavingChanges = ref(false)
+const isDeletingBooking = ref(false)
 
 // Language switching
 const changeLanguage = (lang) => {
@@ -344,6 +352,8 @@ const onBookingAdded = () => {
 const saveBookingChanges = async () => {
   if (!selectedBooking.value) return
   
+  isSavingChanges.value = true
+  
   console.log('Saving booking changes:', {
     id: selectedBooking.value.id,
     name: selectedBooking.value.name,
@@ -365,7 +375,6 @@ const saveBookingChanges = async () => {
       
       if (result.success) {
         console.log('Booking updated successfully:', result.message)
-        alert('Booking updated successfully!')
         // Refresh bookings to show updated data
         bookingStore.fetchBookedSlots(true)
         // Close modal
@@ -378,6 +387,7 @@ const saveBookingChanges = async () => {
       // Clean up
       delete window[callbackName]
       document.head.removeChild(script)
+      isSavingChanges.value = false
     }
     
     // Create script element for JSONP
@@ -394,15 +404,14 @@ const saveBookingChanges = async () => {
       window[fallbackCallbackName] = (result) => {
         if (result.success) {
           console.log('Status updated successfully via fallback:', result.message)
-          alert('Status updated successfully!')
           bookingStore.fetchBookedSlots(true)
           closeModal('editBookingModal')
         } else {
           console.error('Fallback also failed:', result.message)
-          alert('Failed to connect to the server. Please check the Google Apps Script deployment.')
         }
         delete window[fallbackCallbackName]
         document.head.removeChild(fallbackScript)
+        isSavingChanges.value = false
       }
       
       const fallbackScript = document.createElement('script')
@@ -411,12 +420,13 @@ const saveBookingChanges = async () => {
       
       delete window[callbackName]
       document.head.removeChild(script)
+      isSavingChanges.value = false
     }
     document.head.appendChild(script)
     
   } catch (error) {
     console.error('Error updating booking:', error)
-    alert('Error updating booking. Please try again.')
+    isSavingChanges.value = false
   }
 }
 
@@ -424,13 +434,7 @@ const saveBookingChanges = async () => {
 const confirmDeleteBooking = async () => {
   if (!selectedBooking.value) return
   
-  // Show confirmation dialog
-  const customerName = selectedBooking.value.name
-  const confirmMessage = `Are you sure you want to delete the booking for ${customerName}? This action cannot be undone.`
-  
-  if (!confirm(confirmMessage)) {
-    return
-  }
+  isDeletingBooking.value = true
   
   console.log('Deleting booking:', {
     id: selectedBooking.value.id,
@@ -451,19 +455,18 @@ const confirmDeleteBooking = async () => {
       
       if (result.success) {
         console.log('Booking deleted successfully:', result.message)
-        alert('Booking deleted successfully!')
         // Refresh bookings to remove deleted booking
         bookingStore.fetchBookedSlots(true)
         // Close modal
         closeModal('editBookingModal')
       } else {
         console.error('Failed to delete booking:', result.message)
-        alert(`Failed to delete booking: ${result.message}`)
       }
       
       // Clean up
       delete window[callbackName]
       document.head.removeChild(script)
+      isDeletingBooking.value = false
     }
     
     // Create script element for JSONP
@@ -471,15 +474,15 @@ const confirmDeleteBooking = async () => {
     script.src = url
     script.onerror = () => {
       console.error('Delete script failed to load:', url)
-      alert('Failed to connect to the server. Please try again.')
       delete window[callbackName]
       document.head.removeChild(script)
+      isDeletingBooking.value = false
     }
     document.head.appendChild(script)
     
   } catch (error) {
     console.error('Error deleting booking:', error)
-    alert('Error deleting booking. Please try again.')
+    isDeletingBooking.value = false
   }
 }
 

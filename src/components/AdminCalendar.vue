@@ -37,7 +37,7 @@
         </div>
         <div class="col-md-6 text-end mt-3 mt-md-0">
           <button 
-            class="btn btn-outline-primary btn-sm me-3" 
+            class="btn btn-outline-secondary btn-sm me-3 refresh-btn" 
             @click="refreshBookings"
             :disabled="isLoading"
           >
@@ -532,6 +532,18 @@ const handleBookingClick = (booking) => {
 .form-select:focus {
   border-color: #2c3e33;
   box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
+}
+
+.refresh-btn {
+  border-color: #dee2e6;
+  color: #6c757d;
+  background-color: #f8f9fa;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  border-color: #adb5bd;
+  color: #495057;
+  background-color: #e9ecef;
 }
 
 /* Responsive */

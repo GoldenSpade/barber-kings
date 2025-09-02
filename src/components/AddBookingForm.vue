@@ -198,7 +198,8 @@
               :disabled="isSubmitting || !isFormValid"
               style="background-color: #2c3e33; border-color: #2c3e33; color: white;"
             >
-              <i class="bi bi-plus-circle me-2"></i>
+              <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <i v-else class="bi bi-plus-circle me-2"></i>
               {{ isSubmitting ? $t('admin.addBooking.adding') : $t('admin.addBooking.addBooking') }}
             </button>
             
@@ -230,6 +231,9 @@ import Loader from '@/components/Loader.vue'
 const { t: $t } = useI18n()
 
 const bookingStore = useBookingStore()
+
+// Define emits
+const emit = defineEmits(['booking-added'])
 
 // Make services available in template
 const availableServices = ref(services)
@@ -427,10 +431,12 @@ const handleSubmit = async () => {
     if (result.success) {
       // Сбрасываем форму вручную (так как store сбросил свою)
       resetFormFields()
-      showMessage($t('admin.addBooking.successMessage'), 'success')
       console.log('Booking added with ID:', result.id)
+      
+      // Emit event to parent to close modal
+      emit('booking-added')
     } else {
-      showMessage($t('admin.addBooking.errorMessage') + ': ' + result.message, 'error')
+      console.error('Failed to add booking:', result.message)
       throw new Error(result.message)
     }
     
@@ -438,7 +444,6 @@ const handleSubmit = async () => {
     
   } catch (error) {
     console.error('Error adding booking:', error)
-    showMessage($t('admin.addBooking.errorMessage'), 'error')
   }
 }
 
@@ -462,20 +467,9 @@ const resetForm = () => {
   clearMessage()
 }
 
-const showMessage = (text, type) => {
-  console.log('Showing message:', text, 'Type:', type)
-  
-  // Используем alert для надежного отображения сообщений
-  if (type === 'success') {
-    alert(`✅ ${text}`)
-  } else {
-    alert(`❌ ${text}`)
-  }
-}
-
 const clearMessage = () => {
   // Функция оставлена для совместимости, но больше ничего не делает
-  console.log('clearMessage called (now using alerts)')
+  console.log('clearMessage called')
 }
 
 // Watch for changes in date, location, or service to clear time selection if needed
