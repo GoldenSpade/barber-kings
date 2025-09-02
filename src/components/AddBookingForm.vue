@@ -171,7 +171,6 @@
                   :disabled="isSubmitting"
                 />
                 <label class="form-check-label" for="pending">
-                  <span class="badge bg-warning me-2">{{ $t('admin.addBooking.pending') }}</span>
                   {{ $t('admin.addBooking.pendingConfirmation') }}
                 </label>
               </div>
@@ -185,7 +184,6 @@
                   :disabled="isSubmitting"
                 />
                 <label class="form-check-label" for="confirmed">
-                  <span class="badge bg-success me-2">{{ $t('admin.addBooking.confirmed') }}</span>
                   {{ $t('admin.addBooking.confirmed') }}
                 </label>
               </div>
