@@ -2,7 +2,6 @@ export default {
   // Navigation
   nav: {
     home: 'Početna',
-    about: 'O nama',
     booking: 'Rezervacija'
   },
   
@@ -129,47 +128,6 @@ export default {
         sunday: 'Zatvoreno'
       }
     }
-  },
-  
-  // About page
-  about: {
-    title: 'O Barber Kings',
-    subtitle: 'Saznajte više o našoj priči, misiji i timu koji stoji iza Barber Kings',
-    intro: 'U Barber Kings-u držimo stvari jednostavnima: odlične frizure, iskreni savjeti i mjesto koje ćete se radovati posjetiti. Naši berberi spajaju staru školu s modernim tehnikama kako bi pružili oštre fade frizure, klasični rad škarama, precizno oblikovanje brade i brijanje vručim ručnicima.',
-    ourStory: 'Naša Priča',
-    ourStoryText: 'Otvorili smo ovaj salon da vratimo osjećaj pravog susjedskog berbershopa—mjesto gdje vas pozdravljaju po imenu, gdje je glazba prava, a razgovor opušten. Od prvog dana, naš cilj je isti: konzistentni rezultati, bez komplikacija i usluga koja poštuje vaše vrijeme.',
-    whatWeDo: 'Što Radimo',
-    services: {
-      cuts: 'Klasične i moderne frizure',
-      fades: 'Fade frizure, ošišano škarama',
-      beards: 'Uređenje brade, linije i preoblikovanje',
-      shaves: 'Brijanje vručim ručnicima i britvom',
-      kids: 'Frizure za djecu (strpljivi berberi, odobreno od roditelja)'
-    },
-    whatWeDoText: 'Koristimo profesionalne alate i proizvode kojima vjerujemo, te ćemo vam pokazati kako stilizirati svoju frizuru kod kuće tako da izgleda dobro svaki dan—ne samo kada odlazite iz stolca.',
-    whyChooseUs: 'Zašto Odabrati Nas',
-    features: {
-      craft: {
-        title: 'Zanatlija prije svega',
-        description: 'Berberi usmjereni na detalje kojima je stalo do svakog milimetra.'
-      },
-      clean: {
-        title: 'Čisto i udobno',
-        description: 'Dezinficirani alati, svježi ogrtači i opuštena atmosfera.'
-      },
-      onTime: {
-        title: 'Na vrijeme',
-        description: 'Lako online rezerviranje i walk-in kada su stolci slobodni.'
-      },
-      straightTalk: {
-        title: 'Direktan razgovor',
-        description: 'Preporučit ćemo ono što pristaje vašoj kosi, obliku lica i načinu života.'
-      }
-    },
-    ourPromise: 'Naše Obećanje',
-    ourPromiseText: 'Trebali biste izaći osjećajući se samouvjereno i spremno za fotografiranje. Ako nešto nije savršeno, javite nam prije odlaska—ispravit ćemo to.',
-    visitUs: 'Posjetite Nas',
-    visitUsText: 'Rezervirajte online, nazovite unaprijed, ili svratite—kava je spremna, stolci čekaju. Bilo da tražite oštar novi look ili samo osvježavanje, Barber Kings vas pokriva.'
   },
 
   // Footer
