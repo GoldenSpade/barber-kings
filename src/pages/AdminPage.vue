@@ -207,6 +207,12 @@ const handleEditBookingFromCalendar = (event) => {
 const closeModal = (modalId) => {
   const modalElement = document.getElementById(modalId)
   if (modalElement) {
+    // Remove focus from any element inside modal before closing
+    const activeElement = document.activeElement
+    if (activeElement && modalElement.contains(activeElement)) {
+      activeElement.blur()
+    }
+    
     modalElement.style.display = 'none'
     modalElement.classList.remove('show')
     modalElement.setAttribute('aria-hidden', 'true')
@@ -222,6 +228,17 @@ const closeModal = (modalId) => {
   
   // Restore body scrolling
   document.body.classList.remove('modal-open')
+  
+  // Focus back to a safe element (like body or main content)
+  const safeElement = document.querySelector('main') || document.body
+  if (safeElement && safeElement !== document.activeElement) {
+    safeElement.focus()
+    // Remove focus outline for non-keyboard users
+    safeElement.style.outline = 'none'
+    setTimeout(() => {
+      safeElement.removeAttribute('style')
+    }, 100)
+  }
 }
 
 // Handle booking added successfully
@@ -268,6 +285,20 @@ const updateBookingStatus = async () => {
   }
 }
 
+// Handle escape key to close modal
+const handleEscapeKey = (event) => {
+  if (event.key === 'Escape') {
+    const addBookingModal = document.getElementById('addBookingModal')
+    const editBookingModal = document.getElementById('editBookingModal')
+    
+    if (addBookingModal && addBookingModal.style.display === 'block') {
+      closeModal('addBookingModal')
+    } else if (editBookingModal && editBookingModal.style.display === 'block') {
+      closeModal('editBookingModal')
+    }
+  }
+}
+
 onMounted(async () => {
   // Initialize calendar first
   bookingStore.initializeCalendar()
@@ -277,12 +308,16 @@ onMounted(async () => {
   // Add event listeners for calendar interactions
   window.addEventListener('admin-add-booking', handleAddBookingFromCalendar)
   window.addEventListener('admin-edit-booking', handleEditBookingFromCalendar)
+  
+  // Add escape key listener
+  document.addEventListener('keydown', handleEscapeKey)
 })
 
 onUnmounted(() => {
   // Clean up event listeners
   window.removeEventListener('admin-add-booking', handleAddBookingFromCalendar)
   window.removeEventListener('admin-edit-booking', handleEditBookingFromCalendar)
+  document.removeEventListener('keydown', handleEscapeKey)
 })
 </script>
 

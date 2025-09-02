@@ -480,12 +480,20 @@ const clearMessage = () => {
   console.log('clearMessage called (now using alerts)')
 }
 
-// Watch for changes in date, location, or service to clear time selection
+// Watch for changes in date, location, or service to clear time selection if needed
 watch([() => form.value.date, () => form.value.location, () => form.value.service], (newValues, oldValues) => {
   // Only clear message if this is a user interaction, not a programmatic reset
   if ((oldValues[0] && oldValues[1]) || oldValues[2]) {
-    // Clear selected time when date, location, or service changes
-    form.value.time = ''
+    // Check if currently selected time is still available for new service
+    if (form.value.time && form.value.date && form.value.location && form.value.service) {
+      // If selected time is now booked/unavailable with new service, clear it
+      if (isSlotBooked(form.value.time)) {
+        form.value.time = ''
+      }
+    } else if (!form.value.date || !form.value.location) {
+      // Clear time only if date or location is cleared
+      form.value.time = ''
+    }
     clearMessage()
   }
 })
