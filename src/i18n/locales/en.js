@@ -201,9 +201,16 @@ export default {
     },
     editBooking: {
       title: 'Edit Booking',
+      customerInfo: 'Customer Information',
+      bookingDetails: 'Booking Details',
       name: 'Name',
       phone: 'Phone',
-      status: 'Status'
+      location: 'Location',
+      dateTime: 'Date & Time',
+      status: 'Status',
+      deleteBooking: 'Delete Booking',
+      cancel: 'Cancel',
+      saveChanges: 'Save Changes'
     },
     addBooking: {
       title: 'Add New Booking',

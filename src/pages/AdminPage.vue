@@ -93,22 +93,113 @@
             <button type="button" class="btn-close" @click="closeModal('editBookingModal')" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <!-- Edit form will be here -->
-            <div v-if="selectedBooking">
-              <div class="mb-3">
-                <strong>{{ $t('admin.editBooking.name') }}:</strong> {{ selectedBooking.name }}
-              </div>
-              <div class="mb-3">
-                <strong>{{ $t('admin.editBooking.phone') }}:</strong> {{ selectedBooking.phone }}
-              </div>
-              <div class="mb-3">
-                <strong>{{ $t('admin.editBooking.status') }}:</strong>
-                <select v-model="selectedBooking.status" class="form-select mt-2" @change="updateBookingStatus">
-                  <option value="Pending">Pending</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
+            <!-- Edit form -->
+            <div v-if="selectedBooking" class="edit-booking-form">
+              <form @submit.prevent="saveBookingChanges">
+                <div class="row">
+                  <!-- Customer Information -->
+                  <div class="col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">
+                      <i class="bi bi-person me-2"></i>{{ $t('admin.editBooking.customerInfo') }}
+                    </h6>
+                    
+                    <div class="mb-3">
+                      <label class="form-label">{{ $t('admin.editBooking.name') }} *</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="selectedBooking.name"
+                        required
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">{{ $t('admin.editBooking.phone') }} *</label>
+                      <input
+                        type="tel"
+                        class="form-control"
+                        v-model="selectedBooking.phone"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Booking Details -->
+                  <div class="col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">
+                      <i class="bi bi-calendar-event me-2"></i>{{ $t('admin.editBooking.bookingDetails') }}
+                    </h6>
+                    
+                    <div class="mb-3">
+                      <label class="form-label">{{ $t('admin.editBooking.location') }}</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        :value="selectedBooking.location"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">{{ $t('admin.editBooking.dateTime') }}</label>
+                      <div class="row">
+                        <div class="col-6">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :value="selectedBooking.date"
+                            readonly
+                          />
+                        </div>
+                        <div class="col-6">
+                          <input
+                            type="text"
+                            class="form-control"
+                            :value="selectedBooking.time"
+                            readonly
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">{{ $t('admin.editBooking.status') }} *</label>
+                      <select v-model="selectedBooking.status" class="form-select" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    @click="confirmDeleteBooking"
+                  >
+                    <i class="bi bi-trash me-2"></i>{{ $t('admin.editBooking.deleteBooking') }}
+                  </button>
+                  
+                  <div class="d-flex gap-2">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      @click="closeModal('editBookingModal')"
+                    >
+                      {{ $t('admin.editBooking.cancel') }}
+                    </button>
+                    <button
+                      type="submit"
+                      class="btn btn-success"
+                    >
+                      <i class="bi bi-check-lg me-2"></i>{{ $t('admin.editBooking.saveChanges') }}
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -249,24 +340,39 @@ const onBookingAdded = () => {
   bookingStore.fetchBookedSlots(true)
 }
 
-// Update booking status
-const updateBookingStatus = async () => {
+// Save booking changes (name, phone, status)
+const saveBookingChanges = async () => {
   if (!selectedBooking.value) return
+  
+  console.log('Saving booking changes:', {
+    id: selectedBooking.value.id,
+    name: selectedBooking.value.name,
+    phone: selectedBooking.value.phone,
+    status: selectedBooking.value.status
+  })
   
   try {
     // Use GET request with JSONP for CORS
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwXGJVD8C-k5P-RaKHZ_Vp-oFZhBUQM5FMmRGU4LqHOKT9vEr1gvV8IZp0n4TxnzXPQhg/exec'
-    const url = `${scriptUrl}?action=updateStatus&id=${encodeURIComponent(selectedBooking.value.id)}&newStatus=${encodeURIComponent(selectedBooking.value.status)}&callback=handleUpdateResult`
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+    const url = `${scriptUrl}?action=updateBooking&id=${encodeURIComponent(selectedBooking.value.id)}&name=${encodeURIComponent(selectedBooking.value.name)}&phone=${encodeURIComponent(selectedBooking.value.phone)}&status=${encodeURIComponent(selectedBooking.value.status)}&callback=handleUpdateBookingResult`
+    
+    console.log('Making request to:', url)
     
     // Create JSONP request
-    const callbackName = 'handleUpdateResult'
+    const callbackName = 'handleUpdateBookingResult'
     window[callbackName] = (result) => {
+      console.log('Received response from updateBooking:', result)
+      
       if (result.success) {
-        console.log('Status updated successfully:', result.message)
-        // Refresh bookings to show updated status
+        console.log('Booking updated successfully:', result.message)
+        alert('Booking updated successfully!')
+        // Refresh bookings to show updated data
         bookingStore.fetchBookedSlots(true)
+        // Close modal
+        closeModal('editBookingModal')
       } else {
-        console.error('Failed to update status:', result.message)
+        console.error('Failed to update booking:', result.message)
+        alert(`Failed to update booking: ${result.message}`)
       }
       
       // Clean up
@@ -277,10 +383,103 @@ const updateBookingStatus = async () => {
     // Create script element for JSONP
     const script = document.createElement('script')
     script.src = url
+    script.onerror = () => {
+      console.error('Script failed to load:', url)
+      console.log('Trying fallback method for status update only...')
+      
+      // Fallback: try the old updateStatus method if only status changed
+      const fallbackUrl = `${scriptUrl}?action=updateStatus&id=${encodeURIComponent(selectedBooking.value.id)}&newStatus=${encodeURIComponent(selectedBooking.value.status)}&callback=handleUpdateStatusFallback`
+      
+      const fallbackCallbackName = 'handleUpdateStatusFallback'
+      window[fallbackCallbackName] = (result) => {
+        if (result.success) {
+          console.log('Status updated successfully via fallback:', result.message)
+          alert('Status updated successfully!')
+          bookingStore.fetchBookedSlots(true)
+          closeModal('editBookingModal')
+        } else {
+          console.error('Fallback also failed:', result.message)
+          alert('Failed to connect to the server. Please check the Google Apps Script deployment.')
+        }
+        delete window[fallbackCallbackName]
+        document.head.removeChild(fallbackScript)
+      }
+      
+      const fallbackScript = document.createElement('script')
+      fallbackScript.src = fallbackUrl
+      document.head.appendChild(fallbackScript)
+      
+      delete window[callbackName]
+      document.head.removeChild(script)
+    }
     document.head.appendChild(script)
     
   } catch (error) {
-    console.error('Error updating booking status:', error)
+    console.error('Error updating booking:', error)
+    alert('Error updating booking. Please try again.')
+  }
+}
+
+// Confirm and delete booking
+const confirmDeleteBooking = async () => {
+  if (!selectedBooking.value) return
+  
+  // Show confirmation dialog
+  const customerName = selectedBooking.value.name
+  const confirmMessage = `Are you sure you want to delete the booking for ${customerName}? This action cannot be undone.`
+  
+  if (!confirm(confirmMessage)) {
+    return
+  }
+  
+  console.log('Deleting booking:', {
+    id: selectedBooking.value.id,
+    name: selectedBooking.value.name
+  })
+  
+  try {
+    // Use GET request with JSONP for CORS
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+    const url = `${scriptUrl}?action=deleteBooking&id=${encodeURIComponent(selectedBooking.value.id)}&callback=handleDeleteBookingResult`
+    
+    console.log('Making delete request to:', url)
+    
+    // Create JSONP request
+    const callbackName = 'handleDeleteBookingResult'
+    window[callbackName] = (result) => {
+      console.log('Received response from deleteBooking:', result)
+      
+      if (result.success) {
+        console.log('Booking deleted successfully:', result.message)
+        alert('Booking deleted successfully!')
+        // Refresh bookings to remove deleted booking
+        bookingStore.fetchBookedSlots(true)
+        // Close modal
+        closeModal('editBookingModal')
+      } else {
+        console.error('Failed to delete booking:', result.message)
+        alert(`Failed to delete booking: ${result.message}`)
+      }
+      
+      // Clean up
+      delete window[callbackName]
+      document.head.removeChild(script)
+    }
+    
+    // Create script element for JSONP
+    const script = document.createElement('script')
+    script.src = url
+    script.onerror = () => {
+      console.error('Delete script failed to load:', url)
+      alert('Failed to connect to the server. Please try again.')
+      delete window[callbackName]
+      document.head.removeChild(script)
+    }
+    document.head.appendChild(script)
+    
+  } catch (error) {
+    console.error('Error deleting booking:', error)
+    alert('Error deleting booking. Please try again.')
   }
 }
 

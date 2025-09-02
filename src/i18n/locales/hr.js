@@ -201,9 +201,16 @@ export default {
     },
     editBooking: {
       title: 'Uredi rezervaciju',
+      customerInfo: 'Informacije o korisniku',
+      bookingDetails: 'Detalji rezervacije',
       name: 'Ime',
       phone: 'Telefon',
-      status: 'Status'
+      location: 'Lokacija',
+      dateTime: 'Datum i vrijeme',
+      status: 'Status',
+      deleteBooking: 'Ukloni rezervaciju',
+      cancel: 'Odustani',
+      saveChanges: 'Spremi promjene'
     },
     addBooking: {
       title: 'Dodaj novu rezervaciju',

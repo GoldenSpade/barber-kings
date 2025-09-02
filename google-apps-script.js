@@ -26,6 +26,16 @@ function doGet(e) {
       return handleUpdateBookingStatus(e)
     }
 
+    if (action === 'updateBooking') {
+      // Обрабатываем обновление полной информации о бронировании через GET (для обхода CORS)
+      return handleUpdateBooking(e)
+    }
+
+    if (action === 'deleteBooking') {
+      // Обрабатываем удаление бронирования через GET (для обхода CORS)
+      return handleDeleteBooking(e)
+    }
+
     // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
 
@@ -461,5 +471,143 @@ function updateBookingStatus(e) {
         message: 'Error updating status: ' + error.toString(),
       })
     ).setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
+// Функция для обновления полной информации о бронировании через GET параметры (для обхода CORS)
+function handleUpdateBooking(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const id = e.parameter.id
+    const name = e.parameter.name
+    const phone = e.parameter.phone
+    const status = e.parameter.status
+
+    // Проверяем обязательные поля
+    if (!id || !name || !phone || !status) {
+      throw new Error('Missing required fields: id, name, phone, and status')
+    }
+
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+
+    // Находим все строки по ID и обновляем информацию для всех
+    const allData = sheet.getDataRange().getValues()
+    let updatedCount = 0
+
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      // Ищем по id (колонка A, индекс 0)
+      if (row[0] === id) {
+        // Обновляем Name (колонка C, индекс 2)
+        sheet.getRange(i + 1, 3).setValue(name)
+        // Обновляем Phone (колонка D, индекс 3)
+        sheet.getRange(i + 1, 4).setValue("'" + phone)
+        // Обновляем Status (колонка H, индекс 7)
+        sheet.getRange(i + 1, 8).setValue(status)
+        updatedCount++
+      }
+    }
+
+    const result = {
+      success: updatedCount > 0,
+      message: updatedCount > 0 ? `Booking updated for ${updatedCount} slots` : 'Booking not found',
+      updatedCount: updatedCount,
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error updating booking: ' + error.toString(),
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Функция для удаления бронирования через GET параметры (для обхода CORS)
+function handleDeleteBooking(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const id = e.parameter.id
+
+    // Проверяем обязательные поля
+    if (!id) {
+      throw new Error('Missing required field: id')
+    }
+
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+
+    // Находим все строки по ID и удаляем их
+    const allData = sheet.getDataRange().getValues()
+    let deletedCount = 0
+    
+    // Проходим по строкам в обратном порядке, чтобы удаление не сдвинуло индексы
+    for (let i = allData.length - 1; i >= 1; i--) {
+      const row = allData[i]
+      // Ищем по id (колонка A, индекс 0)
+      if (row[0] === id) {
+        // Удаляем строку (i+1 потому что getRange использует 1-based индексацию)
+        sheet.deleteRow(i + 1)
+        deletedCount++
+      }
+    }
+
+    const result = {
+      success: deletedCount > 0,
+      message: deletedCount > 0 ? `Booking deleted (${deletedCount} slots removed)` : 'Booking not found',
+      deletedCount: deletedCount,
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error deleting booking: ' + error.toString(),
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
   }
 }
