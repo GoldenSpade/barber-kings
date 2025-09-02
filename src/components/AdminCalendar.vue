@@ -41,7 +41,6 @@
         <div class="col-md-6">
           <label class="form-label fw-bold">{{ $t('admin.calendar.filterLocation') }}</label>
           <select v-model="selectedLocationFilter" class="form-select" data-location-filter>
-            <option value="">{{ $t('admin.calendar.allLocations') }}</option>
             <option value="Martinkovac">Martinkovac</option>
             <option value="Adamiceva">Adamiceva</option>
           </select>
@@ -162,7 +161,7 @@ import Loader from '@/components/Loader.vue'
 const { t: $t, locale } = useI18n()
 
 const bookingStore = useBookingStore()
-const selectedLocationFilter = ref('')
+const selectedLocationFilter = ref('Martinkovac')
 
 // State for copy notification
 const showCopyNotification = ref(false)
@@ -273,18 +272,13 @@ const getBookingsForSlot = (day, slot) => {
   const date = new Date(day.date)
   const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   
-  // Find all bookings that match date and time
+  // Find all bookings that match date, time, and selected location
   const bookings = bookingStore.bookedSlots.filter(booking => {
     const matchesDate = booking.date === dateString
     const matchesTime = booking.time === slot
+    const matchesLocation = booking.location === selectedLocationFilter.value
     
-    // If location filter is selected, also check location
-    if (selectedLocationFilter.value) {
-      return matchesDate && matchesTime && booking.location === selectedLocationFilter.value
-    }
-    
-    // If no filter, show all bookings
-    return matchesDate && matchesTime
+    return matchesDate && matchesTime && matchesLocation
   })
   
   return bookings

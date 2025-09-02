@@ -139,9 +139,9 @@ const changeLanguage = (lang) => {
 const handleAddBookingFromCalendar = (event) => {
   const { date, time, dayDate } = event.detail
   
-  // Determine location based on current filter or default
-  const locationFilter = document.querySelector('select[data-location-filter]')?.value || ''
-  const location = locationFilter || 'Martinkovac' // Default location
+  // Get location from current filter (always has a value now)
+  const locationFilter = document.querySelector('select[data-location-filter]')?.value || 'Martinkovac'
+  const location = locationFilter
   
   console.log('Showing add booking modal for:', { date, time, location })
   
