@@ -1,15 +1,5 @@
 <template>
   <div class="admin-calendar">
-    <!-- Copy Notification -->
-    <div 
-      v-if="showCopyNotification" 
-      class="copy-notification alert alert-success alert-dismissible fade show position-fixed"
-      style="top: 20px; right: 20px; z-index: 9999;"
-    >
-      <i class="bi bi-check-circle me-2"></i>
-      {{ $t('admin.calendar.phoneCopied', { phone: copiedPhone }) }}
-      <button type="button" class="btn-close" @click="showCopyNotification = false"></button>
-    </div>
 
     <!-- Calendar Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -101,24 +91,20 @@
                 :key="slot"
                 class="time-slot mb-1 p-2 rounded"
                 :class="getSlotClass(day, slot)"
+                @click="getBookingsForSlot(day, slot).length > 0 ? handleBookingClick(getBookingsForSlot(day, slot)[0]) : handleEmptySlotClick(day, slot)"
               >
                 <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center">
                   <div class="time-label fw-medium mb-1">{{ slot }}</div>
                   
                   <!-- Show all bookings for this slot -->
-                  <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2 booking-clickable" :class="{ 'border-top pt-2': index > 0 }" @click="handleBookingClick(booking)">
+                  <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2" :class="{ 'border-top pt-2': index > 0 }">
                     <div class="customer-name text-dark fw-bold mb-1">
                       <i class="bi bi-person-fill me-1"></i>
                       {{ booking.name }}
                     </div>
-                    <div 
-                      class="customer-phone text-muted small phone-clickable mb-1" 
-                      @click.stop="copyPhoneToClipboard(booking.phone)"
-                      :title="$t('admin.calendar.clickToCopyPhone')"
-                    >
+                    <div class="customer-phone text-muted small mb-1">
                       <i class="bi bi-telephone-fill me-1"></i>
                       {{ booking.phone }}
-                      <i class="bi bi-clipboard ms-1 copy-icon"></i>
                     </div>
                     <div v-if="booking.service" class="booking-service text-muted small mb-1">
                       <i class="bi bi-scissors me-1"></i>
@@ -126,7 +112,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="empty-slot-clickable position-relative" @click="handleEmptySlotClick(day, slot)">
+                <div v-else class="empty-slot-content position-relative">
                   <span class="fw-medium time-label">{{ slot }}</span>
                   <i class="bi bi-plus-circle add-icon"></i>
                 </div>
@@ -151,9 +137,6 @@ const { t: $t, locale } = useI18n()
 const bookingStore = useBookingStore()
 const selectedLocationFilter = ref('Martinkovac')
 
-// State for copy notification
-const showCopyNotification = ref(false)
-const copiedPhone = ref('')
 
 // Load bookings on mount
 onMounted(async () => {
@@ -311,42 +294,6 @@ const refreshBookings = async () => {
   }
 }
 
-// Copy phone number to clipboard
-const copyPhoneToClipboard = async (phone) => {
-  if (!phone || phone === 'undefined') {
-    console.error('Phone number is undefined or empty')
-    return
-  }
-  
-  try {
-    await navigator.clipboard.writeText(phone)
-    copiedPhone.value = phone
-    showCopyNotification.value = true
-    
-    // Hide notification after 2 seconds
-    setTimeout(() => {
-      showCopyNotification.value = false
-    }, 2000)
-  } catch (error) {
-    console.error('Failed to copy phone number:', error)
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea')
-    textArea.value = phone
-    document.body.appendChild(textArea)
-    textArea.select()
-    try {
-      document.execCommand('copy')
-      copiedPhone.value = phone
-      showCopyNotification.value = true
-      setTimeout(() => {
-        showCopyNotification.value = false
-      }, 2000)
-    } catch (fallbackError) {
-      console.error('Fallback copy failed:', fallbackError)
-    }
-    document.body.removeChild(textArea)
-  }
-}
 
 // Handle click on empty slot to add booking
 const handleEmptySlotClick = (day, slot) => {
@@ -426,8 +373,16 @@ const handleBookingClick = (booking) => {
   border-color: #aed581;
 }
 
+.time-slot.occupied {
+  cursor: pointer;
+}
+
 .time-slot.occupied:hover {
   background-color: #ffcdd2;
+}
+
+.time-slot.available {
+  cursor: pointer;
 }
 
 .time-slot.available:hover {
@@ -471,22 +426,9 @@ const handleBookingClick = (booking) => {
 }
 
 
-.phone-clickable {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
-  padding: 2px 4px;
-}
 
-.phone-clickable:hover {
-  background-color: rgba(44, 62, 51, 0.1);
-  color: #2c3e33 !important;
-}
-
-/* Empty slot clickable styles */
-.empty-slot-clickable {
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* Empty slot content styles */
+.empty-slot-content {
   padding: 8px;
   height: 32px;
   border-radius: 4px;
@@ -495,18 +437,12 @@ const handleBookingClick = (booking) => {
   justify-content: center;
 }
 
-.empty-slot-clickable:hover {
-  /* Remove background color on hover */
-  transform: none;
-}
-
-.empty-slot-clickable .time-label {
-  /* Center the time text */
+.empty-slot-content .time-label {
   text-align: center;
   width: 100%;
 }
 
-.empty-slot-clickable .add-icon {
+.empty-slot-content .add-icon {
   opacity: 0;
   transition: opacity 0.3s ease;
   color: #2c3e33;
@@ -517,31 +453,11 @@ const handleBookingClick = (booking) => {
   transform: translateY(-50%);
 }
 
-.empty-slot-clickable:hover .add-icon {
+.time-slot.available:hover .add-icon {
   opacity: 1;
 }
 
-.copy-icon {
-  opacity: 0.6;
-  font-size: 0.65rem;
-  transition: opacity 0.2s ease;
-}
 
-.phone-clickable:hover .copy-icon {
-  opacity: 1;
-}
-
-/* Booking clickable styles */
-.booking-clickable {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
-  padding: 0.25rem;
-}
-
-.booking-clickable:hover {
-  transform: scale(1.02);
-}
 
 
 .time-label {

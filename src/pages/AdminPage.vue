@@ -134,7 +134,7 @@
                       <label class="form-label">{{ $t('admin.editBooking.location') }}</label>
                       <input
                         type="text"
-                        class="form-control"
+                        class="form-control readonly-field"
                         :value="selectedBooking.location"
                         readonly
                       />
@@ -146,7 +146,7 @@
                         <div class="col-6">
                           <input
                             type="text"
-                            class="form-control"
+                            class="form-control readonly-field"
                             :value="selectedBooking.date"
                             readonly
                           />
@@ -154,7 +154,7 @@
                         <div class="col-6">
                           <input
                             type="text"
-                            class="form-control"
+                            class="form-control readonly-field"
                             :value="selectedBooking.time"
                             readonly
                           />
@@ -545,5 +545,11 @@ onUnmounted(() => {
   background-color: #2c3e33;
   border-color: #2c3e33;
   color: white;
+}
+
+.readonly-field {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed;
 }
 </style>
