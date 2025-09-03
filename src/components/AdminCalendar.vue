@@ -37,12 +37,19 @@
         </div>
         <div class="col-md-6 text-end mt-3 mt-md-0">
           <button 
-            class="btn btn-outline-secondary btn-sm me-3 refresh-btn" 
+            type="button"
+            class="btn btn-outline-secondary btn-sm me-3 mb-3 refresh-btn" 
             @click="refreshBookings"
             :disabled="isLoading"
+            :aria-label="isLoading ? $t('admin.calendar.loading') : $t('admin.bookings.refresh')"
+            role="button"
           >
-            <i class="bi bi-arrow-clockwise me-1" :class="{ 'spin': isLoading }"></i>
-            {{ isLoading ? $t('admin.calendar.loading') : $t('admin.bookings.refresh') }}
+            <i 
+              class="bi bi-arrow-clockwise me-1" 
+              :class="{ 'spin': isLoading }"
+              aria-hidden="true"
+            ></i>
+            <span>{{ isLoading ? $t('admin.calendar.loading') : $t('admin.bookings.refresh') }}</span>
           </button>
           <div class="legend d-inline-flex align-items-center flex-wrap">
             <div class="legend-item me-3 mb-1">
@@ -621,11 +628,39 @@ const handleBookingClick = (booking) => {
 
 .spin {
   animation: spin 1s linear infinite;
+  -webkit-animation: spin 1s linear infinite;
+  -moz-animation: spin 1s linear infinite;
+  -o-animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from { 
+    transform: rotate(0deg); 
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  to { 
+    transform: rotate(360deg); 
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+
+@-moz-keyframes spin {
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(360deg); }
+}
+
+@-o-keyframes spin {
+  from { -o-transform: rotate(0deg); }
+  to { -o-transform: rotate(360deg); }
 }
 
 .btn-outline-secondary {
@@ -645,15 +680,50 @@ const handleBookingClick = (booking) => {
 }
 
 .refresh-btn {
-  border-color: #dee2e6;
+  border: 1px solid #dee2e6;
   color: #6c757d;
   background-color: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  border-radius: 0.375rem;
+  -webkit-border-radius: 0.375rem;
+  -moz-border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .refresh-btn:hover:not(:disabled) {
   border-color: #adb5bd;
   color: #495057;
   background-color: #e9ecef;
+  transform: none;
+  -webkit-transform: none;
+  -moz-transform: none;
+  -o-transform: none;
+}
+
+.refresh-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+  -moz-box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* Responsive */
