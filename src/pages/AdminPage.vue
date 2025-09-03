@@ -58,16 +58,94 @@
       </div>
     </div>
 
-    <!-- Main Calendar -->
+    <!-- Admin Tabs -->
     <div class="container py-4">
       <div class="card">
         <div class="card-header bg-white">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-calendar3 me-2"></i>{{ $t('admin.tabs.calendar') }}
-          </h5>
+          <!-- Tab Navigation -->
+          <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link active" 
+                id="calendar-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#calendar-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="calendar-pane" 
+                aria-selected="true"
+              >
+                <i class="bi bi-calendar3 me-2"></i>{{ $t('admin.tabs.calendar') }}
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                id="add-booking-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#add-booking-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="add-booking-pane" 
+                aria-selected="false"
+              >
+                <i class="bi bi-plus-circle me-2"></i>{{ $t('admin.tabs.addBooking') }}
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                id="manage-bookings-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#manage-bookings-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="manage-bookings-pane" 
+                aria-selected="false"
+              >
+                <i class="bi bi-table me-2"></i>{{ $t('admin.tabs.manageBookings') }}
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                id="manage-services-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#manage-services-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="manage-services-pane" 
+                aria-selected="false"
+              >
+                <i class="bi bi-gear me-2"></i>{{ $t('admin.tabs.manageServices') }}
+              </button>
+            </li>
+          </ul>
         </div>
+        
         <div class="card-body">
-          <AdminCalendar />
+          <!-- Tab Content -->
+          <div class="tab-content" id="adminTabsContent">
+            <!-- Calendar Tab -->
+            <div class="tab-pane fade show active" id="calendar-pane" role="tabpanel" aria-labelledby="calendar-tab">
+              <AdminCalendar />
+            </div>
+            
+            <!-- Add Booking Tab -->
+            <div class="tab-pane fade" id="add-booking-pane" role="tabpanel" aria-labelledby="add-booking-tab">
+              <AddBookingForm @booking-added="onBookingAdded" />
+            </div>
+            
+            <!-- Manage Bookings Tab -->
+            <div class="tab-pane fade" id="manage-bookings-pane" role="tabpanel" aria-labelledby="manage-bookings-tab">
+              <BookingsTable />
+            </div>
+            
+            <!-- Manage Services Tab -->
+            <div class="tab-pane fade" id="manage-services-pane" role="tabpanel" aria-labelledby="manage-services-tab">
+              <ManageServices />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -227,6 +305,8 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AdminCalendar from '@/components/AdminCalendar.vue'
 import AddBookingForm from '@/components/AddBookingForm.vue'
+import BookingsTable from '@/components/BookingsTable.vue'
+import ManageServices from '@/components/ManageServices.vue'
 import { useBookingStore } from '@/stores/booking'
 import { useAuthStore } from '@/stores/auth'
 

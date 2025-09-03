@@ -175,7 +175,8 @@ export default {
     tabs: {
       calendar: 'Bookings Calendar',
       addBooking: 'Add Booking', 
-      manageBookings: 'Manage Bookings'
+      manageBookings: 'Manage Bookings',
+      manageServices: 'Manage Services'
     },
     calendar: {
       title: 'Bookings Calendar',
@@ -277,6 +278,38 @@ export default {
         allLocations: 'All Locations'
       },
       allStatus: 'All Status'
+    },
+    services: {
+      title: 'Service Management',
+      addService: 'Add Service',
+      editService: 'Edit Service',
+      addFirstService: 'Add Your First Service',
+      loading: 'Loading services...',
+      noServices: 'No services found',
+      noServicesText: 'Create your first service to get started.',
+      retry: 'Retry',
+      name: 'Name',
+      description: 'Description',
+      duration: 'Duration',
+      price: 'Price',
+      category: 'Category',
+      actions: 'Actions',
+      namePlaceholder: 'Enter service name',
+      descriptionPlaceholder: 'Enter service description (optional)',
+      pricePlaceholder: '25.00',
+      selectDuration: 'Select duration',
+      minutes: 'minutes',
+      categories: {
+        haircut: 'Haircut',
+        beard: 'Beard',
+        styling: 'Styling',
+        other: 'Other'
+      },
+      cancel: 'Cancel',
+      save: 'Save',
+      saving: 'Saving...',
+      processing: 'Processing...',
+      confirmDelete: 'Are you sure you want to delete "{name}"? This action cannot be undone.'
     }
   },
 

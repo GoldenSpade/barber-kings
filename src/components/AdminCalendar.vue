@@ -323,7 +323,7 @@ const getStatusIconClass = (status) => {
 const getStatusTitle = (status) => {
   try {
     const key = status.toLowerCase()
-    return $t(`admin.bookings.status.${key}`)
+    return $t(`admin.bookings.statuses.${key}`)
   } catch (error) {
     // Fallback to default values if translation fails
     const statusTitles = {

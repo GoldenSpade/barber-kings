@@ -175,7 +175,8 @@ export default {
     tabs: {
       calendar: 'Kalendar rezervacija',
       addBooking: 'Dodaj rezervaciju',
-      manageBookings: 'Upravljaj rezervacijama'
+      manageBookings: 'Upravljaj rezervacijama',
+      manageServices: 'Upravljaj uslugama'
     },
     calendar: {
       title: 'Kalendar rezervacija',
@@ -277,6 +278,38 @@ export default {
         allLocations: 'Sve lokacije'
       },
       allStatus: 'Svi statusni'
+    },
+    services: {
+      title: 'Upravljanje uslugama',
+      addService: 'Dodaj uslugu',
+      editService: 'Uredi uslugu',
+      addFirstService: 'Dodajte prvu uslugu',
+      loading: 'Učitavaju se usluge...',
+      noServices: 'Nema usluga',
+      noServicesText: 'Kreirajte prvu uslugu za početak.',
+      retry: 'Pokušaj ponovno',
+      name: 'Naziv',
+      description: 'Opis',
+      duration: 'Trajanje',
+      price: 'Cijena',
+      category: 'Kategorija',
+      actions: 'Akcije',
+      namePlaceholder: 'Unesite naziv usluge',
+      descriptionPlaceholder: 'Unesite opis usluge (opcionalno)',
+      pricePlaceholder: '25.00',
+      selectDuration: 'Odaberite trajanje',
+      minutes: 'minuta',
+      categories: {
+        haircut: 'Šišanje',
+        beard: 'Brada',
+        styling: 'Stiliziranje',
+        other: 'Ostalo'
+      },
+      cancel: 'Odustani',
+      save: 'Spremi',
+      saving: 'Spremam...',
+      processing: 'Obrađujem...',
+      confirmDelete: 'Jeste li sigurni da želite obrisati "{name}"? Ova akcija se ne može poništiti.'
     }
   },
 

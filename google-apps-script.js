@@ -51,6 +51,26 @@ function doGet(e) {
       return handleUserVerification(e)
     }
 
+    if (action === 'getServices') {
+      // Получение всех активных услуг
+      return handleGetServices(e)
+    }
+
+    if (action === 'addService') {
+      // Добавление новой услуги
+      return handleAddService(e)
+    }
+
+    if (action === 'updateService') {
+      // Обновление существующей услуги
+      return handleUpdateService(e)
+    }
+
+    if (action === 'deleteService') {
+      // Удаление услуги (soft delete)
+      return handleDeleteService(e)
+    }
+
     // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
 
@@ -600,6 +620,352 @@ function handleUserVerification(e) {
     }
 
     console.error('User verification error:', errorResult.message)
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Функции для управления услугами
+
+// Получение всех активных услуг
+function handleGetServices(e) {
+  try {
+    // Открываем таблицу и получаем лист Services
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
+    let servicesSheet = spreadsheet.getSheetByName('Services')
+    
+    // Если лист не существует, создаем его с заголовками
+    if (!servicesSheet) {
+      servicesSheet = spreadsheet.insertSheet('Services')
+      // Создаем заголовки: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
+      servicesSheet.getRange(1, 1, 1, 8).setValues([
+        ['id', 'name', 'description', 'duration', 'category', 'order', 'status', 'price']
+      ])
+      
+      // Добавляем базовые услуги для начала
+      const defaultServices = [
+        [generateShortId(), "Men's Haircut", 'Classic and modern haircuts for men', 30, 'haircut', 1, 'active', 25],
+        [generateShortId(), "Men's Haircut + Beard Trim", 'Haircut with professional beard trimming and shaping', 60, 'haircut', 2, 'active', 35],
+        [generateShortId(), "Women's Haircut", 'Professional haircuts for women', 60, 'haircut', 3, 'active', 40]
+      ]
+      servicesSheet.getRange(2, 1, defaultServices.length, 8).setValues(defaultServices)
+    }
+
+    // Получаем все данные из листа Services
+    const servicesData = servicesSheet.getDataRange().getValues()
+    const services = []
+    
+    // Начинаем с индекса 1, чтобы пропустить заголовки
+    // Структура: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
+    for (let i = 1; i < servicesData.length; i++) {
+      const row = servicesData[i]
+      // Проверяем что строка не пустая и услуга активна
+      if (row[0] && row[1] && row[6] === 'active') {
+        services.push({
+          id: row[0], // id
+          name: row[1], // name
+          description: row[2] || '', // description
+          duration: parseInt(row[3]) || 30, // duration (minutes)
+          category: row[4] || 'haircut', // category
+          order: parseInt(row[5]) || 999, // order
+          status: row[6] || 'active', // status
+          price: parseFloat(row[7]) || 0 // price
+        })
+      }
+    }
+
+    // Сортируем по порядку
+    services.sort((a, b) => a.order - b.order)
+
+    const result = {
+      success: true,
+      services: services,
+      totalCount: services.length
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error fetching services: ' + error.toString(),
+      services: []
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Добавление новой услуги
+function handleAddService(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const name = e.parameter.name
+    const description = e.parameter.description || ''
+    const duration = parseInt(e.parameter.duration) || 30
+    const price = parseFloat(e.parameter.price) || 0
+    const category = e.parameter.category || 'haircut'
+
+    // Проверяем обязательные поля
+    if (!name || !duration) {
+      throw new Error('Missing required fields: name and duration')
+    }
+
+    // Открываем таблицу и получаем лист Services
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
+    let servicesSheet = spreadsheet.getSheetByName('Services')
+    
+    if (!servicesSheet) {
+      throw new Error('Services sheet not found')
+    }
+
+    // Генерируем уникальный ID для услуги
+    const serviceId = generateShortId()
+
+    // Находим максимальный порядковый номер для нового порядка
+    const servicesData = servicesSheet.getDataRange().getValues()
+    let maxOrder = 0
+    for (let i = 1; i < servicesData.length; i++) {
+      const order = parseInt(servicesData[i][5]) || 0 // F - order
+      if (order > maxOrder) {
+        maxOrder = order
+      }
+    }
+
+    // Подготавливаем данные для записи в таблицу
+    // Порядок: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
+    const rowData = [
+      serviceId, // A - id
+      name, // B - name
+      description, // C - description
+      duration, // D - duration (minutes)
+      category, // E - category
+      maxOrder + 1, // F - order (следующий порядковый номер)
+      'active', // G - status (по умолчанию активная)
+      price // H - price
+    ]
+
+    // Добавляем строку в таблицу
+    servicesSheet.getRange(servicesSheet.getLastRow() + 1, 1, 1, rowData.length).setValues([rowData])
+
+    const result = {
+      success: true,
+      message: 'Service added successfully',
+      id: serviceId,
+      service: {
+        id: serviceId,
+        name: name,
+        description: description,
+        duration: duration,
+        price: price,
+        category: category,
+        status: 'active',
+        order: maxOrder + 1
+      }
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error adding service: ' + error.toString()
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Обновление существующей услуги
+function handleUpdateService(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const id = e.parameter.id
+    const name = e.parameter.name
+    const description = e.parameter.description || ''
+    const duration = parseInt(e.parameter.duration) || 30
+    const price = parseFloat(e.parameter.price) || 0
+    const category = e.parameter.category || 'haircut'
+
+    // Проверяем обязательные поля
+    if (!id || !name || !duration) {
+      throw new Error('Missing required fields: id, name, and duration')
+    }
+
+    // Открываем таблицу и получаем лист Services
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
+    const servicesSheet = spreadsheet.getSheetByName('Services')
+    
+    if (!servicesSheet) {
+      throw new Error('Services sheet not found')
+    }
+
+    // Находим строку по ID и обновляем информацию
+    const allData = servicesSheet.getDataRange().getValues()
+    let updated = false
+
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      // Ищем по id (колонка A, индекс 0)
+      if (row[0] === id) {
+        // Обновляем все поля
+        servicesSheet.getRange(i + 1, 2).setValue(name) // B - name
+        servicesSheet.getRange(i + 1, 3).setValue(description) // C - description
+        servicesSheet.getRange(i + 1, 4).setValue(duration) // D - duration
+        servicesSheet.getRange(i + 1, 5).setValue(category) // E - category
+        servicesSheet.getRange(i + 1, 8).setValue(price) // H - price
+        updated = true
+        break
+      }
+    }
+
+    const result = {
+      success: updated,
+      message: updated ? 'Service updated successfully' : 'Service not found',
+      service: updated ? {
+        id: id,
+        name: name,
+        description: description,
+        duration: duration,
+        price: price,
+        category: category
+      } : null
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error updating service: ' + error.toString()
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Удаление услуги (soft delete - меняем статус на 'inactive')
+function handleDeleteService(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const id = e.parameter.id
+
+    // Проверяем обязательные поля
+    if (!id) {
+      throw new Error('Missing required field: id')
+    }
+
+    // Открываем таблицу и получаем лист Services
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
+    const servicesSheet = spreadsheet.getSheetByName('Services')
+    
+    if (!servicesSheet) {
+      throw new Error('Services sheet not found')
+    }
+
+    // Находим строку по ID и меняем статус на inactive
+    const allData = servicesSheet.getDataRange().getValues()
+    let deleted = false
+
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      // Ищем по id (колонка A, индекс 0)
+      if (row[0] === id) {
+        // Меняем статус на 'inactive' (колонка G, индекс 6)
+        servicesSheet.getRange(i + 1, 7).setValue('inactive')
+        deleted = true
+        break
+      }
+    }
+
+    const result = {
+      success: deleted,
+      message: deleted ? 'Service deleted successfully' : 'Service not found'
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error deleting service: ' + error.toString()
+    }
 
     // Поддержка JSONP для ошибок
     const callback = e.parameter.callback
