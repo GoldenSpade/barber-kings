@@ -488,7 +488,6 @@ onMounted(async () => {
   background-color: #1f2b24;
   border-color: #1f2b24;
   color: white;
-  transform: translateY(-1px);
 }
 
 .btn-add-service:focus,
@@ -528,7 +527,6 @@ onMounted(async () => {
   background-color: #2c3e33;
   border-color: #2c3e33;
   color: white;
-  transform: translateY(-1px);
 }
 
 .btn-action-edit:focus,
@@ -552,7 +550,6 @@ onMounted(async () => {
   background-color: #dc3545;
   border-color: #dc3545;
   color: white;
-  transform: translateY(-1px);
 }
 
 .btn-action-delete:focus,
@@ -583,7 +580,6 @@ onMounted(async () => {
   background-color: #1f2b24;
   border-color: #1f2b24;
   color: white;
-  transform: translateY(-1px);
 }
 
 .btn-save-modal:focus,
