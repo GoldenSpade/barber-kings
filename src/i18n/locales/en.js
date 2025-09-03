@@ -55,6 +55,7 @@ export default {
       details: 'Details'
     },
     chooseService: 'Choose Your Service',
+    loadingServices: 'Loading available services...',
     chooseLocation: 'Choose Location',
     service: 'Service',
     location: 'Location',

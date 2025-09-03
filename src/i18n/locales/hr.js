@@ -55,6 +55,7 @@ export default {
       details: 'Detalji'
     },
     chooseService: 'Odaberite uslugu',
+    loadingServices: 'Učitavanje dostupnih usluga...',
     chooseLocation: 'Odaberite lokaciju',
     service: 'Usluga',
     location: 'Lokacija',

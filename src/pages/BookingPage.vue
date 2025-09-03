@@ -164,10 +164,17 @@
 
       <!-- Step 2: Service Selection -->
       <div v-if="bookingStore.currentStep === 2" class="step-content">
-        <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseService') }}</h2>
+        <!-- Loading State -->
+        <div v-if="servicesStore.isLoading" class="text-center py-5">
+          <Loader size="large" :message="$t('booking.loadingServices')" />
+        </div>
         
-        <div class="row justify-content-center">
-          <div class="col-md-6 mb-4" v-for="service in translatedServices" :key="service.id">
+        <!-- Services Content -->
+        <div v-else>
+          <h2 class="text-center mb-5 fw-bold">{{ $t('booking.chooseService') }}</h2>
+          
+          <div class="row justify-content-center">
+            <div class="col-md-6 mb-4" v-for="service in translatedServices" :key="service.id">
             <div
               class="service-card h-100"
               :class="{ selected: bookingStore.selectedService?.id === service.id }"
@@ -188,6 +195,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
