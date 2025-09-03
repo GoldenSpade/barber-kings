@@ -14,7 +14,7 @@
             <!-- Language Switcher -->
             <div class="dropdown d-inline-block me-3">
               <button
-                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                class="btn btn-outline-secondary dropdown-toggle"
                 type="button"
                 id="adminLanguageDropdown"
                 data-bs-toggle="dropdown"
@@ -45,7 +45,7 @@
             
             <button 
               @click="handleLogout" 
-              class="btn btn-outline-danger me-2"
+              class="btn btn-outline-secondary me-2"
               :title="$t('auth.logout')"
             >
               <i class="bi bi-box-arrow-right me-2"></i>{{ $t('auth.logout') }}
