@@ -6,7 +6,7 @@
         <i class="bi bi-gear-fill me-2"></i>{{ $t('admin.services.title') }}
       </h5>
       <button 
-        class="btn btn-success" 
+        class="btn btn-add-service" 
         @click="showAddModal"
         :disabled="servicesStore.isLoading"
       >
@@ -50,7 +50,7 @@
             <td class="fw-bold">{{ service.name }}</td>
             <td class="text-muted">{{ service.description || '—' }}</td>
             <td>
-              <span class="badge bg-info">{{ servicesStore.formatDuration(service.duration) }}</span>
+              <span class="badge badge-duration">{{ servicesStore.formatDuration(service.duration) }}</span>
             </td>
             <td class="fw-bold text-success">{{ servicesStore.formatPrice(service.price) }}</td>
             <td>
@@ -58,14 +58,14 @@
             </td>
             <td class="text-center">
               <button 
-                class="btn btn-sm btn-outline-primary me-2" 
+                class="btn btn-sm btn-action-edit me-2" 
                 @click="editService(service)"
                 :disabled="servicesStore.isSubmitting"
               >
                 <i class="bi bi-pencil"></i>
               </button>
               <button 
-                class="btn btn-sm btn-outline-danger" 
+                class="btn btn-sm btn-action-delete" 
                 @click="confirmDeleteService(service)"
                 :disabled="servicesStore.isSubmitting"
               >
@@ -82,7 +82,7 @@
       <i class="bi bi-gear display-1 text-muted"></i>
       <h5 class="mt-3 text-muted">{{ $t('admin.services.noServices') }}</h5>
       <p class="text-muted">{{ $t('admin.services.noServicesText') }}</p>
-      <button class="btn btn-success" @click="showAddModal">
+      <button class="btn btn-add-service" @click="showAddModal">
         <i class="bi bi-plus-circle me-2"></i>{{ $t('admin.services.addFirstService') }}
       </button>
     </div>
@@ -209,7 +209,7 @@
                 </button>
                 <button
                   type="submit"
-                  class="btn btn-success"
+                  class="btn btn-save-modal"
                   :disabled="servicesStore.isSubmitting || v$.$invalid"
                 >
                   <span v-if="servicesStore.isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -472,6 +472,134 @@ onMounted(async () => {
   justify-content: center;
   border-radius: 8px;
   min-height: 200px;
+}
+
+.btn-add-service {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-add-service:hover {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-add-service:focus,
+.btn-add-service:active {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
+}
+
+.btn-add-service:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+  transform: none;
+}
+
+.badge-duration {
+  background-color: #2c3e33;
+  color: white;
+  font-weight: 500;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.btn-action-edit {
+  background-color: transparent;
+  border: 1px solid #2c3e33;
+  color: #2c3e33;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.btn-action-edit:hover {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-action-edit:focus,
+.btn-action-edit:active {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
+}
+
+.btn-action-delete {
+  background-color: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.btn-action-delete:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-action-delete:focus,
+.btn-action-delete:active {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.btn-action-edit:disabled,
+.btn-action-delete:disabled {
+  opacity: 0.65;
+  transform: none;
+}
+
+.btn-save-modal {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-save-modal:hover {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-save-modal:focus,
+.btn-save-modal:active {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
+}
+
+.btn-save-modal:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  opacity: 0.65;
+  transform: none;
 }
 
 @media (max-width: 768px) {
