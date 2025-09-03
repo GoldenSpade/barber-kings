@@ -144,8 +144,6 @@
                       <option value="">{{ $t('admin.services.selectDuration') }}</option>
                       <option value="30">30 {{ $t('admin.services.minutes') }}</option>
                       <option value="60">60 {{ $t('admin.services.minutes') }}</option>
-                      <option value="90">90 {{ $t('admin.services.minutes') }}</option>
-                      <option value="120">120 {{ $t('admin.services.minutes') }}</option>
                     </select>
                     <div v-if="v$.duration.$error" class="invalid-feedback">
                       <div v-for="error in v$.duration.$errors" :key="error.$uid">
@@ -167,7 +165,7 @@
                         :placeholder="$t('admin.services.pricePlaceholder')"
                         :disabled="servicesStore.isSubmitting"
                         min="0"
-                        step="0.01"
+                        step="0.5"
                         @blur="v$.price.$touch"
                       />
                       <div v-if="v$.price.$error" class="invalid-feedback">

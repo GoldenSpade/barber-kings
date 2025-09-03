@@ -337,7 +337,7 @@ const isSlotBooked = (slot) => {
   // Check if selected service needs multiple slots
   let slotsNeeded = 1
   if (form.value.service) {
-    const selectedServiceConfig = getServiceById(parseInt(form.value.service))
+    const selectedServiceConfig = getServiceById(form.value.service)
     if (selectedServiceConfig) {
       slotsNeeded = selectedServiceConfig.duration / 30
     }
@@ -419,7 +419,7 @@ const handleSubmit = async () => {
     )
     
     // Set selected service in store
-    const selectedServiceConfig = getServiceById(parseInt(bookingData.service))
+    const selectedServiceConfig = getServiceById(bookingData.service)
     if (selectedServiceConfig) {
       bookingStore.selectedService = selectedServiceConfig
     }
@@ -476,6 +476,14 @@ const clearMessage = () => {
 
 // Watch for changes in date, location, or service to clear time selection if needed
 watch([() => form.value.date, () => form.value.location, () => form.value.service], (newValues, oldValues) => {
+  // Sync selected service with store when it changes
+  if (form.value.service) {
+    const selectedServiceConfig = getServiceById(form.value.service)
+    if (selectedServiceConfig) {
+      bookingStore.selectService(selectedServiceConfig)
+    }
+  }
+  
   // Only clear message if this is a user interaction, not a programmatic reset
   if ((oldValues[0] && oldValues[1]) || oldValues[2]) {
     // Check if currently selected time is still available for new service
