@@ -425,8 +425,8 @@ const handleBookingClick = (booking) => {
 }
 
 .time-slot.occupied.status-confirmed {
-  background-color: #eaf4fd;
-  border-color: #85c1e9;
+  background-color: #d1f2eb;
+  border-color: #58d68d;
 }
 
 .time-slot.occupied.status-completed {
@@ -454,7 +454,7 @@ const handleBookingClick = (booking) => {
 }
 
 .time-slot.occupied.status-confirmed:hover {
-  background-color: #d6ebf9;
+  background-color: #a9dfbf;
 }
 
 .time-slot.occupied.status-completed:hover {
@@ -586,8 +586,8 @@ const handleBookingClick = (booking) => {
 }
 
 .legend-color.status-confirmed {
-  background-color: #eaf4fd;
-  border-color: #85c1e9;
+  background-color: #d1f2eb;
+  border-color: #58d68d;
 }
 
 .legend-color.status-completed {
