@@ -101,8 +101,15 @@
                 :class="getSlotClass(day, slot)"
                 @click="getBookingsForSlot(day, slot).length > 0 ? handleBookingClick(getBookingsForSlot(day, slot)[0]) : handleEmptySlotClick(day, slot)"
               >
-                <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center">
+                <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center position-relative">
                   <div class="time-label fw-medium mb-1">{{ slot }}</div>
+                  
+                  <!-- Status icon in top right corner -->
+                  <i 
+                    class="status-icon-corner position-absolute" 
+                    :class="getStatusIconClass(getBookingsForSlot(day, slot)[0].status)"
+                    :title="getStatusTitle(getBookingsForSlot(day, slot)[0].status)"
+                  ></i>
                   
                   <!-- Show all bookings for this slot -->
                   <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2" :class="{ 'border-top pt-2': index > 0 }">
@@ -298,6 +305,36 @@ const getServiceName = (serviceKey) => {
   return serviceNames[serviceKey] || serviceKey
 }
 
+// Get status icon class based on booking status
+const getStatusIconClass = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'bi bi-clock status-icon-dark'
+    case 'Confirmed':
+      return 'bi bi-check-circle status-icon-dark'
+    case 'Completed':
+      return 'bi bi-check2-circle status-icon-dark'
+    default:
+      return 'bi bi-question-circle status-icon-dark'
+  }
+}
+
+// Get status title for tooltip
+const getStatusTitle = (status) => {
+  try {
+    const key = status.toLowerCase()
+    return $t(`admin.bookings.status.${key}`)
+  } catch (error) {
+    // Fallback to default values if translation fails
+    const statusTitles = {
+      'Pending': 'Pending Confirmation',
+      'Confirmed': 'Confirmed',
+      'Completed': 'Completed'
+    }
+    return statusTitles[status] || status
+  }
+}
+
 
 // Loading state
 const isLoading = computed(() => bookingStore.isLoadingBookedSlots)
@@ -383,18 +420,18 @@ const handleBookingClick = (booking) => {
 
 /* Status-specific styles */
 .time-slot.occupied.status-pending {
-  background-color: #fff3cd;
-  border-color: #fd7e14;
+  background-color: #fef9e7;
+  border-color: #f4d03f;
 }
 
 .time-slot.occupied.status-confirmed {
-  background-color: #d4edda;
-  border-color: #007bff;
+  background-color: #eaf4fd;
+  border-color: #85c1e9;
 }
 
 .time-slot.occupied.status-completed {
-  background-color: #f5f5f5;
-  border-color: #9e9e9e;
+  background-color: #f4f4f4;
+  border-color: #bdc3c7;
 }
 
 /* Fallback for occupied slots without specific status */
@@ -413,15 +450,15 @@ const handleBookingClick = (booking) => {
 }
 
 .time-slot.occupied.status-pending:hover {
-  background-color: #fff1b3;
+  background-color: #fdf5d3;
 }
 
 .time-slot.occupied.status-confirmed:hover {
-  background-color: #c3e6cb;
+  background-color: #d6ebf9;
 }
 
 .time-slot.occupied.status-completed:hover {
-  background-color: #eeeeee;
+  background-color: #f0f0f0;
 }
 
 /* Fallback hover for occupied slots */
@@ -471,6 +508,18 @@ const handleBookingClick = (booking) => {
 .booking-service {
   font-size: 0.7rem;
   line-height: 1.2;
+}
+
+/* Status icon styles */
+.status-icon-corner {
+  font-size: 0.8rem;
+  top: 2px;
+  right: 4px;
+  z-index: 5;
+}
+
+.status-icon-corner.status-icon-dark {
+  color: #495057 !important;
 }
 
 
@@ -532,18 +581,18 @@ const handleBookingClick = (booking) => {
 }
 
 .legend-color.status-pending {
-  background-color: #fff3cd;
-  border-color: #fd7e14;
+  background-color: #fef9e7;
+  border-color: #f4d03f;
 }
 
 .legend-color.status-confirmed {
-  background-color: #d4edda;
-  border-color: #007bff;
+  background-color: #eaf4fd;
+  border-color: #85c1e9;
 }
 
 .legend-color.status-completed {
-  background-color: #f5f5f5;
-  border-color: #9e9e9e;
+  background-color: #f4f4f4;
+  border-color: #bdc3c7;
 }
 
 .legend-color.available {
@@ -666,6 +715,11 @@ const handleBookingClick = (booking) => {
     font-size: 0.7rem;
   }
   
+  .status-icon-corner {
+    font-size: 0.7rem;
+    top: 1px;
+    right: 3px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -725,6 +779,11 @@ const handleBookingClick = (booking) => {
     font-size: 0.5rem;
   }
   
+  .status-icon-corner {
+    font-size: 0.6rem;
+    top: 1px;
+    right: 2px;
+  }
   
   /* Hide some icons on small screens */
   .customer-name .bi-person-fill,
