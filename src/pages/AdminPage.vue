@@ -89,7 +89,7 @@
                 aria-controls="manage-services-pane" 
                 aria-selected="false"
               >
-                <i class="bi bi-gear me-2"></i>{{ $t('admin.tabs.manageServices') }}
+                <i class="bi bi-scissors me-2"></i>{{ $t('admin.tabs.manageServices') }}
               </button>
             </li>
           </ul>
