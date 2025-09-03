@@ -41,7 +41,6 @@ export const useBookingStore = defineStore('booking', () => {
       descriptionKey: 'locations.downtown.description',
       phoneKey: 'locations.downtown.phone',
       hoursKey: 'locations.downtown.hours',
-      // Keep original properties for backward compatibility
       name: 'Barber Kings Martinkovac',
       address: 'Martinkovac ul. 127, 51000, Rijeka',
       description: 'Located in Marti Retail Park',
@@ -64,7 +63,6 @@ export const useBookingStore = defineStore('booking', () => {
       descriptionKey: 'locations.podil.description',
       phoneKey: 'locations.podil.phone',
       hoursKey: 'locations.podil.hours',
-      // Keep original properties for backward compatibility
       name: 'Barber Kings Adamiceva',
       address: 'Adamiceva ul. 34A, 51000, Rijeka',
       description: 'Professional barber services in the heart of Rijeka',
@@ -550,7 +548,7 @@ export const useBookingStore = defineStore('booking', () => {
           id: 1,
           name: 'John Doe',
           phone: '123456789',
-          location: 'downtown',
+          location: 'Martinkovac',
           date: '02/09/2025',
           time: '14:00',
           status: 'Confirmed'
@@ -559,7 +557,7 @@ export const useBookingStore = defineStore('booking', () => {
           id: 2,
           name: 'Jane Smith',
           phone: '987654321',
-          location: 'podil',
+          location: 'Adamiceva',
           date: '03/09/2025',
           time: '15:30',
           status: 'Pending'
