@@ -49,6 +49,10 @@
               <span class="legend-color occupied"></span>
               <small>{{ $t('admin.calendar.occupied') }}</small>
             </div>
+            <div class="legend-item me-3">
+              <span class="legend-color completed"></span>
+              <small>Completed</small>
+            </div>
             <div class="legend-item">
               <span class="legend-color available"></span>
               <small>{{ $t('admin.calendar.available') }}</small>
@@ -93,8 +97,15 @@
                 :class="getSlotClass(day, slot)"
                 @click="getBookingsForSlot(day, slot).length > 0 ? handleBookingClick(getBookingsForSlot(day, slot)[0]) : handleEmptySlotClick(day, slot)"
               >
-                <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center">
+                <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center position-relative">
                   <div class="time-label fw-medium mb-1">{{ slot }}</div>
+                  
+                  <!-- Status icon in top right corner -->
+                  <i 
+                    class="status-icon-corner position-absolute" 
+                    :class="getStatusIconClass(getBookingsForSlot(day, slot)[0].status)"
+                    :title="getStatusTitle(getBookingsForSlot(day, slot)[0].status)"
+                  ></i>
                   
                   <!-- Show all bookings for this slot -->
                   <div v-for="(booking, index) in getBookingsForSlot(day, slot)" :key="booking.id || index" class="single-booking mb-2" :class="{ 'border-top pt-2': index > 0 }">
@@ -264,9 +275,16 @@ const getBookingForSlot = (day, slot) => {
 // Get CSS class for time slot
 const getSlotClass = (day, slot) => {
   const bookings = getBookingsForSlot(day, slot)
+  if (bookings.length === 0) {
+    return { 'available': true }
+  }
+  
+  // Check if any booking is completed
+  const hasCompleted = bookings.some(booking => booking.status === 'Completed')
+  
   return {
-    'occupied': bookings.length > 0,
-    'available': bookings.length === 0
+    'occupied': true,
+    'completed': hasCompleted
   }
 }
 
@@ -279,6 +297,36 @@ const getServiceName = (serviceKey) => {
   }
   
   return serviceNames[serviceKey] || serviceKey
+}
+
+// Get status icon class based on booking status
+const getStatusIconClass = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'bi bi-clock-fill text-warning'
+    case 'Confirmed':
+      return 'bi bi-check-circle-fill text-primary'
+    case 'Completed':
+      return 'bi bi-check-circle-fill text-success'
+    default:
+      return 'bi bi-question-circle text-muted'
+  }
+}
+
+// Get status title for tooltip
+const getStatusTitle = (status) => {
+  try {
+    const key = status.toLowerCase()
+    return $t(`admin.bookings.status.${key}`)
+  } catch (error) {
+    // Fallback to default values if translation fails
+    const statusTitles = {
+      'Pending': 'Pending Confirmation',
+      'Confirmed': 'Confirmed',
+      'Completed': 'Completed'
+    }
+    return statusTitles[status] || status
+  }
 }
 
 // Loading state
@@ -368,6 +416,11 @@ const handleBookingClick = (booking) => {
   border-color: #e57373;
 }
 
+.time-slot.occupied.completed {
+  background-color: #f5f5f5;
+  border-color: #9e9e9e;
+}
+
 .time-slot.available {
   background-color: #f1f8e9;
   border-color: #aed581;
@@ -379,6 +432,10 @@ const handleBookingClick = (booking) => {
 
 .time-slot.occupied:hover {
   background-color: #ffcdd2;
+}
+
+.time-slot.occupied.completed:hover {
+  background-color: #eeeeee;
 }
 
 .time-slot.available {
@@ -423,6 +480,30 @@ const handleBookingClick = (booking) => {
 .booking-service {
   font-size: 0.7rem;
   line-height: 1.2;
+}
+
+/* Status icon styles */
+.status-icon-corner {
+  font-size: 0.8rem;
+  top: 2px;
+  right: 4px;
+  z-index: 5;
+}
+
+.status-icon-corner.text-warning {
+  color: #fd7e14 !important;
+}
+
+.status-icon-corner.text-success {
+  color: #28a745 !important;
+}
+
+.status-icon-corner.text-primary {
+  color: #007bff !important;
+}
+
+.status-icon-corner.text-muted {
+  color: #6c757d !important;
 }
 
 
@@ -484,10 +565,17 @@ const handleBookingClick = (booking) => {
 
 .legend-color.occupied {
   background-color: #ffebee;
+  border-color: #e57373;
+}
+
+.legend-color.completed {
+  background-color: #f5f5f5;
+  border-color: #9e9e9e;
 }
 
 .legend-color.available {
   background-color: #f1f8e9;
+  border-color: #aed581;
 }
 
 .btn-nav-arrow {
@@ -604,6 +692,12 @@ const handleBookingClick = (booking) => {
     min-width: 40px;
     font-size: 0.7rem;
   }
+  
+  .status-icon-corner {
+    font-size: 0.7rem;
+    top: 1px;
+    right: 3px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -661,6 +755,12 @@ const handleBookingClick = (booking) => {
   
   .copy-icon {
     font-size: 0.5rem;
+  }
+  
+  .status-icon-corner {
+    font-size: 0.6rem;
+    top: 1px;
+    right: 2px;
   }
   
   /* Hide some icons on small screens */

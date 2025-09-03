@@ -258,7 +258,14 @@ export default {
       statuses: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed'
+        completed: 'Completed',
+        cancelled: 'Cancelled'
+      },
+      status: {
+        pending: 'Pending Confirmation',
+        confirmed: 'Confirmed',
+        completed: 'Completed', 
+        cancelled: 'Cancelled'
       },
       locations: {
         allLocations: 'All Locations',

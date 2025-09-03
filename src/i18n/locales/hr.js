@@ -258,7 +258,14 @@ export default {
       statuses: {
         pending: 'Na čekanju',
         confirmed: 'Potvrđeno',
-        completed: 'Završeno'
+        completed: 'Završeno',
+        cancelled: 'Otkazano'
+      },
+      status: {
+        pending: 'Čeka potvrdu',
+        confirmed: 'Potvrđeno',
+        completed: 'Završeno',
+        cancelled: 'Otkazano'
       },
       locations: {
         allLocations: 'Sve lokacije',

@@ -11,6 +11,16 @@ function generateShortId() {
   return result
 }
 
+// Функция для получения всех доступных слотов времени
+function getAllTimeSlots() {
+  return [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'
+  ]
+}
+
 function doGet(e) {
   try {
     // Проверяем действие
@@ -57,9 +67,6 @@ function doGet(e) {
       const row = data[i]
       // Проверяем что строка не пустая (id, Name, Location, Date, Time)
       if (row[0] && row[2] && row[4] && row[5] && row[6]) {
-        // Теперь в таблице location уже хранится в коротком виде
-        const locationKey = row[4] // "Adamiceva" или "Martinkovac"
-
         if (isAdmin) {
           // Для админки возвращаем полную информацию
           bookings.push({
@@ -76,7 +83,7 @@ function doGet(e) {
         } else {
           // Для обычных пользователей - только необходимые данные с короткими названиями
           bookings.push({
-            location: locationKey, // Location key (Martinkovac, Adamiceva)
+            location: row[4], // Location (Martinkovac, Adamiceva)
             date: row[5], // Date
             time: row[6], // Time
             status: row[7], // Status
@@ -137,7 +144,6 @@ function handleAddBooking(e) {
     const location = e.parameter.location
     const date = e.parameter.date
     const time = e.parameter.time
-    const endTime = e.parameter.endTime
     const duration = parseInt(e.parameter.duration) || 30
     const status = e.parameter.status || 'Confirmed'
     const service = e.parameter.service || ''
@@ -160,32 +166,7 @@ function handleAddBooking(e) {
     const shortLocationName = location // Martinkovac или Adamiceva
 
     // Вычисляем все слоты, которые занимает услуга
-    const allSlots = [
-      '09:00',
-      '09:30',
-      '10:00',
-      '10:30',
-      '11:00',
-      '11:30',
-      '12:00',
-      '12:30',
-      '13:00',
-      '13:30',
-      '14:00',
-      '14:30',
-      '15:00',
-      '15:30',
-      '16:00',
-      '16:30',
-      '17:00',
-      '17:30',
-      '18:00',
-      '18:30',
-      '19:00',
-      '19:30',
-      '20:00',
-      '20:30'
-    ]
+    const allSlots = getAllTimeSlots()
     const startIndex = allSlots.indexOf(time)
     const slotsNeeded = Math.ceil(duration / 30) // Количество 30-минутных слотов
 
@@ -282,32 +263,7 @@ function doPost(e) {
     const shortLocationName = data.location // Martinkovac или Adamiceva
 
     // Вычисляем все слоты, которые занимает услуга
-    const allSlots = [
-      '09:00',
-      '09:30',
-      '10:00',
-      '10:30',
-      '11:00',
-      '11:30',
-      '12:00',
-      '12:30',
-      '13:00',
-      '13:30',
-      '14:00',
-      '14:30',
-      '15:00',
-      '15:30',
-      '16:00',
-      '16:30',
-      '17:00',
-      '17:30',
-      '18:00',
-      '18:30',
-      '19:00',
-      '19:30',
-      '20:00',
-      '20:30'
-    ]
+    const allSlots = getAllTimeSlots()
     const startIndex = allSlots.indexOf(timeString)
     const slotsNeeded = Math.ceil(duration / 30) // Количество 30-минутных слотов
 
@@ -328,7 +284,7 @@ function doPost(e) {
           shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
           "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
           "'" + slotTime, // G - Time (время каждого слота)
-          status, // H - Status (из формы или "Pending")
+          status, // H - Status (из формы или "Confirmed")
           service, // I - Service (тип услуги)
         ]
         rowsToAdd.push(rowData)
@@ -427,57 +383,6 @@ function handleUpdateBookingStatus(e) {
   }
 }
 
-// Функция для обновления статуса бронирования (для админ-панели)
-function updateBookingStatus(e) {
-  try {
-    const data = JSON.parse(e.postData.contents)
-    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
-
-    // Проверяем наличие ID
-    if (!data.id) {
-      return ContentService.createTextOutput(
-        JSON.stringify({
-          success: false,
-          message: 'Booking ID is required',
-        })
-      ).setMimeType(ContentService.MimeType.JSON)
-    }
-
-    // Находим строку по ID
-    const allData = sheet.getDataRange().getValues()
-
-    for (let i = 1; i < allData.length; i++) {
-      const row = allData[i]
-      // Ищем по id (колонка A, индекс 0)
-      if (row[0] === data.id) {
-        // Обновляем статус (колонка H, индекс 7)
-        sheet.getRange(i + 1, 8).setValue(data.newStatus)
-
-        return ContentService.createTextOutput(
-          JSON.stringify({
-            success: true,
-            message: 'Status updated successfully',
-          })
-        ).setMimeType(ContentService.MimeType.JSON)
-      }
-    }
-
-    // Если не найдено
-    return ContentService.createTextOutput(
-      JSON.stringify({
-        success: false,
-        message: 'Booking not found',
-      })
-    ).setMimeType(ContentService.MimeType.JSON)
-  } catch (error) {
-    return ContentService.createTextOutput(
-      JSON.stringify({
-        success: false,
-        message: 'Error updating status: ' + error.toString(),
-      })
-    ).setMimeType(ContentService.MimeType.JSON)
-  }
-}
 
 // Функция для обновления полной информации о бронировании через GET параметры (для обхода CORS)
 function handleUpdateBooking(e) {
