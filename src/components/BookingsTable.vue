@@ -8,8 +8,8 @@
             <label class="form-label fw-bold">{{ $t('admin.bookings.filterLocation') }}</label>
             <select v-model="locationFilter" class="form-select">
               <option value="">{{ $t('admin.bookings.locations.allLocations') }}</option>
-              <option value="downtown">Downtown</option>
-              <option value="podil">{{ $t('admin.bookings.locations.podil') }}</option>
+              <option value="downtown">Martinkovac</option>
+              <option value="podil">Adamićeva</option>
             </select>
           </div>
           <div class="col-sm-6 mb-3">

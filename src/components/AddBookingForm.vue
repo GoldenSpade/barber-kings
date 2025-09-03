@@ -325,8 +325,8 @@ const isSlotBooked = (slot) => {
   
   // Normalize location names for comparison
   const normalizeLocation = (location) => {
-    if (location === 'Martinkovac' || location === 'downtown' || location === 'Downtown Barber Kings') return 'Martinkovac'
-    if (location === 'Adamiceva' || location === 'podil' || location === 'Barber Kings Podil') return 'Adamiceva'
+    if (location === 'Martinkovac' || location === 'Downtown Barber Kings') return 'Martinkovac'
+    if (location === 'Adamiceva' || location === 'Barber Kings Podil') return 'Adamiceva'
     return location
   }
   

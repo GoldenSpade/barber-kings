@@ -274,9 +274,7 @@ export default {
         cancelled: 'Cancelled'
       },
       locations: {
-        allLocations: 'All Locations',
-        downtown: 'Downtown',
-        podil: 'Podil'
+        allLocations: 'All Locations'
       },
       allStatus: 'All Status'
     }

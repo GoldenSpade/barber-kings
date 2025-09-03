@@ -55,27 +55,51 @@
             
             <div class="row justify-content-center mb-5">
               <!-- Location 1 -->
-              <div class="col-md-6 mb-4">
-                <div class="location-item d-flex align-items-center justify-content-center">
-                  <div class="location-icon me-3">
-                    <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+              <div class="col-lg-6 mb-4">
+                <div class="location-item text-center">
+                  <div class="location-header d-flex align-items-center justify-content-center mb-3">
+                    <div class="location-icon me-3">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-1">Martinkovac ul. 127, 51000, Rijeka</h5>
+                    </div>
                   </div>
-                  <div class="location-info text-center">
-                    <h5 class="fw-bold text-dark mb-1">{{ $t('locations.downtown.address') }}</h5>
-                    <p class="text-muted mb-0">({{ $t('locations.downtown.description') }})</p>
+                  <div class="map-container">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.691183100972!2d14.3628497!3d45.3550458!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a778cea92f49%3A0xe6f79ee3aa294ac7!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892589098!5m2!1sru!2sua" 
+                      width="100%" 
+                      height="300" 
+                      style="border:0; border-radius: 8px;" 
+                      allowfullscreen="" 
+                      loading="lazy" 
+                      referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
                   </div>
                 </div>
               </div>
 
               <!-- Location 2 -->
-              <div class="col-md-6 mb-4">
-                <div class="location-item d-flex align-items-center justify-content-center">
-                  <div class="location-icon me-3">
-                    <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+              <div class="col-lg-6 mb-4">
+                <div class="location-item text-center">
+                  <div class="location-header d-flex align-items-center justify-content-center mb-3">
+                    <div class="location-icon me-3">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-1">Adamićeva ul. 34A, 51000, Rijeka</h5>
+                    </div>
                   </div>
-                  <div class="location-info text-center">
-                    <h5 class="fw-bold text-dark mb-1">{{ $t('locations.podil.address') }}</h5>
-                    <p class="text-muted mb-0">({{ $t('locations.podil.description') }})</p>
+                  <div class="map-container">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2805.062280198281!2d14.439723400000002!3d45.32736479999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a16f5d1d6545%3A0xdbf757076701a6e!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892541675!5m2!1sru!2sua" 
+                      width="100%" 
+                      height="300" 
+                      style="border:0; border-radius: 8px;" 
+                      allowfullscreen="" 
+                      loading="lazy" 
+                      referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
                   </div>
                 </div>
               </div>
@@ -251,6 +275,12 @@ import Footer from '@/components/Footer.vue'
   min-width: 50px;
 }
 
+.map-container {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .hours-column {
   max-width: 300px;
   margin: 0 auto;
@@ -311,6 +341,10 @@ import Footer from '@/components/Footer.vue'
   .location-icon {
     margin-bottom: 1rem;
     margin-right: 0 !important;
+  }
+  
+  .location-header {
+    flex-direction: column !important;
   }
   
   .hours-column {

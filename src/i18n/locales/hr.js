@@ -274,9 +274,7 @@ export default {
         cancelled: 'Otkazano'
       },
       locations: {
-        allLocations: 'Sve lokacije',
-        downtown: 'Centar',
-        podil: 'Podil'
+        allLocations: 'Sve lokacije'
       },
       allStatus: 'Svi statusni'
     }
