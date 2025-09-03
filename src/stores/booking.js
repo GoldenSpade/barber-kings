@@ -366,9 +366,7 @@ export const useBookingStore = defineStore('booking', () => {
         name: bookingForm.value.name,
         phone: bookingForm.value.phone, // Апостроф добавляется на стороне Google Apps Script
         location: locationKey,
-        service: selectedService.value.nameKey ? 
-          selectedService.value.nameKey.replace('services.', '').replace('.name', '') : 
-          selectedService.value.name,
+        service: selectedService.value.name,
         date: formattedDate,
         time: formattedTime,
         endTime: endTime,

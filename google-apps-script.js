@@ -681,8 +681,7 @@ function handleGetServices(e) {
       }
     }
 
-    // Сортируем по ID (порядок добавления)
-    services.sort((a, b) => a.id.localeCompare(b.id))
+    // Оставляем порядок как в таблице (сверху вниз)
 
     const result = {
       success: true,

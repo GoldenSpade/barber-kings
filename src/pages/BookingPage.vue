@@ -605,9 +605,7 @@ const getSelectedLocationAddress = () => {
 
 const getSelectedServiceName = () => {
   if (!bookingStore.selectedService) return ''
-  return bookingStore.selectedService.nameKey
-    ? $t(bookingStore.selectedService.nameKey)
-    : bookingStore.selectedService.name
+  return bookingStore.selectedService.name
 }
 
 const getSelectedServiceDuration = () => {

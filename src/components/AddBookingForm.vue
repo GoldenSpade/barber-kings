@@ -95,7 +95,7 @@
                     :key="service.id"
                     :value="service.id"
                   >
-                    {{ $t(service.nameKey) }} ({{ service.duration }} min)
+                    {{ service.name }} ({{ service.duration }} min)
                   </option>
                 </select>
                 <div v-if="v$.service.$error" class="invalid-feedback">
@@ -414,8 +414,8 @@ const handleSubmit = async () => {
     const storeLocationKey = locationMapping[bookingData.location] || bookingData.location
     
     bookingStore.selectedLocation = bookingStore.locations.find(loc => 
-      loc.nameKey?.replace('locations.', '').replace('.name', '') === storeLocationKey || 
-      loc.name === bookingData.location
+      (loc.nameKey?.replace('locations.', '').replace('.name', '') === storeLocationKey) || 
+      (loc.name === bookingData.location)
     )
     
     // Set selected service in store

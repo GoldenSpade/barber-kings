@@ -101,7 +101,7 @@ export const useServicesStore = defineStore('services', () => {
         console.log('Services array:', data.services)
         console.log('Services count:', data.services ? data.services.length : 0)
 
-        if (data.success && data.services) {
+        if (data.success && Array.isArray(data.services)) {
           services.value = data.services
           console.log(`Successfully loaded ${data.services.length} services`)
           console.log('Services data:', data.services)
@@ -191,7 +191,7 @@ export const useServicesStore = defineStore('services', () => {
           if (data.success) {
             console.log('Service added successfully:', data.service)
             // Add the new service to local state
-            if (data.service) {
+            if (data.service && typeof data.service === 'object') {
               services.value.push(data.service)
             }
             resolve(data)
