@@ -14,10 +14,10 @@ export const useServicesStore = defineStore('services', () => {
 
   // Getters
   const activeServices = computed(() => {
-    const filtered = services.value.filter(service => service.status === 'active')
-    console.log('Active services computed:', filtered)
-    console.log('All services:', services.value)
-    return filtered
+    // Поскольку теперь неактивные услуги полностью удаляются из таблицы,
+    // возвращаем все услуги (они все активные)
+    console.log('Active services computed:', services.value)
+    return services.value
   })
   
   const serviceById = computed(() => (id) => 

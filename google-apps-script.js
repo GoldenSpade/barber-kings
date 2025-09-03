@@ -669,8 +669,8 @@ function handleGetServices(e) {
     // Структура: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
     for (let i = 1; i < servicesData.length; i++) {
       const row = servicesData[i]
-      // Проверяем что строка не пустая и услуга активна
-      if (row[0] && row[1] && row[6] === 'active') {
+      // Проверяем что строка не пустая (поскольку неактивные услуги теперь полностью удаляются)
+      if (row[0] && row[1]) {
         services.push({
           id: row[0], // id
           name: row[1], // name
@@ -911,7 +911,7 @@ function handleUpdateService(e) {
   }
 }
 
-// Удаление услуги (soft delete - меняем статус на 'inactive')
+// Удаление услуги (полное удаление строки из таблицы)
 function handleDeleteService(e) {
   try {
     // Получаем параметры из GET запроса
@@ -930,16 +930,17 @@ function handleDeleteService(e) {
       throw new Error('Services sheet not found')
     }
 
-    // Находим строку по ID и меняем статус на inactive
+    // Находим строку по ID и удаляем её полностью
     const allData = servicesSheet.getDataRange().getValues()
     let deleted = false
 
-    for (let i = 1; i < allData.length; i++) {
+    // Проходим по строкам в обратном порядке, чтобы удаление не сдвинуло индексы
+    for (let i = allData.length - 1; i >= 1; i--) {
       const row = allData[i]
       // Ищем по id (колонка A, индекс 0)
       if (row[0] === id) {
-        // Меняем статус на 'inactive' (колонка G, индекс 6)
-        servicesSheet.getRange(i + 1, 7).setValue('inactive')
+        // Удаляем строку полностью (i+1 потому что getRange использует 1-based индексацию)
+        servicesSheet.deleteRow(i + 1)
         deleted = true
         break
       }
