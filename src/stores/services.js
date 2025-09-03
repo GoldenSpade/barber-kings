@@ -184,6 +184,9 @@ export const useServicesStore = defineStore('services', () => {
             document.head.removeChild(script)
           }
           delete window[callbackName]
+          
+          // Reset loading state
+          isSubmitting.value = false
 
           if (data.success) {
             console.log('Service added successfully:', data.service)
@@ -217,6 +220,7 @@ export const useServicesStore = defineStore('services', () => {
             document.head.removeChild(script)
           }
           delete window[callbackName]
+          isSubmitting.value = false
           const errorMsg = 'Network error while adding service'
           error.value = errorMsg
           reject(new Error(errorMsg))
@@ -229,6 +233,7 @@ export const useServicesStore = defineStore('services', () => {
               document.head.removeChild(script)
             }
             delete window[callbackName]
+            isSubmitting.value = false
             const errorMsg = 'Request timeout while adding service'
             error.value = errorMsg
             reject(new Error(errorMsg))
@@ -237,8 +242,9 @@ export const useServicesStore = defineStore('services', () => {
 
         document.head.appendChild(script)
       })
-    } finally {
+    } catch (error) {
       isSubmitting.value = false
+      throw error
     }
   }
 

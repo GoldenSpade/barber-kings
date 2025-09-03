@@ -212,7 +212,7 @@
                   class="btn btn-success"
                   :disabled="servicesStore.isSubmitting || v$.$invalid"
                 >
-                  <span v-if="servicesStore.isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                  <span v-if="servicesStore.isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   <i v-else class="bi bi-check-lg me-2"></i>
                   {{ servicesStore.isSubmitting ? $t('admin.services.saving') : $t('admin.services.save') }}
                 </button>
@@ -318,10 +318,10 @@ const saveService = async () => {
     }
 
     closeModal()
-    // Refresh services list
-    await refreshServices()
+    // No need to refresh - the store already updates local state
   } catch (error) {
     console.error('Error saving service:', error)
+    // Show error message to user if needed
   }
 }
 
@@ -333,7 +333,7 @@ const confirmDeleteService = async (service) => {
   if (confirmed) {
     try {
       await servicesStore.deleteService(service.id)
-      await refreshServices()
+      // No need to refresh - the store already updates local state
     } catch (error) {
       console.error('Error deleting service:', error)
     }
