@@ -611,6 +611,8 @@ onUnmounted(() => {
 .card-header {
   border-bottom: 1px solid #e9ecef;
   border-radius: 12px 12px 0 0 !important;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 }
 
 .btn-outline-secondary {
@@ -621,6 +623,50 @@ onUnmounted(() => {
 .btn-outline-secondary:hover {
   background-color: #2c3e33;
   border-color: #2c3e33;
+  color: white;
+}
+
+/* Simple Nav Tabs Styling */
+.nav-tabs {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: 0;
+}
+
+.nav-tabs .nav-link {
+  background: transparent;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  color: #6c757d;
+  font-weight: 500;
+  padding: 1rem 1.5rem;
+  margin: 0 2px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-tabs .nav-link:hover {
+  background: rgba(44, 62, 51, 0.1);
+  color: #2c3e33;
+  border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  background: #2c3e33;
+  color: white;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link i {
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.nav-tabs .nav-link.active i {
   color: white;
 }
 
