@@ -246,7 +246,7 @@ const form = ref({
   service: '',
   date: '',
   time: '',
-  status: 'Pending'
+  status: 'Confirmed'
 })
 
 // Form state - используем состояние из store
@@ -456,7 +456,7 @@ const resetFormFields = () => {
     service: '',
     date: '',
     time: '',
-    status: 'Pending'
+    status: 'Confirmed'
   }
   // Reset validation state
   v$.value.$reset()

@@ -70,7 +70,7 @@ function doGet(e) {
             location: row[4], // Location (короткое название: Martinkovac, Adamiceva)
             date: row[5], // Date
             time: row[6], // Time
-            status: row[7] || 'Pending', // Status (по умолчанию Pending)
+            status: row[7] || 'Confirmed', // Status (по умолчанию Confirmed)
             service: row[8] || '', // Service
           })
         } else {
@@ -139,7 +139,7 @@ function handleAddBooking(e) {
     const time = e.parameter.time
     const endTime = e.parameter.endTime
     const duration = parseInt(e.parameter.duration) || 30
-    const status = e.parameter.status || 'Pending'
+    const status = e.parameter.status || 'Confirmed'
     const service = e.parameter.service || ''
 
     // Проверяем обязательные поля
@@ -275,7 +275,7 @@ function doPost(e) {
     const dateString = data.date // DD/MM/YYYY
     const timeString = data.time // HH:MM
     const duration = parseInt(data.duration) || 30
-    const status = data.status || 'Pending' // Статус из формы или по умолчанию "Pending"
+    const status = data.status || 'Confirmed' // Статус из формы или по умолчанию "Confirmed"
     const service = data.service || '' // Тип услуги из формы
 
     // Сохраняем location в коротком виде (без преобразования в полное название)
