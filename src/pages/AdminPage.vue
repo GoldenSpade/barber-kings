@@ -81,34 +81,6 @@
             <li class="nav-item" role="presentation">
               <button 
                 class="nav-link" 
-                id="add-booking-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#add-booking-pane" 
-                type="button" 
-                role="tab" 
-                aria-controls="add-booking-pane" 
-                aria-selected="false"
-              >
-                <i class="bi bi-plus-circle me-2"></i>{{ $t('admin.tabs.addBooking') }}
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button 
-                class="nav-link" 
-                id="manage-bookings-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#manage-bookings-pane" 
-                type="button" 
-                role="tab" 
-                aria-controls="manage-bookings-pane" 
-                aria-selected="false"
-              >
-                <i class="bi bi-table me-2"></i>{{ $t('admin.tabs.manageBookings') }}
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button 
-                class="nav-link" 
                 id="manage-services-tab" 
                 data-bs-toggle="tab" 
                 data-bs-target="#manage-services-pane" 
@@ -131,15 +103,6 @@
               <AdminCalendar />
             </div>
             
-            <!-- Add Booking Tab -->
-            <div class="tab-pane fade" id="add-booking-pane" role="tabpanel" aria-labelledby="add-booking-tab">
-              <AddBookingForm @booking-added="onBookingAdded" />
-            </div>
-            
-            <!-- Manage Bookings Tab -->
-            <div class="tab-pane fade" id="manage-bookings-pane" role="tabpanel" aria-labelledby="manage-bookings-tab">
-              <BookingsTable />
-            </div>
             
             <!-- Manage Services Tab -->
             <div class="tab-pane fade" id="manage-services-pane" role="tabpanel" aria-labelledby="manage-services-tab">
@@ -305,7 +268,6 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AdminCalendar from '@/components/AdminCalendar.vue'
 import AddBookingForm from '@/components/AddBookingForm.vue'
-import BookingsTable from '@/components/BookingsTable.vue'
 import ManageServices from '@/components/ManageServices.vue'
 import { useBookingStore } from '@/stores/booking'
 import { useAuthStore } from '@/stores/auth'
@@ -415,14 +377,20 @@ const closeModal = (modalId) => {
     modalElement.removeAttribute('role')
   }
   
-  // Remove backdrop
-  const backdrop = document.getElementById('modal-backdrop')
-  if (backdrop) {
-    backdrop.remove()
+  // Remove ALL backdrops (both with ID and class)
+  const backdropById = document.getElementById('modal-backdrop')
+  if (backdropById) {
+    backdropById.remove()
   }
   
-  // Restore body scrolling
+  // Also remove any backdrops by class
+  const backdrops = document.querySelectorAll('.modal-backdrop')
+  backdrops.forEach(backdrop => backdrop.remove())
+  
+  // Restore body scrolling completely
   document.body.classList.remove('modal-open')
+  document.body.style.overflow = ''
+  document.body.style.paddingRight = ''
   
   // Focus back to a safe element (like body or main content)
   const safeElement = document.querySelector('main') || document.body
@@ -440,6 +408,15 @@ const closeModal = (modalId) => {
 const onBookingAdded = () => {
   // Close modal and refresh calendar
   closeModal('addBookingModal')
+  
+  // Additional cleanup - force remove any remaining backdrops after a short delay
+  setTimeout(() => {
+    const remainingBackdrops = document.querySelectorAll('.modal-backdrop')
+    remainingBackdrops.forEach(backdrop => backdrop.remove())
+    document.body.classList.remove('modal-open')
+    document.body.style.overflow = ''
+    document.body.style.paddingRight = ''
+  }, 200)
   
   // Refresh bookings
   bookingStore.fetchBookedSlots(true)
