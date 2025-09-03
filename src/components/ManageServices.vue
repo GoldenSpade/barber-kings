@@ -96,7 +96,7 @@
               <i class="bi bi-gear me-2"></i>
               {{ isEditing ? $t('admin.services.editService') : $t('admin.services.addService') }}
             </h5>
-            <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
+            <button type="button" class="btn-close" @click="closeModal" @keydown.enter="closeModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <!-- Loading Overlay -->
@@ -226,7 +226,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minValue, minLength } from '@vuelidate/validators'
@@ -393,6 +393,12 @@ const closeModal = () => {
     }
     
     // Fallback: hide modal manually
+    // Сначала убираем фокус с любого элемента внутри модалки
+    const focusedElement = modalElement.querySelector(':focus')
+    if (focusedElement) {
+      focusedElement.blur()
+    }
+    
     modalElement.style.display = 'none'
     modalElement.classList.remove('show')
     modalElement.setAttribute('aria-hidden', 'true')
@@ -407,13 +413,36 @@ const closeModal = () => {
     
     // Restore body scrolling
     document.body.classList.remove('modal-open')
+    
+    // Возвращаем фокус на безопасный элемент
+    const safeElement = document.querySelector('.btn-add-service') || document.body
+    if (safeElement) {
+      setTimeout(() => {
+        safeElement.focus()
+      }, 100)
+    }
   }
   resetForm()
+}
+
+// Keyboard event handlers
+const handleKeydown = (event) => {
+  if (event.key === 'Escape') {
+    const modalElement = document.getElementById('serviceModal')
+    if (modalElement && modalElement.classList.contains('show')) {
+      closeModal()
+    }
+  }
 }
 
 // Lifecycle
 onMounted(async () => {
   await refreshServices()
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
