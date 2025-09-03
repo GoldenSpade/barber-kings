@@ -210,7 +210,6 @@ export const useServicesStore = defineStore('services', () => {
           description: serviceData.description || '',
           duration: serviceData.duration,
           price: serviceData.price || 0,
-          category: serviceData.category || 'haircut',
           callback: callbackName
         })
         script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`
@@ -298,7 +297,6 @@ export const useServicesStore = defineStore('services', () => {
           description: serviceData.description || '',
           duration: serviceData.duration,
           price: serviceData.price || 0,
-          category: serviceData.category || 'haircut',
           callback: callbackName
         })
         script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`

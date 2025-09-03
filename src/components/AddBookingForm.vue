@@ -225,18 +225,20 @@ import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
-import { services, getServiceById } from '@/config/services'
+import { useServicesStore } from '@/stores/services'
+import { getAllServices, getServiceById } from '@/config/services'
 import Loader from '@/components/Loader.vue'
 
 const { t: $t } = useI18n()
 
 const bookingStore = useBookingStore()
+const servicesStore = useServicesStore()
 
 // Define emits
 const emit = defineEmits(['booking-added'])
 
-// Make services available in template
-const availableServices = ref(services)
+// Make services available in template - computed to be reactive to store changes
+const availableServices = computed(() => getAllServices())
 
 // Form data
 const form = ref({
@@ -515,6 +517,9 @@ const handlePrefillForm = (event) => {
 
 // Load booked slots when component mounts
 onMounted(async () => {
+  // Load services first
+  await servicesStore.fetchServices()
+  
   await bookingStore.fetchBookedSlots(true)
   
   // Add event listener for form pre-fill

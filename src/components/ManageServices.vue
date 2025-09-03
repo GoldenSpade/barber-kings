@@ -41,7 +41,6 @@
             <th>{{ $t('admin.services.description') }}</th>
             <th>{{ $t('admin.services.duration') }}</th>
             <th>{{ $t('admin.services.price') }}</th>
-            <th>{{ $t('admin.services.category') }}</th>
             <th class="text-center">{{ $t('admin.services.actions') }}</th>
           </tr>
         </thead>
@@ -53,9 +52,6 @@
               <span class="badge badge-duration">{{ servicesStore.formatDuration(service.duration) }}</span>
             </td>
             <td class="fw-bold text-success">{{ servicesStore.formatPrice(service.price) }}</td>
-            <td>
-              <span class="badge bg-secondary text-capitalize">{{ service.category }}</span>
-            </td>
             <td class="text-center">
               <button 
                 class="btn btn-sm btn-action-edit me-2" 
@@ -184,19 +180,6 @@
                 </div>
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">{{ $t('admin.services.category') }}</label>
-                <select
-                  class="form-select"
-                  v-model="form.category"
-                  :disabled="servicesStore.isSubmitting"
-                >
-                  <option value="haircut">{{ $t('admin.services.categories.haircut') }}</option>
-                  <option value="beard">{{ $t('admin.services.categories.beard') }}</option>
-                  <option value="styling">{{ $t('admin.services.categories.styling') }}</option>
-                  <option value="other">{{ $t('admin.services.categories.other') }}</option>
-                </select>
-              </div>
 
               <div class="d-flex justify-content-end gap-2">
                 <button
@@ -245,8 +228,7 @@ const form = ref({
   name: '',
   description: '',
   duration: '',
-  price: '',
-  category: 'haircut'
+  price: ''
 })
 
 // Form validation rules
@@ -288,8 +270,7 @@ const editService = (service) => {
     name: service.name,
     description: service.description || '',
     duration: service.duration.toString(),
-    price: service.price.toString(),
-    category: service.category
+    price: service.price.toString()
   }
   v$.value.$reset()
   showModal()
@@ -307,8 +288,7 @@ const saveService = async () => {
       name: form.value.name.trim(),
       description: form.value.description.trim(),
       duration: parseInt(form.value.duration),
-      price: parseFloat(form.value.price),
-      category: form.value.category
+      price: parseFloat(form.value.price)
     }
 
     if (isEditing.value && editingServiceId.value) {
@@ -345,8 +325,7 @@ const resetForm = () => {
     name: '',
     description: '',
     duration: '',
-    price: '',
-    category: 'haircut'
+    price: ''
   }
   v$.value.$reset()
 }

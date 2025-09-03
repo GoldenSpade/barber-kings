@@ -647,18 +647,18 @@ function handleGetServices(e) {
     // Если лист не существует, создаем его с заголовками
     if (!servicesSheet) {
       servicesSheet = spreadsheet.insertSheet('Services')
-      // Создаем заголовки: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
-      servicesSheet.getRange(1, 1, 1, 8).setValues([
-        ['id', 'name', 'description', 'duration', 'category', 'order', 'status', 'price']
+      // Создаем заголовки: A=id, B=name, C=description, D=duration, E=price
+      servicesSheet.getRange(1, 1, 1, 5).setValues([
+        ['id', 'name', 'description', 'duration', 'price']
       ])
       
       // Добавляем базовые услуги для начала
       const defaultServices = [
-        [generateShortId(), "Men's Haircut", 'Classic and modern haircuts for men', 30, 'haircut', 1, 'active', 25],
-        [generateShortId(), "Men's Haircut + Beard Trim", 'Haircut with professional beard trimming and shaping', 60, 'haircut', 2, 'active', 35],
-        [generateShortId(), "Women's Haircut", 'Professional haircuts for women', 60, 'haircut', 3, 'active', 40]
+        [generateShortId(), "Men's Haircut", 'Classic and modern haircuts for men', 30, 25],
+        [generateShortId(), "Men's Haircut + Beard Trim", 'Haircut with professional beard trimming and shaping', 60, 35],
+        [generateShortId(), "Women's Haircut", 'Professional haircuts for women', 60, 40]
       ]
-      servicesSheet.getRange(2, 1, defaultServices.length, 8).setValues(defaultServices)
+      servicesSheet.getRange(2, 1, defaultServices.length, 5).setValues(defaultServices)
     }
 
     // Получаем все данные из листа Services
@@ -666,26 +666,23 @@ function handleGetServices(e) {
     const services = []
     
     // Начинаем с индекса 1, чтобы пропустить заголовки
-    // Структура: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
+    // Структура: A=id, B=name, C=description, D=duration, E=price
     for (let i = 1; i < servicesData.length; i++) {
       const row = servicesData[i]
-      // Проверяем что строка не пустая (поскольку неактивные услуги теперь полностью удаляются)
+      // Проверяем что строка не пустая
       if (row[0] && row[1]) {
         services.push({
           id: row[0], // id
           name: row[1], // name
           description: row[2] || '', // description
           duration: parseInt(row[3]) || 30, // duration (minutes)
-          category: row[4] || 'haircut', // category
-          order: parseInt(row[5]) || 999, // order
-          status: row[6] || 'active', // status
-          price: parseFloat(row[7]) || 0 // price
+          price: parseFloat(row[4]) || 0 // price
         })
       }
     }
 
-    // Сортируем по порядку
-    services.sort((a, b) => a.order - b.order)
+    // Сортируем по ID (порядок добавления)
+    services.sort((a, b) => a.id.localeCompare(b.id))
 
     const result = {
       success: true,
@@ -733,7 +730,6 @@ function handleAddService(e) {
     const description = e.parameter.description || ''
     const duration = parseInt(e.parameter.duration) || 30
     const price = parseFloat(e.parameter.price) || 0
-    const category = e.parameter.category || 'haircut'
 
     // Проверяем обязательные поля
     if (!name || !duration) {
@@ -751,27 +747,14 @@ function handleAddService(e) {
     // Генерируем уникальный ID для услуги
     const serviceId = generateShortId()
 
-    // Находим максимальный порядковый номер для нового порядка
-    const servicesData = servicesSheet.getDataRange().getValues()
-    let maxOrder = 0
-    for (let i = 1; i < servicesData.length; i++) {
-      const order = parseInt(servicesData[i][5]) || 0 // F - order
-      if (order > maxOrder) {
-        maxOrder = order
-      }
-    }
-
     // Подготавливаем данные для записи в таблицу
-    // Порядок: A=id, B=name, C=description, D=duration, E=category, F=order, G=status, H=price
+    // Порядок: A=id, B=name, C=description, D=duration, E=price
     const rowData = [
       serviceId, // A - id
       name, // B - name
       description, // C - description
       duration, // D - duration (minutes)
-      category, // E - category
-      maxOrder + 1, // F - order (следующий порядковый номер)
-      'active', // G - status (по умолчанию активная)
-      price // H - price
+      price // E - price
     ]
 
     // Добавляем строку в таблицу
@@ -786,10 +769,7 @@ function handleAddService(e) {
         name: name,
         description: description,
         duration: duration,
-        price: price,
-        category: category,
-        status: 'active',
-        order: maxOrder + 1
+        price: price
       }
     }
 
@@ -833,7 +813,6 @@ function handleUpdateService(e) {
     const description = e.parameter.description || ''
     const duration = parseInt(e.parameter.duration) || 30
     const price = parseFloat(e.parameter.price) || 0
-    const category = e.parameter.category || 'haircut'
 
     // Проверяем обязательные поля
     if (!id || !name || !duration) {
@@ -860,8 +839,7 @@ function handleUpdateService(e) {
         servicesSheet.getRange(i + 1, 2).setValue(name) // B - name
         servicesSheet.getRange(i + 1, 3).setValue(description) // C - description
         servicesSheet.getRange(i + 1, 4).setValue(duration) // D - duration
-        servicesSheet.getRange(i + 1, 5).setValue(category) // E - category
-        servicesSheet.getRange(i + 1, 8).setValue(price) // H - price
+        servicesSheet.getRange(i + 1, 5).setValue(price) // E - price
         updated = true
         break
       }
@@ -875,8 +853,7 @@ function handleUpdateService(e) {
         name: name,
         description: description,
         duration: duration,
-        price: price,
-        category: category
+        price: price
       } : null
     }
 

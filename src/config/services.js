@@ -1,42 +1,23 @@
-// Services configuration file
-// You can add new services or modify existing ones
-// Duration must be in 30-minute increments (30, 60, 90, 120, etc.)
-
-export const services = [
-  {
-    id: 1,
-    nameKey: 'services.mensHaircut.name',
-    descriptionKey: 'services.mensHaircut.description',
-    duration: 30, // minutes
-    price: 25, // optional - for future use
-    category: 'haircut'
-  },
-  {
-    id: 2,
-    nameKey: 'services.mensHaircutBeard.name',
-    descriptionKey: 'services.mensHaircutBeard.description',
-    duration: 60, // minutes (30 min haircut + 30 min beard)
-    price: 35, // optional - for future use
-    category: 'haircut'
-  },
-  {
-    id: 3,
-    nameKey: 'services.womensHaircut.name',
-    descriptionKey: 'services.womensHaircut.description',
-    duration: 60, // minutes
-    price: 40, // optional - for future use
-    category: 'haircut'
-  }
-]
+// Services configuration file - now dynamically loaded from Google Sheets
+import { useServicesStore } from '@/stores/services'
 
 // Helper function to get service by ID
 export const getServiceById = (id) => {
-  return services.find(service => service.id === id)
+  const servicesStore = useServicesStore()
+  return servicesStore.activeServices.find(service => service.id === id)
 }
 
 // Helper function to get all services
 export const getAllServices = () => {
-  return services
+  const servicesStore = useServicesStore()
+  // Преобразуем данные из store в формат, ожидаемый BookingPage
+  return servicesStore.activeServices.map(service => ({
+    id: service.id,
+    name: service.name, // Используем name напрямую вместо nameKey
+    description: service.description, // Используем description напрямую вместо descriptionKey  
+    duration: service.duration,
+    price: service.price
+  }))
 }
 
 // Helper function to format duration

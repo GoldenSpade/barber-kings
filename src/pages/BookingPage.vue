@@ -458,12 +458,14 @@ import { useI18n } from 'vue-i18n'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, helpers } from '@vuelidate/validators'
 import { useBookingStore } from '@/stores/booking'
+import { useServicesStore } from '@/stores/services'
 import { getAllServices, formatDuration } from '@/config/services'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
+const servicesStore = useServicesStore()
 const { t: $t, locale } = useI18n()
 
 // Custom phone validator
@@ -507,11 +509,8 @@ const translatedLocations = computed(() => {
 // Computed services with translations
 const translatedServices = computed(() => {
   try {
-    return getAllServices().map((service) => ({
-      ...service,
-      name: $t(service.nameKey),
-      description: $t(service.descriptionKey),
-    }))
+    // Теперь getAllServices() уже возвращает готовые данные с name и description
+    return getAllServices()
   } catch (error) {
     console.error('Error loading services:', error)
     return []
@@ -890,12 +889,17 @@ onMounted(async () => {
   bookingStore.initializeCalendar()
   
   try {
+    // Загружаем services перед другими данными
+    console.log('Fetching services...')
+    await servicesStore.fetchServices()
+    console.log('Services loaded:', servicesStore.activeServices.length)
+    
     console.log('Fetching booked slots...')
     // Загружаем занятые слоты при загрузке страницы
     await bookingStore.fetchBookedSlots()
     console.log('Booked slots loaded:', bookingStore.bookedSlots.length)
   } catch (error) {
-    console.error('Error fetching booked slots:', error)
+    console.error('Error fetching data:', error)
   }
   
   // Handle URL parameters for direct booking
