@@ -568,25 +568,26 @@ onUnmounted(() => {
 
 .btn-action-delete {
   background-color: transparent;
-  border: 1px solid #dc3545;
-  color: #dc3545;
+  border: 1px solid #6c757d;
+  color: #6c757d;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  font-weight: 300;
   transition: all 0.3s ease;
 }
 
 .btn-action-delete:hover {
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: #6c757d;
+  border-color: #6c757d;
   color: white;
 }
 
 .btn-action-delete:focus,
 .btn-action-delete:active {
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: #5a6268;
+  border-color: #5a6268;
   color: white;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
 }
 
 .btn-action-edit:disabled,

@@ -437,7 +437,7 @@ export const useServicesStore = defineStore('services', () => {
 
   // Helper function to format price
   const formatPrice = (price) => {
-    return `€${price},-`
+    return `€${price}`
   }
 
   return {

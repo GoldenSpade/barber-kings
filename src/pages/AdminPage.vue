@@ -225,7 +225,7 @@
                 <div class="d-flex gap-3 justify-content-between">
                   <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-delete-modal"
                     @click="confirmDeleteBooking"
                     :disabled="isDeletingBooking"
                   >
@@ -237,14 +237,14 @@
                   <div class="d-flex gap-2">
                     <button
                       type="button"
-                      class="btn btn-outline-secondary"
+                      class="btn btn-cancel-modal"
                       @click="closeModal('editBookingModal')"
                     >
                       {{ $t('admin.editBooking.cancel') }}
                     </button>
                     <button
                       type="submit"
-                      class="btn btn-success"
+                      class="btn btn-save-modal"
                       :disabled="isSavingChanges"
                     >
                       <span v-if="isSavingChanges" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -674,5 +674,89 @@ onUnmounted(() => {
   background-color: #f8f9fa !important;
   color: #6c757d !important;
   cursor: not-allowed;
+}
+
+/* Modal Button Styles */
+.btn-save-modal {
+  background-color: #2c3e33;
+  border-color: #2c3e33;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-save-modal:hover {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+}
+
+.btn-save-modal:focus,
+.btn-save-modal:active {
+  background-color: #1f2b24;
+  border-color: #1f2b24;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 51, 0.25);
+}
+
+.btn-save-modal:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  opacity: 0.65;
+}
+
+.btn-cancel-modal {
+  background-color: transparent;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel-modal:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-cancel-modal:focus,
+.btn-cancel-modal:active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+.btn-delete-modal {
+  background-color: transparent;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+  font-weight: 300;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-delete-modal:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-delete-modal:focus,
+.btn-delete-modal:active {
+  background-color: #5a6268;
+  border-color: #5a6268;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+.btn-delete-modal:disabled {
+  opacity: 0.65;
 }
 </style>
