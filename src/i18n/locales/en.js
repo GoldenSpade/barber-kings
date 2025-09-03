@@ -32,6 +32,7 @@ export default {
     pricing: 'PRICING',
     bookAppointment: 'BOOK APPOINTMENT',
     pricingServices: {
+      services: 'SERVICES',
       regular: 'REGULAR',
       discounts: 'DISCOUNTS',
       haircut: 'Haircut',

@@ -174,37 +174,27 @@
               {{ $t('home.pricing') }}
             </h2>
             
-            <div class="row">
-              <!-- Regular Services -->
+            <!-- Loading State -->
+            <div v-if="servicesStore.isLoading" class="text-center py-5">
+              <Loader size="large" message="Loading pricing information..." />
+            </div>
+
+            <!-- Services Content -->
+            <div v-else class="row">
+              <!-- Dynamic Services -->
               <div class="col-md-6">
                 <div class="pricing-column">
                   <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
                     {{ $t('home.pricingServices.regular') }}
                   </h3>
                   
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.haircut') }}</span>
-                    <span class="fw-bold">€35,-</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.haircutWash') }}</span>
-                    <span class="fw-bold">€40,-</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.haircutBeardTrim') }}</span>
-                    <span class="fw-bold">€45,-</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.haircutBeardTrimWash') }}</span>
-                    <span class="fw-bold">€50,-</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2">
-                    <span>{{ $t('home.pricingServices.beardTrim') }}</span>
-                    <span class="fw-bold">from €15,-</span>
+                  <div 
+                    v-for="service in pricingServices" 
+                    :key="service.id"
+                    class="service-item d-flex justify-content-between py-2 border-bottom border-secondary"
+                  >
+                    <span>{{ service.name }}</span>
+                    <span class="fw-bold">{{ service.formattedPrice }}</span>
                   </div>
                 </div>
               </div>
@@ -218,17 +208,17 @@
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
                     <span>{{ $t('home.pricingServices.studentHaircut') }}</span>
-                    <span class="fw-bold">€30,-</span>
+                    <span class="fw-bold">€30</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
                     <span>{{ $t('home.pricingServices.kidsHaircut') }}</span>
-                    <span class="fw-bold">€30,-</span>
+                    <span class="fw-bold">€30</span>
                   </div>
                   
                   <div class="service-item d-flex justify-content-between py-2">
                     <span>{{ $t('home.pricingServices.seniorHaircut') }}</span>
-                    <span class="fw-bold">€30,-</span>
+                    <span class="fw-bold">€30</span>
                   </div>
                 </div>
               </div>
@@ -255,8 +245,26 @@
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue'
 import Navigation from '@/components/Navigation.vue'
 import Footer from '@/components/Footer.vue'
+import Loader from '@/components/Loader.vue'
+import { useServicesStore } from '@/stores/services'
+
+const servicesStore = useServicesStore()
+
+// Load services on component mount
+onMounted(async () => {
+  await servicesStore.fetchServices()
+})
+
+// Computed property for services with pricing
+const pricingServices = computed(() => {
+  return servicesStore.activeServices.map(service => ({
+    ...service,
+    formattedPrice: service.price > 0 ? `€${service.price}` : 'from €15'
+  }))
+})
 </script>
 
 <style scoped>

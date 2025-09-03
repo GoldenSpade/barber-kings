@@ -32,6 +32,7 @@ export default {
     pricing: 'CIJENE',
     bookAppointment: 'REZERVIRAJ TERMIN',
     pricingServices: {
+      services: 'USLUGE',
       regular: 'REDOVNE',
       discounts: 'POPUSTI',
       haircut: 'Šišanje',
