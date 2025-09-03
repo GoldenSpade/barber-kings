@@ -188,7 +188,13 @@ export default {
       closed: 'Zatvoreno',
       loading: 'Učitavaju se rezervacije...',
       clickToCopyPhone: 'Kliknite za kopiranje broja telefona',
-      phoneCopied: 'Telefon {phone} kopiran u međuspremnik!'
+      phoneCopied: 'Telefon {phone} kopiran u međuspremnik!',
+      legend: {
+        pending: 'Na čekanju',
+        confirmed: 'Potvrđeno',
+        completed: 'Završeno',
+        available: 'Dostupno'
+      }
     },
     editBooking: {
       title: 'Uredi rezervaciju',

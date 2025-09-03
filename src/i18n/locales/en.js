@@ -188,7 +188,13 @@ export default {
       closed: 'Closed',
       loading: 'Loading bookings...',
       clickToCopyPhone: 'Click to copy phone number',
-      phoneCopied: 'Phone {phone} copied to clipboard!'
+      phoneCopied: 'Phone {phone} copied to clipboard!',
+      legend: {
+        pending: 'Pending',
+        confirmed: 'Confirmed',
+        completed: 'Completed',
+        available: 'Available'
+      }
     },
     editBooking: {
       title: 'Edit Booking',
