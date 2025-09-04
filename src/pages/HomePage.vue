@@ -119,7 +119,7 @@
             </h2>
             
             <div class="row justify-content-center">
-              <!-- Column 1 -->
+              <!-- Column 1: Mon-Fri 9:00–21:00, Sun Closed -->
               <div class="col-md-6 mb-4">
                 <div class="hours-column">
                   <div class="d-flex justify-content-between py-2">
@@ -138,19 +138,39 @@
                     <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
                     <span>9:00 to 21:00</span>
                   </div>
-                </div>
-              </div>
-              
-              <!-- Column 2 -->
-              <div class="col-md-6 mb-4">
-                <div class="hours-column">
                   <div class="d-flex justify-content-between py-2">
                     <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
                     <span>9:00 to 21:00</span>
                   </div>
                   <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.saturday') }}</span>
-                    <span>9:00 to 21:00</span>
+                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
+                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Column 2: Mon-Fri 8:00–17:00, Sun Closed -->
+              <div class="col-md-6 mb-4">
+                <div class="hours-column">
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
+                    <span>8:00 to 17:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
+                    <span>8:00 to 17:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
+                    <span>8:00 to 17:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
+                    <span>8:00 to 17:00</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
+                    <span>8:00 to 17:00</span>
                   </div>
                   <div class="d-flex justify-content-between py-2">
                     <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
