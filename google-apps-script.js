@@ -1,5 +1,5 @@
 // ID вашей Google Таблицы (замените на свой ID)
-const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
+const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
 
 // Функция для генерации короткого ID (аналог nanoid)
 function generateShortId() {
