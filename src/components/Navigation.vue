@@ -20,8 +20,6 @@
 
         <!-- Right Links -->
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <!-- Removed booking link -->
-          
           <!-- Language Switcher -->
           <div class="dropdown">
             <button 
@@ -83,8 +81,6 @@
         <!-- Collapsible Mobile Menu -->
         <div class="collapse navbar-collapse" id="mobileNav">
           <div class="navbar-nav text-center mt-3">
-            <!-- Removed home and booking links -->
-            
             <!-- Mobile Language Switcher -->
             <div class="mt-3">
               <button 
@@ -122,6 +118,7 @@ const changeLanguage = (lang) => {
   locale.value = lang
   localStorage.setItem('locale', lang)
 }
+
 </script>
 
 <style scoped>

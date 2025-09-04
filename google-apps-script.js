@@ -1,6 +1,7 @@
 // ID вашей Google Таблицы (замените на свой ID)
 const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
 
+
 // Функция для генерации короткого ID (аналог nanoid)
 function generateShortId() {
   const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -20,6 +21,7 @@ function getAllTimeSlots() {
     '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'
   ]
 }
+
 
 function doGet(e) {
   try {
@@ -70,6 +72,7 @@ function doGet(e) {
       // Удаление услуги (soft delete)
       return handleDeleteService(e)
     }
+
 
     // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
@@ -957,3 +960,4 @@ function handleDeleteService(e) {
     )
   }
 }
+
