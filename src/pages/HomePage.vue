@@ -180,9 +180,9 @@
             </div>
 
             <!-- Services Content -->
-            <div v-else class="row">
-              <!-- Dynamic Services -->
-              <div class="col-md-6">
+            <div v-else class="row justify-content-center">
+              <!-- Dynamic Services (Regular) -->
+              <div class="col-md-8 col-lg-6">
                 <div class="pricing-column">
                   <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
                     {{ $t('home.pricingServices.regular') }}
@@ -195,30 +195,6 @@
                   >
                     <span>{{ service.name }}</span>
                     <span class="fw-bold">{{ service.formattedPrice }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Discount Services -->
-              <div class="col-md-6">
-                <div class="pricing-column">
-                  <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    {{ $t('home.pricingServices.discounts') }}
-                  </h3>
-                  
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.studentHaircut') }}</span>
-                    <span class="fw-bold">€30</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2 border-bottom border-secondary">
-                    <span>{{ $t('home.pricingServices.kidsHaircut') }}</span>
-                    <span class="fw-bold">€30</span>
-                  </div>
-                  
-                  <div class="service-item d-flex justify-content-between py-2">
-                    <span>{{ $t('home.pricingServices.seniorHaircut') }}</span>
-                    <span class="fw-bold">€30</span>
                   </div>
                 </div>
               </div>
