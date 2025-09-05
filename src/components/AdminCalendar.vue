@@ -557,11 +557,11 @@ const handleBookingClick = (booking) => {
 /* Стили для многослотовых бронирований */
 .time-slot.multi-slot {
   position: relative;
-  border: 2px solid;
-  border-radius: 8px;
+  border: 1px solid #f0f0f0; /* такая же толщина как у обычных слотов */
+  border-radius: 4px; /* стандартный border-radius */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .time-slot.multi-slot .booking-info-vertical {
@@ -569,39 +569,36 @@ const handleBookingClick = (booking) => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 0.75rem 0.5rem;
+  padding: 0.25rem; /* стандартный padding как у обычных */
 }
 
+/* Стандартные размеры шрифтов как у обычных слотов */
 .time-slot.multi-slot .time-label {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  color: #2c3e33;
+  font-size: 0.85rem; /* стандартный размер */
+  font-weight: 500;   /* стандартный weight */
+  margin-bottom: 0.25rem; /* стандартный отступ */
 }
 
 .time-slot.multi-slot .customer-name {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;  /* стандартный размер */
+  font-weight: bold;  /* стандартный weight */
 }
 
 .time-slot.multi-slot .customer-phone,
 .time-slot.multi-slot .booking-service {
-  font-size: 0.8rem;
+  font-size: 0.7rem; /* стандартный размер */
 }
 
 .time-slot.multi-slot.status-pending {
   border-color: #f4d03f;
-  box-shadow: 0 2px 6px rgba(244, 208, 63, 0.4);
 }
 
 .time-slot.multi-slot.status-confirmed {
   border-color: #58d68d;
-  box-shadow: 0 2px 6px rgba(88, 214, 141, 0.4);
 }
 
 .time-slot.multi-slot.status-completed {
   border-color: #bdc3c7;
-  box-shadow: 0 2px 6px rgba(189, 195, 199, 0.4);
 }
 
 /* Status-specific styles */
