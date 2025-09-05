@@ -1,12 +1,18 @@
 // ID вашей Google Таблицы (замените на свой ID)
 const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
 
-// Настройки Twilio для WhatsApp уведомлений администратору
+// Настройки Twilio для WhatsApp уведомлений
 const TWILIO_ACCOUNT_SID = 'AC85d7e903c497d51fbc7d78240b6f9352'
 const TWILIO_AUTH_TOKEN = '6cf4936898a774e088c04a5f60a73cbb'
 const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886'
-const ADMIN_WHATSAPP_NUMBER = 'whatsapp:+380951067390' // Номер администратора для уведомлений
 
+// 🔧 НАСТРОЙКИ АДМИНОВ - легко изменить здесь
+const ADMIN_WHATSAPP_NUMBERS = [
+  'whatsapp:+380951067390',  // Первый администратор
+  'whatsapp:+380935425887'   // Второй администратор
+  // Добавьте сюда новые номера по необходимости:
+  // 'whatsapp:+380123456789',  // Третий администратор
+]
 
 // Функция для генерации короткого ID (аналог nanoid)
 function generateShortId() {
@@ -28,10 +34,10 @@ function getAllTimeSlots() {
   ]
 }
 
-// Функция для отправки WhatsApp уведомления администратору
+// Функция для отправки WhatsApp уведомлений всем администраторам
 function sendWhatsAppNotificationToAdmin(name, phone, location, date, time, service) {
   try {
-    // Формируем сообщение для администратора
+    // Формируем сообщение для администраторов
     const message = `🔔 New booking at Barber Kings!
 
 👤 Client: ${name}
@@ -43,13 +49,56 @@ function sendWhatsAppNotificationToAdmin(name, phone, location, date, time, serv
 
 Check the booking in admin panel.`
 
+    const results = []
+    
+    // Отправляем сообщение каждому администратору
+    for (let i = 0; i < ADMIN_WHATSAPP_NUMBERS.length; i++) {
+      const adminNumber = ADMIN_WHATSAPP_NUMBERS[i]
+      
+      try {
+        const success = sendWhatsAppMessage(adminNumber, message)
+        results.push({ 
+          number: adminNumber, 
+          success: success,
+          index: i + 1 
+        })
+        
+        // Небольшая задержка между отправками для избежания rate limits
+        if (i < ADMIN_WHATSAPP_NUMBERS.length - 1) {
+          Utilities.sleep(500) // 0.5 секунды задержка
+        }
+      } catch (error) {
+        console.error(`Failed to send to admin ${i + 1} (${adminNumber}):`, error.toString())
+        results.push({ 
+          number: adminNumber, 
+          success: false,
+          error: error.toString(),
+          index: i + 1 
+        })
+      }
+    }
+    
+    // Логируем результаты
+    const successful = results.filter(r => r.success).length
+    console.log(`WhatsApp notifications: ${successful}/${results.length} sent successfully`)
+    
+    return successful > 0 // Возвращаем true если хотя бы одно сообщение отправлено
+  } catch (error) {
+    console.error('Error in sendWhatsAppNotificationToAdmin:', error.toString())
+    return false
+  }
+}
+
+// Вспомогательная функция для отправки одного WhatsApp сообщения
+function sendWhatsAppMessage(toNumber, message) {
+  try {
     // URL для Twilio API
     const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`
     
     // Подготавливаем данные для отправки
     const payload = {
       'From': TWILIO_WHATSAPP_FROM,
-      'To': ADMIN_WHATSAPP_NUMBER,
+      'To': toNumber,
       'Body': message
     }
 
@@ -68,14 +117,14 @@ Check the booking in admin panel.`
     const responseData = JSON.parse(response.getContentText())
     
     if (response.getResponseCode() === 201) {
-      console.log('WhatsApp notification sent successfully:', responseData.sid)
+      console.log(`WhatsApp sent to ${toNumber}: ${responseData.sid}`)
       return true
     } else {
-      console.error('Failed to send WhatsApp notification:', responseData)
+      console.error(`Failed to send to ${toNumber}:`, responseData)
       return false
     }
   } catch (error) {
-    console.error('Error sending WhatsApp notification:', error.toString())
+    console.error(`Error sending to ${toNumber}:`, error.toString())
     return false
   }
 }
