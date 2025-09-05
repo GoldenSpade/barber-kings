@@ -586,14 +586,13 @@ const handleSubmitBooking = async () => {
     if (result.success) {
       // Reset validation state on successful submission
       v$.value.$reset()
-      alert(result.message)
       router.push('/')
     } else {
       alert(result.message)
     }
   } catch (error) {
     console.error('Error submitting booking:', error)
-    alert('Sorry, there was an error submitting your booking. Please try again.')
+    console.error('Booking submission failed')
   }
 }
 
