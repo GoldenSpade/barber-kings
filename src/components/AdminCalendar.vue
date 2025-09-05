@@ -574,7 +574,7 @@ const handleBookingClick = (booking) => {
 
 /* Стандартные размеры шрифтов как у обычных слотов */
 .time-slot.multi-slot .time-label {
-  font-size: 0.85rem; /* стандартный размер */
+  font-size: 0.75rem; /* уменьшенный размер как у обычных слотов */
   font-weight: 500;   /* стандартный weight */
   margin-bottom: 0.25rem; /* стандартный отступ */
 }
@@ -928,7 +928,7 @@ const handleBookingClick = (booking) => {
   }
   
   .time-slot.multi-slot .time-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     margin-bottom: 0.25rem;
   }
   
