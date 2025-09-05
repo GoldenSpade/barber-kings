@@ -1,6 +1,12 @@
 // ID вашей Google Таблицы (замените на свой ID)
 const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
 
+// Настройки Twilio для WhatsApp уведомлений администратору
+const TWILIO_ACCOUNT_SID = 'AC85d7e903c497d51fbc7d78240b6f9352'
+const TWILIO_AUTH_TOKEN = '6cf4936898a774e088c04a5f60a73cbb'
+const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886'
+const ADMIN_WHATSAPP_NUMBER = 'whatsapp:+380951067390' // Номер администратора для уведомлений
+
 
 // Функция для генерации короткого ID (аналог nanoid)
 function generateShortId() {
@@ -20,6 +26,58 @@ function getAllTimeSlots() {
     '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
     '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'
   ]
+}
+
+// Функция для отправки WhatsApp уведомления администратору
+function sendWhatsAppNotificationToAdmin(name, phone, location, date, time, service) {
+  try {
+    // Формируем сообщение для администратора
+    const message = `🔔 New booking at Barber Kings!
+
+👤 Client: ${name}
+📞 Phone: ${phone}
+📍 Location: ${location}
+📅 Date: ${date}
+🕐 Time: ${time}
+✂️ Service: ${service || 'Not specified'}
+
+Check the booking in admin panel.`
+
+    // URL для Twilio API
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`
+    
+    // Подготавливаем данные для отправки
+    const payload = {
+      'From': TWILIO_WHATSAPP_FROM,
+      'To': ADMIN_WHATSAPP_NUMBER,
+      'Body': message
+    }
+
+    // Настройки запроса
+    const options = {
+      'method': 'POST',
+      'headers': {
+        'Authorization': 'Basic ' + Utilities.base64Encode(TWILIO_ACCOUNT_SID + ':' + TWILIO_AUTH_TOKEN),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      'payload': Object.keys(payload).map(key => key + '=' + encodeURIComponent(payload[key])).join('&')
+    }
+
+    // Отправляем запрос
+    const response = UrlFetchApp.fetch(url, options)
+    const responseData = JSON.parse(response.getContentText())
+    
+    if (response.getResponseCode() === 201) {
+      console.log('WhatsApp notification sent successfully:', responseData.sid)
+      return true
+    } else {
+      console.error('Failed to send WhatsApp notification:', responseData)
+      return false
+    }
+  } catch (error) {
+    console.error('Error sending WhatsApp notification:', error.toString())
+    return false
+  }
 }
 
 
@@ -222,6 +280,9 @@ function handleAddBooking(e) {
       // Добавляем строки одним вызовом для лучшей производительности
       const range = sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, rowsToAdd[0].length)
       range.setValues(rowsToAdd)
+      
+      // Отправляем WhatsApp уведомление администратору
+      sendWhatsAppNotificationToAdmin(name, phone, location, date, time, service)
     }
 
     const result = {
@@ -319,6 +380,9 @@ function doPost(e) {
       // Добавляем строки одним вызовом для лучшей производительности
       const range = sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, rowsToAdd[0].length)
       range.setValues(rowsToAdd)
+      
+      // Отправляем WhatsApp уведомление администратору
+      sendWhatsAppNotificationToAdmin(data.name, data.phone, shortLocationName, dateString, timeString, service)
     }
 
     // Возвращаем успешный ответ с ID созданной записи
