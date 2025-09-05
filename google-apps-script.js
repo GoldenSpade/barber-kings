@@ -206,7 +206,7 @@ function doGet(e) {
             location: row[4], // Location (короткое название: Martinkovac, Adamiceva)
             date: row[5], // Date
             time: row[6], // Time
-            status: row[7] || 'Confirmed', // Status (по умолчанию Confirmed)
+            status: row[7] || 'Pending', // Status (по умолчанию Pending)
             service: row[8] || '', // Service
           })
         } else {
@@ -274,7 +274,7 @@ function handleAddBooking(e) {
     const date = e.parameter.date
     const time = e.parameter.time
     const duration = parseInt(e.parameter.duration) || 30
-    const status = e.parameter.status || 'Confirmed'
+    const status = e.parameter.status || 'Pending'
     const service = e.parameter.service || ''
 
     // Проверяем обязательные поля
@@ -388,7 +388,7 @@ function doPost(e) {
     const dateString = data.date // DD/MM/YYYY
     const timeString = data.time // HH:MM
     const duration = parseInt(data.duration) || 30
-    const status = data.status || 'Confirmed' // Статус из формы или по умолчанию "Confirmed"
+    const status = data.status || 'Pending' // Статус из формы или по умолчанию "Pending"
     const service = data.service || '' // Тип услуги из формы
 
     // Сохраняем location в коротком виде (без преобразования в полное название)
@@ -416,7 +416,7 @@ function doPost(e) {
           shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
           "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
           "'" + slotTime, // G - Time (время каждого слота)
-          status, // H - Status (из формы или "Confirmed")
+          status, // H - Status (из формы или "Pending")
           service, // I - Service (тип услуги)
         ]
         rowsToAdd.push(rowData)
@@ -1072,4 +1072,3 @@ function handleDeleteService(e) {
     )
   }
 }
-

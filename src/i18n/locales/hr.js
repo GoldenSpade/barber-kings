@@ -195,7 +195,6 @@ export default {
       legend: {
         pending: 'Na čekanju',
         confirmed: 'Potvrđeno',
-        completed: 'Završeno',
         available: 'Dostupno'
       }
     },
@@ -267,13 +266,11 @@ export default {
       statuses: {
         pending: 'Na čekanju',
         confirmed: 'Potvrđeno',
-        completed: 'Završeno',
         cancelled: 'Otkazano'
       },
       status: {
         pending: 'Čeka potvrdu',
         confirmed: 'Potvrđeno',
-        completed: 'Završeno',
         cancelled: 'Otkazano'
       },
       locations: {

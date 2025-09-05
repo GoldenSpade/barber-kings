@@ -215,7 +215,6 @@
                       <select v-model="selectedBooking.status" class="form-select" required>
                         <option value="Pending">Pending</option>
                         <option value="Confirmed">Confirmed</option>
-                        <option value="Completed">Completed</option>
                       </select>
                     </div>
                   </div>

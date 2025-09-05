@@ -343,8 +343,7 @@ const getSlotClass = (day, slot) => {
   return {
     'occupied': true,
     'status-pending': status === 'Pending',
-    'status-confirmed': status === 'Confirmed', 
-    'status-completed': status === 'Completed',
+    'status-confirmed': status === 'Confirmed',
     'multi-slot': height > 1
   }
 }
@@ -430,8 +429,6 @@ const getStatusIconClass = (status) => {
       return 'bi bi-clock status-icon-dark'
     case 'Confirmed':
       return 'bi bi-check-circle status-icon-dark'
-    case 'Completed':
-      return 'bi bi-check2-circle status-icon-dark'
     default:
       return 'bi bi-question-circle status-icon-dark'
   }
@@ -446,8 +443,7 @@ const getStatusTitle = (status) => {
     // Fallback to default values if translation fails
     const statusTitles = {
       'Pending': 'Pending Confirmation',
-      'Confirmed': 'Confirmed',
-      'Completed': 'Completed'
+      'Confirmed': 'Confirmed'
     }
     return statusTitles[status] || status
   }
@@ -572,21 +568,18 @@ const handleBookingClick = (booking) => {
 }
 
 .time-slot.multi-slot.status-pending {
-  border-color: #f4d03f;
+  border-color: #ff9999;
 }
 
 .time-slot.multi-slot.status-confirmed {
   border-color: #58d68d;
 }
 
-.time-slot.multi-slot.status-completed {
-  border-color: #bdc3c7;
-}
 
 /* Status-specific styles */
 .time-slot.occupied.status-pending {
-  background-color: #fef9e7;
-  border-color: #f4d03f;
+  background-color: #ffe6e6;
+  border-color: #ff9999;
 }
 
 .time-slot.occupied.status-confirmed {
@@ -594,10 +587,6 @@ const handleBookingClick = (booking) => {
   border-color: #58d68d;
 }
 
-.time-slot.occupied.status-completed {
-  background-color: #f4f4f4;
-  border-color: #bdc3c7;
-}
 
 /* Fallback for occupied slots without specific status */
 .time-slot.occupied {
@@ -615,16 +604,13 @@ const handleBookingClick = (booking) => {
 }
 
 .time-slot.occupied.status-pending:hover {
-  background-color: #fdf5d3;
+  background-color: #ffcccc;
 }
 
 .time-slot.occupied.status-confirmed:hover {
   background-color: #a9dfbf;
 }
 
-.time-slot.occupied.status-completed:hover {
-  background-color: #f0f0f0;
-}
 
 /* Fallback hover for occupied slots */
 .time-slot.occupied:hover {
@@ -746,8 +732,8 @@ const handleBookingClick = (booking) => {
 }
 
 .legend-color.status-pending {
-  background-color: #fef9e7;
-  border-color: #f4d03f;
+  background-color: #ffe6e6;
+  border-color: #ff9999;
 }
 
 .legend-color.status-confirmed {
@@ -755,10 +741,6 @@ const handleBookingClick = (booking) => {
   border-color: #58d68d;
 }
 
-.legend-color.status-completed {
-  background-color: #f4f4f4;
-  border-color: #bdc3c7;
-}
 
 .legend-color.available {
   background-color: #f1f8e9;

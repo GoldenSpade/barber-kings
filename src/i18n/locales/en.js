@@ -195,7 +195,6 @@ export default {
       legend: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed',
         available: 'Available'
       }
     },
@@ -267,13 +266,11 @@ export default {
       statuses: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed',
         cancelled: 'Cancelled'
       },
       status: {
         pending: 'Pending Confirmation',
         confirmed: 'Confirmed',
-        completed: 'Completed', 
         cancelled: 'Cancelled'
       },
       locations: {
