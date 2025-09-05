@@ -104,12 +104,14 @@
               <div 
                 v-for="slot in allTimeSlots" 
                 :key="slot"
+                v-show="!isAdditionalSlot(day, slot)"
                 class="time-slot mb-1 p-2 rounded"
                 :class="getSlotClass(day, slot)"
+                :style="getSlotStyle(day, slot)"
                 @click="getBookingsForSlot(day, slot).length > 0 ? handleBookingClick(getBookingsForSlot(day, slot)[0]) : handleEmptySlotClick(day, slot)"
               >
                 <div v-if="getBookingsForSlot(day, slot).length > 0" class="booking-info-vertical text-center position-relative">
-                  <div class="time-label fw-medium mb-1">{{ slot }}</div>
+                  <div class="time-label fw-medium mb-1">{{ getTimeRangeLabel(day, slot) }}</div>
                   
                   <!-- Status icon in top right corner -->
                   <i 
@@ -255,8 +257,65 @@ const nextWeek = () => {
   bookingStore.nextWeek()
 }
 
-// Get bookings for specific slot (can return multiple bookings)
-const getBookingsForSlot = (day, slot) => {
+// Проверяет, является ли слот "дополнительным" (частью многослотового бронирования, но не первым)
+const isAdditionalSlot = (day, slot) => {
+  const date = new Date(day.date)
+  const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  
+  // Найти все бронирования для этой даты и локации
+  const dayBookings = bookingStore.bookedSlots.filter(booking => 
+    booking.date === dateString && booking.location === selectedLocationFilter.value
+  )
+  
+  // Группировать по ID
+  const bookingGroups = {}
+  dayBookings.forEach(booking => {
+    if (!bookingGroups[booking.id]) {
+      bookingGroups[booking.id] = []
+    }
+    bookingGroups[booking.id].push(booking)
+  })
+  
+  // Проверить, есть ли бронирование с тем же ID, но более ранним временем
+  const currentSlotBooking = dayBookings.find(booking => booking.time === slot)
+  if (!currentSlotBooking) return false
+  
+  const sameIdBookings = bookingGroups[currentSlotBooking.id] || []
+  if (sameIdBookings.length <= 1) return false
+  
+  // Сортируем по времени и проверяем, не является ли текущий слот первым
+  const sortedSlots = sameIdBookings
+    .map(b => b.time)
+    .sort((a, b) => {
+      const [hoursA, minutesA] = a.split(':').map(Number)
+      const [hoursB, minutesB] = b.split(':').map(Number)
+      return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB)
+    })
+  
+  return sortedSlots[0] !== slot
+}
+
+// Получает высоту слота в зависимости от продолжительности услуги
+const getSlotHeight = (day, slot) => {
+  const bookings = getBookingsForMainSlot(day, slot)
+  if (bookings.length === 0) return 1
+  
+  const date = new Date(day.date)
+  const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  
+  // Найти все слоты этого же бронирования
+  const booking = bookings[0]
+  const allSlotsForBooking = bookingStore.bookedSlots.filter(b => 
+    b.id === booking.id && 
+    b.date === dateString && 
+    b.location === selectedLocationFilter.value
+  )
+  
+  return allSlotsForBooking.length
+}
+
+// Get bookings for specific slot (only for main slots - первый слот многослотового бронирования)
+const getBookingsForMainSlot = (day, slot) => {
   // Return empty array if data is not yet loaded
   if (!bookingStore.bookedSlots || !Array.isArray(bookingStore.bookedSlots) || bookingStore.bookedSlots.length === 0) {
     return []
@@ -277,6 +336,11 @@ const getBookingsForSlot = (day, slot) => {
   return bookings
 }
 
+// Get bookings for specific slot (обратная совместимость)
+const getBookingsForSlot = (day, slot) => {
+  return getBookingsForMainSlot(day, slot)
+}
+
 // Get booking for specific slot (backwards compatibility - returns first booking)
 const getBookingForSlot = (day, slot) => {
   const bookings = getBookingsForSlot(day, slot)
@@ -292,13 +356,78 @@ const getSlotClass = (day, slot) => {
   
   // Determine the predominant status (use first booking's status for simplicity)
   const status = bookings[0].status
+  const height = getSlotHeight(day, slot)
   
   return {
     'occupied': true,
     'status-pending': status === 'Pending',
     'status-confirmed': status === 'Confirmed', 
-    'status-completed': status === 'Completed'
+    'status-completed': status === 'Completed',
+    'multi-slot': height > 1
   }
+}
+
+// Get dynamic styles for time slot
+const getSlotStyle = (day, slot) => {
+  const bookings = getBookingsForSlot(day, slot)
+  if (bookings.length === 0) {
+    return {}
+  }
+  
+  const height = getSlotHeight(day, slot)
+  if (height <= 1) {
+    return {}
+  }
+  
+  // Простое увеличение высоты для многослотовых бронирований
+  const slotHeight = 49 // высота обычного слота с отступами
+  const totalHeight = slotHeight * height
+  
+  return {
+    minHeight: `${totalHeight}px`,
+    zIndex: 15,
+    marginBottom: '4px'
+  }
+}
+
+// Получить диапазон времени для многослотового бронирования
+const getTimeRangeLabel = (day, slot) => {
+  const bookings = getBookingsForSlot(day, slot)
+  if (bookings.length === 0) return slot
+  
+  const height = getSlotHeight(day, slot)
+  if (height <= 1) return slot
+  
+  const date = new Date(day.date)
+  const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  
+  // Найти все слоты этого же бронирования
+  const booking = bookings[0]
+  const allSlotsForBooking = bookingStore.bookedSlots.filter(b => 
+    b.id === booking.id && 
+    b.date === dateString && 
+    b.location === selectedLocationFilter.value
+  )
+  
+  // Сортируем по времени
+  const sortedTimes = allSlotsForBooking
+    .map(b => b.time)
+    .sort((a, b) => {
+      const [hoursA, minutesA] = a.split(':').map(Number)
+      const [hoursB, minutesB] = b.split(':').map(Number)
+      return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB)
+    })
+  
+  if (sortedTimes.length <= 1) return slot
+  
+  // Вычисляем конечное время
+  const lastTime = sortedTimes[sortedTimes.length - 1]
+  const [lastHours, lastMinutes] = lastTime.split(':').map(Number)
+  const endHours = lastMinutes === 30 ? lastHours + 1 : lastHours
+  const endMinutes = lastMinutes === 30 ? 0 : 30
+  const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`
+  
+  return `${sortedTimes[0]}-${endTime}`
 }
 
 const getServiceName = (serviceKey) => {
@@ -423,6 +552,56 @@ const handleBookingClick = (booking) => {
   border: 1px solid #f0f0f0;
   transition: all 0.2s ease;
   font-size: 0.85rem;
+}
+
+/* Стили для многослотовых бронирований */
+.time-slot.multi-slot {
+  position: relative;
+  border: 2px solid;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.time-slot.multi-slot .booking-info-vertical {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0.75rem 0.5rem;
+}
+
+.time-slot.multi-slot .time-label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #2c3e33;
+}
+
+.time-slot.multi-slot .customer-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.time-slot.multi-slot .customer-phone,
+.time-slot.multi-slot .booking-service {
+  font-size: 0.8rem;
+}
+
+.time-slot.multi-slot.status-pending {
+  border-color: #f4d03f;
+  box-shadow: 0 2px 6px rgba(244, 208, 63, 0.4);
+}
+
+.time-slot.multi-slot.status-confirmed {
+  border-color: #58d68d;
+  box-shadow: 0 2px 6px rgba(88, 214, 141, 0.4);
+}
+
+.time-slot.multi-slot.status-completed {
+  border-color: #bdc3c7;
+  box-shadow: 0 2px 6px rgba(189, 195, 199, 0.4);
 }
 
 /* Status-specific styles */
@@ -749,6 +928,15 @@ const handleBookingClick = (booking) => {
   .time-slot {
     font-size: 0.75rem;
     padding: 0.25rem !important;
+  }
+  
+  .time-slot.multi-slot .time-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .time-slot.multi-slot .booking-info-vertical {
+    padding-top: 0.25rem;
   }
   
   .booking-info {
