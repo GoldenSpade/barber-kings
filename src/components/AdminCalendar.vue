@@ -51,24 +51,6 @@
             ></i>
             <span>{{ isLoading ? $t('admin.calendar.loading') : $t('admin.bookings.refresh') }}</span>
           </button>
-          <div class="legend d-inline-flex align-items-center flex-wrap">
-            <div class="legend-item me-3 mb-1">
-              <span class="legend-color status-pending"></span>
-              <small>{{ $t('admin.calendar.legend.pending') }}</small>
-            </div>
-            <div class="legend-item me-3 mb-1">
-              <span class="legend-color status-confirmed"></span>
-              <small>{{ $t('admin.calendar.legend.confirmed') }}</small>
-            </div>
-            <div class="legend-item me-3 mb-1">
-              <span class="legend-color status-completed"></span>
-              <small>{{ $t('admin.calendar.legend.completed') }}</small>
-            </div>
-            <div class="legend-item mb-1">
-              <span class="legend-color available"></span>
-              <small>{{ $t('admin.calendar.legend.available') }}</small>
-            </div>
-          </div>
         </div>
       </div>
     </div>
