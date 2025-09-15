@@ -45,7 +45,7 @@
     </div>
 
     <!-- Locations Section -->
-    <div class="locations-section bg-white py-5">
+    <div class="locations-section bg-white pt-5 pb-4">
       <div class="container">
         <div class="row">
           <div class="col-12 text-center">
@@ -155,7 +155,7 @@
       <div class="container">
         <div class="row">
           <div class="col-12">
-            <h2 class="display-4 fw-bold text-white text-center mb-5" style="font-size: 3rem; letter-spacing: 2px;">
+            <h2 class="display-4 fw-bold text-white text-center mb-3" style="font-size: 3rem; letter-spacing: 2px;">
               {{ $t('home.pricing') }}
             </h2>
             
@@ -172,7 +172,7 @@
                   <div
                     v-for="service in pricingServices"
                     :key="service.id"
-                    class="service-item d-flex justify-content-between py-2 border-bottom border-secondary"
+                    class="service-item d-flex justify-content-between py-3"
                   >
                     <span>{{ service.name }}</span>
                     <span class="fw-bold">{{ service.formattedPrice }}</span>
