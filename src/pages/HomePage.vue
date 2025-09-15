@@ -56,17 +56,15 @@
             <div class="row justify-content-center mb-3">
               <!-- Location 1 -->
               <div class="col-lg-6 mb-4">
-                <div class="location-item text-center">
-                  <div class="location-header mb-3">
-                    <div class="d-flex align-items-center justify-content-center">
-                      <div class="location-icon me-3">
-                        <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
-                      </div>
-                      <div class="location-info text-center">
-                        <h5 class="fw-bold text-dark mb-0">
-                          Martinkovac ul. 127, 51000, Rijeka<br>091 985 2998
-                        </h5>
-                      </div>
+                <div class="location-item">
+                  <div class="location-header mb-3 text-center">
+                    <div class="location-icon mb-2">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-0">
+                        Martinkovac ul. 127, 51000, Rijeka<br>091 985 2998
+                      </h5>
                     </div>
                   </div>
                   <div class="map-container">
@@ -85,17 +83,15 @@
 
               <!-- Location 2 -->
               <div class="col-lg-6 mb-4">
-                <div class="location-item text-center">
-                  <div class="location-header mb-3">
-                    <div class="d-flex align-items-center justify-content-center">
-                      <div class="location-icon me-3">
-                        <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
-                      </div>
-                      <div class="location-info text-center">
-                        <h5 class="fw-bold text-dark mb-0">
-                          Adamićeva ul. 34A, 51000, Rijeka<br>091 948 1514
-                        </h5>
-                      </div>
+                <div class="location-item">
+                  <div class="location-header mb-3 text-center">
+                    <div class="location-icon mb-2">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-0">
+                        Adamićeva ul. 34A, 51000, Rijeka<br>091 948 1514
+                      </h5>
                     </div>
                   </div>
                   <div class="map-container">
@@ -284,7 +280,17 @@ const pricingServices = computed(() => {
 }
 
 .location-icon {
-  min-width: 50px;
+  display: inline-block;
+}
+
+.location-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.location-info {
+  text-align: center;
 }
 
 .map-container {
