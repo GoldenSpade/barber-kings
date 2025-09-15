@@ -2,45 +2,14 @@
   <div class="booking-page bg-light">
     <!-- Logo Header -->
     <div class="py-4 bg-white">
-      <div class="container position-relative">
-        <div class="row align-items-center">
+      <div class="container">
+        <div class="d-flex justify-content-center align-items-center position-relative">
           <!-- Logo -->
-          <div class="col-12 text-center">
-            <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
-          </div>
+          <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
 
           <!-- Language Switcher -->
-          <div class="position-absolute top-0 end-0 p-3">
-            <div class="dropdown d-inline-block">
-              <button
-                class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                type="button"
-                id="languageDropdown"
-                data-bs-toggle="dropdown"
-              >
-                {{ locale.toUpperCase() }}
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('en')"
-                    :class="{ active: locale === 'en' }"
-                  >
-                    EN
-                  </button>
-                </li>
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('hr')"
-                    :class="{ active: locale === 'hr' }"
-                  >
-                    HR
-                  </button>
-                </li>
-              </ul>
-            </div>
+          <div class="position-absolute end-0">
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
@@ -470,6 +439,7 @@ import { useServicesStore } from '@/stores/services'
 import { getAllServices, formatDuration } from '@/config/services'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
@@ -560,11 +530,6 @@ const translatedWeekDays = computed(() => {
 })
 
 // Methods
-const changeLanguage = (lang) => {
-  locale.value = lang
-  localStorage.setItem('locale', lang)
-}
-
 const goBack = () => {
   const shouldGoHome = bookingStore.goToPreviousStep()
   if (shouldGoHome) {
