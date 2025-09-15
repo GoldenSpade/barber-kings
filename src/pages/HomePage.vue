@@ -83,11 +83,7 @@
                     <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
                     <div class="hours-table">
                       <div class="d-flex justify-content-between py-1">
-                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.friday') }}</span>
-                        <span class="fw-bold">9:00 - 21:00</span>
-                      </div>
-                      <div class="d-flex justify-content-between py-1">
-                        <span>{{ $t('booking.days.saturday') }}</span>
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.saturday') }}</span>
                         <span class="fw-bold">9:00 - 21:00</span>
                       </div>
                       <div class="d-flex justify-content-between py-1">
@@ -128,12 +124,8 @@
                     <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
                     <div class="hours-table">
                       <div class="d-flex justify-content-between py-1">
-                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.friday') }}</span>
-                        <span class="fw-bold">8:00 - 17:00</span>
-                      </div>
-                      <div class="d-flex justify-content-between py-1">
-                        <span>{{ $t('booking.days.saturday') }}</span>
-                        <span class="fw-bold">8:00 - 17:00</span>
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.saturday') }}</span>
+                        <span class="fw-bold">9:00 - 21:00</span>
                       </div>
                       <div class="d-flex justify-content-between py-1">
                         <span>{{ $t('booking.days.sunday') }}</span>
