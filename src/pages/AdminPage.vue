@@ -12,35 +12,14 @@
           </div>
           <div class="col-12 col-md-6 text-end mt-3 mt-md-0">
             <!-- Language Switcher -->
-            <div class="dropdown d-inline-block me-3">
+            <div class="d-inline-block me-3">
               <button
-                class="btn btn-outline-secondary dropdown-toggle"
-                type="button"
-                id="adminLanguageDropdown"
-                data-bs-toggle="dropdown"
+                class="btn btn-outline-secondary"
+                @click="changeLanguage(locale === 'hr' ? 'en' : 'hr')"
+                aria-label="Change language"
               >
                 {{ locale.toUpperCase() }}
               </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('en')"
-                    :class="{ active: locale === 'en' }"
-                  >
-                    EN
-                  </button>
-                </li>
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('hr')"
-                    :class="{ active: locale === 'hr' }"
-                  >
-                    HR
-                  </button>
-                </li>
-              </ul>
             </div>
             
             <button 
