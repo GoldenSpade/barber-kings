@@ -236,14 +236,12 @@
                         <div class="time-slots">
                           <div v-if="day.available">
                             <div
-                              v-for="time in generateAllTimeSlots()"
+                              v-for="time in getAvailableTimeSlots(day)"
                               :key="time"
                               class="time-slot mb-1 p-2 rounded"
-                              :class="getSlotClass(day, time)"
                               :title="getSlotTitle(day, time)"
                             >
                               <button
-                                v-if="!isSlotBooked(day, time) && isSlotAvailableForService(day, time)"
                                 class="btn btn-outline-secondary btn-sm w-100"
                                 :class="{
                                   'btn-success':
@@ -254,9 +252,6 @@
                               >
                                 {{ time }}
                               </button>
-                              <div v-else class="time-label fw-medium">
-                                {{ time }}
-                              </div>
                             </div>
                           </div>
                           <div v-else class="text-muted small text-center">
@@ -296,14 +291,13 @@
                   <!-- Mobile Time Slots - Single Column with Scroll -->
                   <div class="mobile-time-slots-container">
                     <div v-if="getSelectedDay().available" class="time-slots-scroll">
-                      <div 
-                        v-for="time in generateAllTimeSlots()"
+                      <div
+                        v-for="time in getAvailableTimeSlots(getSelectedDay())"
                         :key="time"
                         class="time-slot-mobile mb-2"
                         :title="getSlotTitle(getSelectedDay(), time)"
                       >
                         <button
-                          v-if="!isSlotBooked(getSelectedDay(), time) && isSlotAvailableForService(getSelectedDay(), time)"
                           class="btn btn-time-slot w-100"
                           :class="{
                             'btn-success':
@@ -314,12 +308,6 @@
                         >
                           {{ time }}
                         </button>
-                        <div v-else-if="isSlotBooked(getSelectedDay(), time)" class="time-slot-occupied">
-                          <span class="fw-medium">{{ time }}</span>
-                        </div>
-                        <div v-else class="time-slot-unavailable">
-                          <span class="fw-medium">{{ time }}</span>
-                        </div>
                       </div>
                     </div>
                     <div v-else class="text-muted text-center">
@@ -630,6 +618,21 @@ const generateAllTimeSlots = () => {
     slots.push(`${hour.toString().padStart(2, '0')}:30`)
   }
   return slots
+}
+
+// Helper function to get only available time slots (not booked and available for service)
+const getAvailableTimeSlots = (day) => {
+  if (!day.available) {
+    return []
+  }
+
+  // Use day's timeSlots if they exist (filtered by time already for current day)
+  const allSlots = day.timeSlots || generateAllTimeSlots()
+
+  return allSlots.filter(time => {
+    // Check if slot is not booked and available for the selected service
+    return !isSlotBooked(day, time) && isSlotAvailableForService(day, time)
+  })
 }
 
 // Helper function to check if a time slot is available for the selected service

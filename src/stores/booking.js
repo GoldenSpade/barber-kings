@@ -116,11 +116,7 @@ export const useBookingStore = defineStore('booking', () => {
       let timeSlots = []
       
       // Check if date is within our allowed range
-      if (date.getTime() === today.getTime()) {
-        // Today - not available for booking
-        available = false
-        reason = 'Not available today'
-      } else if (date > maxDate.value) {
+      if (date > maxDate.value) {
         available = false
         reason = 'Too far ahead'
       } else if (date.getDay() === 0) { // Sunday
@@ -128,8 +124,25 @@ export const useBookingStore = defineStore('booking', () => {
         reason = 'Closed'
       } else {
         // Generate time slots for available days (9:00-20:30, 30min intervals)
-        const allSlots = generateTimeSlots()
-        
+        let allSlots = generateTimeSlots()
+
+        // For today, filter out past time slots
+        const isToday = date.getTime() === today.getTime()
+        if (isToday) {
+          const now = new Date()
+          const currentHour = now.getHours()
+          const currentMinute = now.getMinutes()
+
+          allSlots = allSlots.filter(timeSlot => {
+            const [hour, minute] = timeSlot.split(':').map(Number)
+            const slotTime = new Date(today)
+            slotTime.setHours(hour, minute, 0, 0)
+
+            // Show slots that are at least 30 minutes in the future
+            return slotTime.getTime() > now.getTime() + (30 * 60 * 1000)
+          })
+        }
+
         // Фильтруем занятые слоты для текущей даты и локации
         const dateString = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
         // Преобразуем название локации для сопоставления с API
@@ -141,7 +154,7 @@ export const useBookingStore = defineStore('booking', () => {
             currentLocation = 'Adamiceva'
           }
         }
-        
+
         // Не фильтруем слоты, а просто используем все слоты
         // Логика отображения (занят/свободен) будет обрабатываться в компоненте
         timeSlots = allSlots
