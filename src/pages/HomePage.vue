@@ -166,15 +166,11 @@
 
             <!-- Services Content -->
             <div v-else class="row justify-content-center">
-              <!-- Dynamic Services (Regular) -->
+              <!-- Dynamic Services -->
               <div class="col-md-8 col-lg-6">
                 <div class="pricing-column">
-                  <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    {{ $t('home.pricingServices.regular') }}
-                  </h3>
-                  
-                  <div 
-                    v-for="service in pricingServices" 
+                  <div
+                    v-for="service in pricingServices"
                     :key="service.id"
                     class="service-item d-flex justify-content-between py-2 border-bottom border-secondary"
                   >
@@ -207,24 +203,45 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Navigation from '@/components/Navigation.vue'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
 import { useServicesStore } from '@/stores/services'
 
 const servicesStore = useServicesStore()
+const { locale } = useI18n()
 
 // Load services on component mount
 onMounted(async () => {
   await servicesStore.fetchServices()
 })
 
-// Computed property for services with pricing
+// Computed property for services with pricing and translation
 const pricingServices = computed(() => {
-  return servicesStore.activeServices.map(service => ({
-    ...service,
-    formattedPrice: service.price > 0 ? `€${service.price}` : 'from €15'
-  }))
+  const translations = {
+    hr: {
+      "Men's Haircut": "Muško šišanje",
+      "Men's Haircut + Beard Trim": "Muško šišanje + uređenje brade",
+      "Women's Haircut": "Žensko šišanje"
+    },
+    en: {
+      "Men's Haircut": "Men's Haircut",
+      "Men's Haircut + Beard Trim": "Men's Haircut + Beard Trim",
+      "Women's Haircut": "Women's Haircut"
+    }
+  }
+
+  return servicesStore.activeServices.map(service => {
+    const currentLangTranslations = translations[locale.value] || translations.en
+    const translatedName = currentLangTranslations[service.name] || service.name
+
+    return {
+      ...service,
+      name: translatedName,
+      formattedPrice: service.price > 0 ? `€${service.price}` : 'from €15'
+    }
+  })
 })
 </script>
 
