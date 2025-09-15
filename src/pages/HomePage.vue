@@ -67,16 +67,34 @@
                       </h5>
                     </div>
                   </div>
-                  <div class="map-container">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.691183100972!2d14.3628497!3d45.3550458!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a778cea92f49%3A0xe6f79ee3aa294ac7!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892589098!5m2!1sru!2sua" 
-                      width="100%" 
-                      height="300" 
-                      style="border:0; border-radius: 8px;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
+                  <div class="map-container mb-3">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.691183100972!2d14.3628497!3d45.3550458!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a778cea92f49%3A0xe6f79ee3aa294ac7!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892589098!5m2!1sru!2sua"
+                      width="100%"
+                      height="300"
+                      style="border:0; border-radius: 8px;"
+                      allowfullscreen=""
+                      loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
+                  </div>
+                  <!-- Hours for Location 1 -->
+                  <div class="location-hours mt-3">
+                    <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
+                    <div class="hours-table">
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.friday') }}</span>
+                        <span class="fw-bold">9:00 - 21:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.saturday') }}</span>
+                        <span class="fw-bold">9:00 - 21:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.sunday') }}</span>
+                        <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -94,83 +112,34 @@
                       </h5>
                     </div>
                   </div>
-                  <div class="map-container">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2805.062280198281!2d14.439723400000002!3d45.32736479999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a16f5d1d6545%3A0xdbf757076701a6e!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892541675!5m2!1sru!2sua" 
-                      width="100%" 
-                      height="300" 
-                      style="border:0; border-radius: 8px;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
+                  <div class="map-container mb-3">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2805.062280198281!2d14.439723400000002!3d45.32736479999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a16f5d1d6545%3A0xdbf757076701a6e!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892541675!5m2!1sru!2sua"
+                      width="100%"
+                      height="300"
+                      style="border:0; border-radius: 8px;"
+                      allowfullscreen=""
+                      loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hours Section -->
-            <h2 class="display-4 fw-bold text-dark mb-5" style="font-size: 3rem; letter-spacing: 2px;">
-              {{ $t('home.hours') }}
-            </h2>
-            
-            <div class="row justify-content-center">
-              <!-- Column 1: Mon-Fri 9:00–21:00, Sun Closed -->
-              <div class="col-md-6 mb-4">
-                <div class="hours-column">
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
-                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Column 2: Mon-Fri 8:00–17:00, Sun Closed -->
-              <div class="col-md-6 mb-4">
-                <div class="hours-column">
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
-                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                  <!-- Hours for Location 2 -->
+                  <div class="location-hours mt-3">
+                    <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
+                    <div class="hours-table">
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.friday') }}</span>
+                        <span class="fw-bold">8:00 - 17:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.saturday') }}</span>
+                        <span class="fw-bold">8:00 - 17:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.sunday') }}</span>
+                        <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -299,9 +268,15 @@ const pricingServices = computed(() => {
   overflow: hidden;
 }
 
-.hours-column {
-  max-width: 300px;
+.location-hours {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
   margin: 0 auto;
+}
+
+.hours-table {
+  font-size: 0.95rem;
 }
 
 .pricing-section {
