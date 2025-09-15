@@ -475,8 +475,41 @@ const translatedLocations = computed(() => {
 // Computed services with translations
 const translatedServices = computed(() => {
   try {
-    // Теперь getAllServices() уже возвращает готовые данные с name и description
-    return getAllServices()
+    const translations = {
+      hr: {
+        "Men's Haircut": "Muško šišanje",
+        "Men's Haircut + Beard Trim": "Muško šišanje + uređenje brade",
+        "Women's Haircut": "Žensko šišanje",
+        // Descriptions translations
+        "Classic and modern haircuts for men": "Klasično i moderno šišanje za muškarce",
+        "Haircut with professional beard trimming and styling": "Šišanje s profesionalnim uređenjem i oblikovanjem brade",
+        "Haircut with professional beard trimming and shaping": "Šišanje s profesionalnim uređenjem i oblikovanjem brade",
+        "Professional haircuts for women": "Profesionalno šišanje za žene"
+      },
+      en: {
+        "Men's Haircut": "Men's Haircut",
+        "Men's Haircut + Beard Trim": "Men's Haircut + Beard Trim",
+        "Women's Haircut": "Women's Haircut",
+        // Descriptions stay the same in English
+        "Classic and modern haircuts for men": "Classic and modern haircuts for men",
+        "Haircut with professional beard trimming and styling": "Haircut with professional beard trimming and styling",
+        "Haircut with professional beard trimming and shaping": "Haircut with professional beard trimming and shaping",
+        "Professional haircuts for women": "Professional haircuts for women"
+      }
+    }
+
+    const currentLangTranslations = translations[locale.value] || translations.en
+
+    return getAllServices().map(service => {
+      const translatedName = currentLangTranslations[service.name] || service.name
+      const translatedDescription = currentLangTranslations[service.description] || service.description
+
+      return {
+        ...service,
+        name: translatedName,
+        description: translatedDescription
+      }
+    })
   } catch (error) {
     console.error('Error loading services:', error)
     return []
