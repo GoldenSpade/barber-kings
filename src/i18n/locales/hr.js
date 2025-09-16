@@ -137,12 +137,12 @@ export default {
       description: 'Profesionalne berberske usluge u srcu Rijeke',
       phone: '091 948 1514',
       hours: {
-        monday: '8:00 - 17:00',
-        tuesday: '8:00 - 17:00',
-        wednesday: '8:00 - 17:00',
-        thursday: '8:00 - 17:00',
-        friday: '8:00 - 17:00',
-        saturday: '8:00 - 13:00',
+        monday: '9:00 - 21:00',
+        tuesday: '9:00 - 21:00',
+        wednesday: '9:00 - 21:00',
+        thursday: '9:00 - 21:00',
+        friday: '9:00 - 21:00',
+        saturday: '9:00 - 21:00',
         sunday: 'Zatvoreno'
       }
     }

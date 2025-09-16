@@ -69,12 +69,12 @@ export const useBookingStore = defineStore('booking', () => {
       phone: '091 948 1514',
       url: '/booking?location=2&step=2',
       hours: {
-        monday: '8 AM - 5 PM',
-        tuesday: '8 AM - 5 PM',
-        wednesday: '8 AM - 5 PM',
-        thursday: '8 AM - 5 PM',
-        friday: '8 AM - 5 PM',
-        saturday: '8 AM - 1 PM',
+        monday: '9 AM - 9 PM',
+        tuesday: '9 AM - 9 PM',
+        wednesday: '9 AM - 9 PM',
+        thursday: '9 AM - 9 PM',
+        friday: '9 AM - 9 PM',
+        saturday: '9 AM - 9 PM',
         sunday: 'Closed'
       }
     }
