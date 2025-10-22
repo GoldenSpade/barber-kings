@@ -1,5 +1,5 @@
 // ID вашей Google Таблицы (замените на свой ID)
-const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
+const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
 
 // Настройки Twilio для WhatsApp уведомлений
 const TWILIO_ACCOUNT_SID = 'AC85d7e903c497d51fbc7d78240b6f9352'
@@ -1092,7 +1092,6 @@ function handleDeleteService(e) {
     )
   }
 }
-<<<<<<< HEAD
 
 // Функция для обработки запросов от VAPI
 function handleVapiRequest(vapiData) {
@@ -1455,5 +1454,3 @@ function handleGetAvailableSlots(e) {
     )
   }
 }
-=======
->>>>>>> 5872e1f72892a03f11ba01d471c20f872f305096
