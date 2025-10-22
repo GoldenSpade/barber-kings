@@ -1092,6 +1092,7 @@ function handleDeleteService(e) {
     )
   }
 }
+<<<<<<< HEAD
 
 // Функция для обработки запросов от VAPI
 function handleVapiRequest(vapiData) {
@@ -1454,3 +1455,5 @@ function handleGetAvailableSlots(e) {
     )
   }
 }
+=======
+>>>>>>> 5872e1f72892a03f11ba01d471c20f872f305096
