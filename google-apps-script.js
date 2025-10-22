@@ -1,5 +1,5 @@
 // ID вашей Google Таблицы (замените на свой ID)
-const SHEET_ID = '1ZWjuxtgYWVsDnXpqyXD7hzpt7WN5aJ_tdfWwo9NsELE'
+const SHEET_ID = '1N6uLNIPKZ--st56l5FtgwyW6vtJZbJgMR25iEGhlaps'
 
 // Настройки Twilio для WhatsApp уведомлений
 const TWILIO_ACCOUNT_SID = 'AC85d7e903c497d51fbc7d78240b6f9352'
