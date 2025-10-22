@@ -137,12 +137,12 @@ export default {
       description: 'Professional barber services in the heart of Rijeka',
       phone: '091 948 1514',
       hours: {
-        monday: '8 AM - 5 PM',
-        tuesday: '8 AM - 5 PM',
-        wednesday: '8 AM - 5 PM',
-        thursday: '8 AM - 5 PM',
-        friday: '8 AM - 5 PM',
-        saturday: '8 AM - 1 PM',
+        monday: '9 AM - 9 PM',
+        tuesday: '9 AM - 9 PM',
+        wednesday: '9 AM - 9 PM',
+        thursday: '9 AM - 9 PM',
+        friday: '9 AM - 9 PM',
+        saturday: '9 AM - 9 PM',
         sunday: 'Closed'
       }
     }
@@ -195,7 +195,6 @@ export default {
       legend: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed',
         available: 'Available'
       }
     },
@@ -267,13 +266,11 @@ export default {
       statuses: {
         pending: 'Pending',
         confirmed: 'Confirmed',
-        completed: 'Completed',
         cancelled: 'Cancelled'
       },
       status: {
         pending: 'Pending Confirmation',
         confirmed: 'Confirmed',
-        completed: 'Completed', 
         cancelled: 'Cancelled'
       },
       locations: {

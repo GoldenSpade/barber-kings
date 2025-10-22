@@ -4,8 +4,8 @@ import hr from './locales/hr.js'
 
 const messages = { en, hr }
 
-// Get saved locale from localStorage or default to English
-const savedLocale = localStorage.getItem('locale') || 'en'
+// Get saved locale from localStorage or default to Croatian
+const savedLocale = localStorage.getItem('locale') || 'hr'
 
 const i18n = createI18n({
   locale: savedLocale,

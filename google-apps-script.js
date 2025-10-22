@@ -179,6 +179,16 @@ function doGet(e) {
       return handleDeleteService(e)
     }
 
+    if (action === 'checkAvailability') {
+      // Проверка доступности времени
+      return handleCheckAvailability(e)
+    }
+
+    if (action === 'getAvailableSlots') {
+      // Получение только свободных слотов
+      return handleGetAvailableSlots(e)
+    }
+
 
     // Стандартная логика для получения данных
     const isAdmin = e.parameter.admin === 'true'
@@ -206,7 +216,7 @@ function doGet(e) {
             location: row[4], // Location (короткое название: Martinkovac, Adamiceva)
             date: row[5], // Date
             time: row[6], // Time
-            status: row[7] || 'Confirmed', // Status (по умолчанию Confirmed)
+            status: row[7] || 'Pending', // Status (по умолчанию Pending)
             service: row[8] || '', // Service
           })
         } else {
@@ -274,7 +284,7 @@ function handleAddBooking(e) {
     const date = e.parameter.date
     const time = e.parameter.time
     const duration = parseInt(e.parameter.duration) || 30
-    const status = e.parameter.status || 'Confirmed'
+    const status = e.parameter.status || 'Pending'
     const service = e.parameter.service || ''
 
     // Проверяем обязательные поля
@@ -372,7 +382,17 @@ function handleAddBooking(e) {
 
 function doPost(e) {
   try {
-    // Получаем данные из POST запроса
+    // Проверяем, это ли запрос от VAPI
+    if (e.postData && e.postData.contents) {
+      const rawData = JSON.parse(e.postData.contents)
+
+      // Если это данные от VAPI, обрабатываем их
+      if (rawData.message && rawData.message.toolCalls && rawData.message.toolCalls.length > 0) {
+        return handleVapiRequest(rawData)
+      }
+    }
+
+    // Получаем данные из POST запроса (стандартная логика)
     const data = JSON.parse(e.postData.contents)
 
     // Открываем таблицу
@@ -388,7 +408,7 @@ function doPost(e) {
     const dateString = data.date // DD/MM/YYYY
     const timeString = data.time // HH:MM
     const duration = parseInt(data.duration) || 30
-    const status = data.status || 'Confirmed' // Статус из формы или по умолчанию "Confirmed"
+    const status = data.status || 'Pending' // Статус из формы или по умолчанию "Pending"
     const service = data.service || '' // Тип услуги из формы
 
     // Сохраняем location в коротком виде (без преобразования в полное название)
@@ -416,7 +436,7 @@ function doPost(e) {
           shortLocationName, // E - Location (короткое название: Martinkovac, Adamiceva)
           "'" + dateString, // F - Date (с апострофом для принудительного текстового формата)
           "'" + slotTime, // G - Time (время каждого слота)
-          status, // H - Status (из формы или "Confirmed")
+          status, // H - Status (из формы или "Pending")
           service, // I - Service (тип услуги)
         ]
         rowsToAdd.push(rowData)
@@ -1016,7 +1036,7 @@ function handleDeleteService(e) {
     // Открываем таблицу и получаем лист Services
     const spreadsheet = SpreadsheetApp.openById(SHEET_ID)
     const servicesSheet = spreadsheet.getSheetByName('Services')
-    
+
     if (!servicesSheet) {
       throw new Error('Services sheet not found')
     }
@@ -1073,3 +1093,364 @@ function handleDeleteService(e) {
   }
 }
 
+// Функция для обработки запросов от VAPI
+function handleVapiRequest(vapiData) {
+  try {
+    console.log('Received VAPI request:', JSON.stringify(vapiData))
+
+    // Извлекаем данные из структуры VAPI
+    const toolCall = vapiData.message.toolCalls[0]
+    if (!toolCall || !toolCall.function || toolCall.function.name !== 'barber_kings_booking_tool') {
+      throw new Error('Invalid tool call from VAPI')
+    }
+
+    const args = toolCall.function.arguments
+    console.log('Tool arguments:', JSON.stringify(args))
+
+    // Нормализуем данные для совместимости
+    const normalizedData = {
+      name: args.name,
+      phone: args.phone,
+      location: args.location,
+      date: args.date,
+      time: args.time,
+      service: normalizeServiceName(args.service),
+      duration: parseInt(args.duration) || 30,
+      status: 'Pending'
+    }
+
+    console.log('Normalized data:', JSON.stringify(normalizedData))
+
+    // Проверяем обязательные поля
+    if (!normalizedData.name || !normalizedData.phone || !normalizedData.location ||
+        !normalizedData.date || !normalizedData.time) {
+      throw new Error('Missing required fields from VAPI')
+    }
+
+    // Добавляем запись в таблицу
+    const result = addBookingToSheet(normalizedData)
+
+    // Возвращаем ответ для VAPI
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        success: true,
+        message: 'Booking added successfully',
+        id: result.id,
+        details: normalizedData
+      })
+    ).setMimeType(ContentService.MimeType.JSON)
+
+  } catch (error) {
+    console.error('Error handling VAPI request:', error.toString())
+
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to process booking: ' + error.toString()
+      })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
+// Функция для нормализации названий услуг
+function normalizeServiceName(serviceName) {
+  const serviceMap = {
+    "Men's Haircut": "Men's Haircut",
+    "Men's Haircut + Beard Trim": "Men's Haircut + Beard",
+    "Men's Haircut + Beard": "Men's Haircut + Beard",
+    "Women's Haircut": "Women's Haircut"
+  }
+
+  return serviceMap[serviceName] || serviceName
+}
+
+// Функция для добавления записи в таблицу (выделена из doPost)
+function addBookingToSheet(data) {
+  // Открываем таблицу
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+
+  // ПРОВЕРКА ДОСТУПНОСТИ ВРЕМЕНИ
+  const allData = sheet.getDataRange().getValues()
+  const occupiedSlots = new Set()
+
+  // Собираем занятые слоты для указанной даты и локации
+  for (let i = 1; i < allData.length; i++) {
+    const row = allData[i]
+    const rowLocation = row[4] // Location (колонка E)
+    const rowDate = String(row[5]).replace(/'/g, '') // Date (колонка F)
+    const rowTime = String(row[6]).replace(/'/g, '') // Time (колонка G)
+    const rowStatus = row[7] // Status (колонка H)
+
+    if (rowLocation === data.location &&
+        rowDate === data.date &&
+        rowStatus !== 'Cancelled') {
+      occupiedSlots.add(rowTime)
+    }
+  }
+
+  // Проверяем доступность запрашиваемого времени
+  const allSlots = getAllTimeSlots()
+  const startIndex = allSlots.indexOf(data.time)
+  const slotsNeeded = Math.ceil(data.duration / 30)
+
+  // Проверяем, что все необходимые слоты свободны
+  for (let i = 0; i < slotsNeeded; i++) {
+    const slotIndex = startIndex + i
+    if (slotIndex < allSlots.length) {
+      const slotTime = allSlots[slotIndex]
+      if (occupiedSlots.has(slotTime)) {
+        throw new Error(`Time slot ${slotTime} is already booked. Please choose another time.`)
+      }
+    }
+  }
+
+  // Генерируем уникальный ID для заказа
+  const bookingId = generateShortId()
+
+  // Создаем timestamp
+  const timestamp = new Date()
+
+  // Создаем записи для всех занятых слотов
+  const rowsToAdd = []
+  for (let i = 0; i < slotsNeeded; i++) {
+    const slotIndex = startIndex + i
+    if (slotIndex < allSlots.length) {
+      const slotTime = allSlots[slotIndex]
+
+      // Подготавливаем данные для записи в таблицу
+      // Порядок: id, Timestamp, Name, Phone, Location, Date, Time, Status, Service
+      const rowData = [
+        bookingId, // A - id (одинаковый для всех слотов одной услуги)
+        timestamp, // B - Timestamp (автоматический)
+        data.name, // C - Name
+        "'" + data.phone, // D - Phone (с апострофом для принудительного текстового формата)
+        data.location, // E - Location (короткое название: Martinkovac, Adamiceva)
+        "'" + data.date, // F - Date (с апострофом для принудительного текстового формата)
+        "'" + slotTime, // G - Time (время каждого слота)
+        data.status, // H - Status
+        data.service, // I - Service (тип услуги)
+      ]
+      rowsToAdd.push(rowData)
+    }
+  }
+
+  // Добавляем все строки в таблицу
+  if (rowsToAdd.length > 0) {
+    // Добавляем строки одним вызовом для лучшей производительности
+    const range = sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, rowsToAdd[0].length)
+    range.setValues(rowsToAdd)
+
+    // Отправляем WhatsApp уведомление администратору
+    sendWhatsAppNotificationToAdmin(data.name, data.phone, data.location, data.date, data.time, data.service)
+  }
+
+  return {
+    id: bookingId,
+    slotsAdded: rowsToAdd.length
+  }
+}
+
+// Функция для проверки доступности времени
+function handleCheckAvailability(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const location = e.parameter.location
+    const date = e.parameter.date
+    const duration = parseInt(e.parameter.duration) || 30
+
+    // Проверяем обязательные поля
+    if (!location || !date) {
+      throw new Error('Missing required fields: location and date')
+    }
+
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+
+    // Получаем все занятые слоты для указанной даты и локации
+    const allData = sheet.getDataRange().getValues()
+    const occupiedSlots = new Set()
+
+    // Проходим по всем записям и собираем занятые слоты
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      const rowLocation = row[4] // Location (колонка E)
+      const rowDate = row[5] // Date (колонка F)
+      const rowTime = row[6] // Time (колонка G)
+      const rowStatus = row[7] // Status (колонка H)
+
+      // Убираем апострофы из даты и времени для сравнения
+      const cleanDate = String(rowDate).replace(/'/g, '')
+      const cleanTime = String(rowTime).replace(/'/g, '')
+
+      // Если локация, дата совпадают и статус не "Cancelled"
+      if (rowLocation === location &&
+          cleanDate === date &&
+          rowStatus !== 'Cancelled') {
+        occupiedSlots.add(cleanTime)
+      }
+    }
+
+    // Получаем все возможные слоты времени
+    const allSlots = getAllTimeSlots()
+
+    // Определяем доступные слоты
+    const availableSlots = []
+    const slotsNeeded = Math.ceil(duration / 30)
+
+    for (let i = 0; i <= allSlots.length - slotsNeeded; i++) {
+      let isAvailable = true
+
+      // Проверяем, что все необходимые последовательные слоты свободны
+      for (let j = 0; j < slotsNeeded; j++) {
+        if (occupiedSlots.has(allSlots[i + j])) {
+          isAvailable = false
+          break
+        }
+      }
+
+      if (isAvailable) {
+        availableSlots.push(allSlots[i])
+      }
+    }
+
+    const result = {
+      success: true,
+      location: location,
+      date: date,
+      duration: duration,
+      availableSlots: availableSlots,
+      occupiedSlots: Array.from(occupiedSlots),
+      totalAvailable: availableSlots.length
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error checking availability: ' + error.toString()
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}
+
+// Функция для получения только доступных слотов (упрощенная версия)
+function handleGetAvailableSlots(e) {
+  try {
+    // Получаем параметры из GET запроса
+    const location = e.parameter.location
+    const date = e.parameter.date
+    const duration = parseInt(e.parameter.duration) || 30
+
+    // Проверяем обязательные поля
+    if (!location || !date) {
+      throw new Error('Missing required fields: location and date')
+    }
+
+    // Открываем таблицу
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet()
+
+    // Получаем все занятые слоты для указанной даты и локации
+    const allData = sheet.getDataRange().getValues()
+    const occupiedSlots = new Set()
+
+    // Проходим по всем записям и собираем занятые слоты
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i]
+      const rowLocation = row[4] // Location (колонка E)
+      const rowDate = row[5] // Date (колонка F)
+      const rowTime = row[6] // Time (колонка G)
+      const rowStatus = row[7] // Status (колонка H)
+
+      // Убираем апострофы из даты и времени для сравнения
+      const cleanDate = String(rowDate).replace(/'/g, '')
+      const cleanTime = String(rowTime).replace(/'/g, '')
+
+      // Если локация, дата совпадают и статус не "Cancelled"
+      if (rowLocation === location &&
+          cleanDate === date &&
+          rowStatus !== 'Cancelled') {
+        occupiedSlots.add(cleanTime)
+      }
+    }
+
+    // Получаем все возможные слоты времени
+    const allSlots = getAllTimeSlots()
+
+    // Определяем доступные слоты (только те, которые могут вместить нужную длительность)
+    const availableSlots = []
+    const slotsNeeded = Math.ceil(duration / 30)
+
+    for (let i = 0; i <= allSlots.length - slotsNeeded; i++) {
+      let isAvailable = true
+
+      // Проверяем, что все необходимые последовательные слоты свободны
+      for (let j = 0; j < slotsNeeded; j++) {
+        if (occupiedSlots.has(allSlots[i + j])) {
+          isAvailable = false
+          break
+        }
+      }
+
+      if (isAvailable) {
+        availableSlots.push(allSlots[i])
+      }
+    }
+
+    // Возвращаем только список доступных слотов
+    const result = {
+      success: true,
+      availableSlots: availableSlots
+    }
+
+    // Поддержка JSONP
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(result) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  } catch (error) {
+    const errorResult = {
+      success: false,
+      message: 'Error getting available slots: ' + error.toString(),
+      availableSlots: []
+    }
+
+    // Поддержка JSONP для ошибок
+    const callback = e.parameter.callback
+    if (callback) {
+      return ContentService.createTextOutput(
+        callback + '(' + JSON.stringify(errorResult) + ');'
+      ).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(errorResult)).setMimeType(
+      ContentService.MimeType.JSON
+    )
+  }
+}

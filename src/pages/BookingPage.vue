@@ -2,45 +2,14 @@
   <div class="booking-page bg-light">
     <!-- Logo Header -->
     <div class="py-4 bg-white">
-      <div class="container position-relative">
-        <div class="row align-items-center">
+      <div class="container">
+        <div class="d-flex justify-content-center align-items-center position-relative">
           <!-- Logo -->
-          <div class="col-12 text-center">
-            <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
-          </div>
+          <img src="@/assets/main-logo.png" alt="Barber Kings" style="height: 80px" />
 
           <!-- Language Switcher -->
-          <div class="position-absolute top-0 end-0 p-3">
-            <div class="dropdown d-inline-block">
-              <button
-                class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                type="button"
-                id="languageDropdown"
-                data-bs-toggle="dropdown"
-              >
-                {{ locale.toUpperCase() }}
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('en')"
-                    :class="{ active: locale === 'en' }"
-                  >
-                    EN
-                  </button>
-                </li>
-                <li>
-                  <button
-                    class="dropdown-item"
-                    @click="changeLanguage('hr')"
-                    :class="{ active: locale === 'hr' }"
-                  >
-                    HR
-                  </button>
-                </li>
-              </ul>
-            </div>
+          <div class="position-absolute end-0">
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
@@ -267,14 +236,12 @@
                         <div class="time-slots">
                           <div v-if="day.available">
                             <div
-                              v-for="time in generateAllTimeSlots()"
+                              v-for="time in getAvailableTimeSlots(day)"
                               :key="time"
                               class="time-slot mb-1 p-2 rounded"
-                              :class="getSlotClass(day, time)"
                               :title="getSlotTitle(day, time)"
                             >
                               <button
-                                v-if="!isSlotBooked(day, time) && isSlotAvailableForService(day, time)"
                                 class="btn btn-outline-secondary btn-sm w-100"
                                 :class="{
                                   'btn-success':
@@ -285,9 +252,6 @@
                               >
                                 {{ time }}
                               </button>
-                              <div v-else class="time-label fw-medium">
-                                {{ time }}
-                              </div>
                             </div>
                           </div>
                           <div v-else class="text-muted small text-center">
@@ -327,14 +291,13 @@
                   <!-- Mobile Time Slots - Single Column with Scroll -->
                   <div class="mobile-time-slots-container">
                     <div v-if="getSelectedDay().available" class="time-slots-scroll">
-                      <div 
-                        v-for="time in generateAllTimeSlots()"
+                      <div
+                        v-for="time in getAvailableTimeSlots(getSelectedDay())"
                         :key="time"
                         class="time-slot-mobile mb-2"
                         :title="getSlotTitle(getSelectedDay(), time)"
                       >
                         <button
-                          v-if="!isSlotBooked(getSelectedDay(), time) && isSlotAvailableForService(getSelectedDay(), time)"
                           class="btn btn-time-slot w-100"
                           :class="{
                             'btn-success':
@@ -345,12 +308,6 @@
                         >
                           {{ time }}
                         </button>
-                        <div v-else-if="isSlotBooked(getSelectedDay(), time)" class="time-slot-occupied">
-                          <span class="fw-medium">{{ time }}</span>
-                        </div>
-                        <div v-else class="time-slot-unavailable">
-                          <span class="fw-medium">{{ time }}</span>
-                        </div>
                       </div>
                     </div>
                     <div v-else class="text-muted text-center">
@@ -470,6 +427,7 @@ import { useServicesStore } from '@/stores/services'
 import { getAllServices, formatDuration } from '@/config/services'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const router = useRouter()
 const bookingStore = useBookingStore()
@@ -517,8 +475,41 @@ const translatedLocations = computed(() => {
 // Computed services with translations
 const translatedServices = computed(() => {
   try {
-    // Теперь getAllServices() уже возвращает готовые данные с name и description
-    return getAllServices()
+    const translations = {
+      hr: {
+        "Men's Haircut": "Muško šišanje",
+        "Men's Haircut + Beard Trim": "Muško šišanje + uređenje brade",
+        "Women's Haircut": "Žensko šišanje",
+        // Descriptions translations
+        "Classic and modern haircuts for men": "Klasično i moderno šišanje za muškarce",
+        "Haircut with professional beard trimming and styling": "Šišanje s profesionalnim uređenjem i oblikovanjem brade",
+        "Haircut with professional beard trimming and shaping": "Šišanje s profesionalnim uređenjem i oblikovanjem brade",
+        "Professional haircuts for women": "Profesionalno šišanje za žene"
+      },
+      en: {
+        "Men's Haircut": "Men's Haircut",
+        "Men's Haircut + Beard Trim": "Men's Haircut + Beard Trim",
+        "Women's Haircut": "Women's Haircut",
+        // Descriptions stay the same in English
+        "Classic and modern haircuts for men": "Classic and modern haircuts for men",
+        "Haircut with professional beard trimming and styling": "Haircut with professional beard trimming and styling",
+        "Haircut with professional beard trimming and shaping": "Haircut with professional beard trimming and shaping",
+        "Professional haircuts for women": "Professional haircuts for women"
+      }
+    }
+
+    const currentLangTranslations = translations[locale.value] || translations.en
+
+    return getAllServices().map(service => {
+      const translatedName = currentLangTranslations[service.name] || service.name
+      const translatedDescription = currentLangTranslations[service.description] || service.description
+
+      return {
+        ...service,
+        name: translatedName,
+        description: translatedDescription
+      }
+    })
   } catch (error) {
     console.error('Error loading services:', error)
     return []
@@ -560,11 +551,6 @@ const translatedWeekDays = computed(() => {
 })
 
 // Methods
-const changeLanguage = (lang) => {
-  locale.value = lang
-  localStorage.setItem('locale', lang)
-}
-
 const goBack = () => {
   const shouldGoHome = bookingStore.goToPreviousStep()
   if (shouldGoHome) {
@@ -586,14 +572,13 @@ const handleSubmitBooking = async () => {
     if (result.success) {
       // Reset validation state on successful submission
       v$.value.$reset()
-      alert(result.message)
       router.push('/')
     } else {
       alert(result.message)
     }
   } catch (error) {
     console.error('Error submitting booking:', error)
-    alert('Sorry, there was an error submitting your booking. Please try again.')
+    console.error('Booking submission failed')
   }
 }
 
@@ -666,6 +651,21 @@ const generateAllTimeSlots = () => {
     slots.push(`${hour.toString().padStart(2, '0')}:30`)
   }
   return slots
+}
+
+// Helper function to get only available time slots (not booked and available for service)
+const getAvailableTimeSlots = (day) => {
+  if (!day.available) {
+    return []
+  }
+
+  // Use day's timeSlots if they exist (filtered by time already for current day)
+  const allSlots = day.timeSlots || generateAllTimeSlots()
+
+  return allSlots.filter(time => {
+    // Check if slot is not booked and available for the selected service
+    return !isSlotBooked(day, time) && isSlotAvailableForService(day, time)
+  })
 }
 
 // Helper function to check if a time slot is available for the selected service

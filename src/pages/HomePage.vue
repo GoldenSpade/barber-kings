@@ -45,7 +45,7 @@
     </div>
 
     <!-- Locations Section -->
-    <div class="locations-section bg-white py-5">
+    <div class="locations-section bg-white pt-5 pb-4">
       <div class="container">
         <div class="row">
           <div class="col-12 text-center">
@@ -56,125 +56,82 @@
             <div class="row justify-content-center mb-3">
               <!-- Location 1 -->
               <div class="col-lg-6 mb-4">
-                <div class="location-item text-center">
-                  <div class="location-header mb-3">
-                    <div class="d-flex align-items-center justify-content-center">
-                      <div class="location-icon me-3">
-                        <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
-                      </div>
-                      <div class="location-info text-center">
-                        <h5 class="fw-bold text-dark mb-0">
-                          Martinkovac ul. 127, 51000, Rijeka<br>091 985 2998
-                        </h5>
-                      </div>
+                <div class="location-item">
+                  <div class="location-header mb-3 text-center">
+                    <div class="location-icon mb-2">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-0">
+                        Martinkovac ul. 127, 51000, Rijeka<br>091 985 2998
+                      </h5>
                     </div>
                   </div>
-                  <div class="map-container">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.691183100972!2d14.3628497!3d45.3550458!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a778cea92f49%3A0xe6f79ee3aa294ac7!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892589098!5m2!1sru!2sua" 
-                      width="100%" 
-                      height="300" 
-                      style="border:0; border-radius: 8px;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
+                  <div class="map-container mb-3">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.691183100972!2d14.3628497!3d45.3550458!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a778cea92f49%3A0xe6f79ee3aa294ac7!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892589098!5m2!1sru!2sua"
+                      width="100%"
+                      height="300"
+                      style="border:0; border-radius: 8px;"
+                      allowfullscreen=""
+                      loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
+                  </div>
+                  <!-- Hours for Location 1 -->
+                  <div class="location-hours mt-3">
+                    <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
+                    <div class="hours-table">
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.saturday') }}</span>
+                        <span class="fw-bold">9:00 - 21:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.sunday') }}</span>
+                        <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Location 2 -->
               <div class="col-lg-6 mb-4">
-                <div class="location-item text-center">
-                  <div class="location-header mb-3">
-                    <div class="d-flex align-items-center justify-content-center">
-                      <div class="location-icon me-3">
-                        <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
-                      </div>
-                      <div class="location-info text-center">
-                        <h5 class="fw-bold text-dark mb-0">
-                          Adamićeva ul. 34A, 51000, Rijeka<br>091 948 1514
-                        </h5>
-                      </div>
+                <div class="location-item">
+                  <div class="location-header mb-3 text-center">
+                    <div class="location-icon mb-2">
+                      <i class="bi bi-geo-alt-fill text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="location-info">
+                      <h5 class="fw-bold text-dark mb-0">
+                        Adamićeva ul. 34A, 51000, Rijeka<br>091 948 1514
+                      </h5>
                     </div>
                   </div>
-                  <div class="map-container">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2805.062280198281!2d14.439723400000002!3d45.32736479999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a16f5d1d6545%3A0xdbf757076701a6e!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892541675!5m2!1sru!2sua" 
-                      width="100%" 
-                      height="300" 
-                      style="border:0; border-radius: 8px;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
+                  <div class="map-container mb-3">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2805.062280198281!2d14.439723400000002!3d45.32736479999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4764a16f5d1d6545%3A0xdbf757076701a6e!2sBarber%20Kings!5e0!3m2!1sru!2sua!4v1756892541675!5m2!1sru!2sua"
+                      width="100%"
+                      height="300"
+                      style="border:0; border-radius: 8px;"
+                      allowfullscreen=""
+                      loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hours Section -->
-            <h2 class="display-4 fw-bold text-dark mb-5" style="font-size: 3rem; letter-spacing: 2px;">
-              {{ $t('home.hours') }}
-            </h2>
-            
-            <div class="row justify-content-center">
-              <!-- Column 1: Mon-Fri 9:00–21:00, Sun Closed -->
-              <div class="col-md-6 mb-4">
-                <div class="hours-column">
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
-                    <span>9:00 to 21:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
-                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Column 2: Mon-Fri 8:00–17:00, Sun Closed -->
-              <div class="col-md-6 mb-4">
-                <div class="hours-column">
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.monday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.tuesday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.wednesday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.thursday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.friday') }}</span>
-                    <span>8:00 to 17:00</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-2">
-                    <span class="fw-bold">{{ $t('booking.days.sunday') }}</span>
-                    <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                  <!-- Hours for Location 2 -->
+                  <div class="location-hours mt-3">
+                    <h6 class="fw-bold text-center mb-3">{{ $t('home.hours') }}</h6>
+                    <div class="hours-table">
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.monday') }}-{{ $t('booking.days.saturday') }}</span>
+                        <span class="fw-bold">9:00 - 21:00</span>
+                      </div>
+                      <div class="d-flex justify-content-between py-1">
+                        <span>{{ $t('booking.days.sunday') }}</span>
+                        <span class="text-danger fw-bold">{{ $t('booking.closed') }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -190,7 +147,7 @@
       <div class="container">
         <div class="row">
           <div class="col-12">
-            <h2 class="display-4 fw-bold text-white text-center mb-5" style="font-size: 3rem; letter-spacing: 2px;">
+            <h2 class="display-4 fw-bold text-white text-center mb-3" style="font-size: 3rem; letter-spacing: 2px;">
               {{ $t('home.pricing') }}
             </h2>
             
@@ -201,17 +158,13 @@
 
             <!-- Services Content -->
             <div v-else class="row justify-content-center">
-              <!-- Dynamic Services (Regular) -->
+              <!-- Dynamic Services -->
               <div class="col-md-8 col-lg-6">
                 <div class="pricing-column">
-                  <h3 class="fw-bold text-white mb-4 pb-2 border-bottom border-white" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    {{ $t('home.pricingServices.regular') }}
-                  </h3>
-                  
-                  <div 
-                    v-for="service in pricingServices" 
+                  <div
+                    v-for="service in pricingServices"
                     :key="service.id"
-                    class="service-item d-flex justify-content-between py-2 border-bottom border-secondary"
+                    class="service-item d-flex justify-content-between py-3"
                   >
                     <span>{{ service.name }}</span>
                     <span class="fw-bold">{{ service.formattedPrice }}</span>
@@ -242,24 +195,45 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Navigation from '@/components/Navigation.vue'
 import Footer from '@/components/Footer.vue'
 import Loader from '@/components/Loader.vue'
 import { useServicesStore } from '@/stores/services'
 
 const servicesStore = useServicesStore()
+const { locale } = useI18n()
 
 // Load services on component mount
 onMounted(async () => {
   await servicesStore.fetchServices()
 })
 
-// Computed property for services with pricing
+// Computed property for services with pricing and translation
 const pricingServices = computed(() => {
-  return servicesStore.activeServices.map(service => ({
-    ...service,
-    formattedPrice: service.price > 0 ? `€${service.price}` : 'from €15'
-  }))
+  const translations = {
+    hr: {
+      "Men's Haircut": "Muško šišanje",
+      "Men's Haircut + Beard Trim": "Muško šišanje + uređenje brade",
+      "Women's Haircut": "Žensko šišanje"
+    },
+    en: {
+      "Men's Haircut": "Men's Haircut",
+      "Men's Haircut + Beard Trim": "Men's Haircut + Beard Trim",
+      "Women's Haircut": "Women's Haircut"
+    }
+  }
+
+  return servicesStore.activeServices.map(service => {
+    const currentLangTranslations = translations[locale.value] || translations.en
+    const translatedName = currentLangTranslations[service.name] || service.name
+
+    return {
+      ...service,
+      name: translatedName,
+      formattedPrice: service.price > 0 ? `€${service.price}` : 'from €15'
+    }
+  })
 })
 </script>
 
@@ -284,7 +258,17 @@ const pricingServices = computed(() => {
 }
 
 .location-icon {
-  min-width: 50px;
+  display: inline-block;
+}
+
+.location-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.location-info {
+  text-align: center;
 }
 
 .map-container {
@@ -293,9 +277,15 @@ const pricingServices = computed(() => {
   overflow: hidden;
 }
 
-.hours-column {
-  max-width: 300px;
+.location-hours {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
   margin: 0 auto;
+}
+
+.hours-table {
+  font-size: 0.95rem;
 }
 
 .pricing-section {

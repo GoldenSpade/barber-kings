@@ -20,44 +20,15 @@
 
         <!-- Right Links -->
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <!-- Language Switcher -->
-          <div class="dropdown">
-            <button 
-              class="btn btn-outline-secondary btn-sm dropdown-toggle" 
-              type="button" 
-              id="languageDropdown" 
-              data-bs-toggle="dropdown"
-            >
-              {{ locale.toUpperCase() }}
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <button 
-                  class="dropdown-item" 
-                  @click="changeLanguage('en')"
-                  :class="{ active: locale === 'en' }"
-                >
-                  EN
-                </button>
-              </li>
-              <li>
-                <button 
-                  class="dropdown-item" 
-                  @click="changeLanguage('hr')"
-                  :class="{ active: locale === 'hr' }"
-                >
-                  HR
-                </button>
-              </li>
-            </ul>
-          </div>
+          <!-- Language Switcher Component -->
+          <LanguageSwitcher />
         </div>
       </div>
 
       <!-- Mobile Navigation -->
       <div class="w-100 d-lg-none">
-        <div class="d-flex justify-content-between align-items-center">
-          <!-- Mobile Logo -->
+        <div class="d-flex justify-content-center align-items-center position-relative">
+          <!-- Centered Mobile Logo -->
           <div class="navbar-brand">
             <img
               src="@/assets/main-logo.png"
@@ -66,38 +37,9 @@
             />
           </div>
 
-          <!-- Mobile Menu Toggle -->
-          <button
-            class="navbar-toggler border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#mobileNav"
-            @click="toggleMobileMenu"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-        </div>
-
-        <!-- Collapsible Mobile Menu -->
-        <div class="collapse navbar-collapse" id="mobileNav">
-          <div class="navbar-nav text-center mt-3">
-            <!-- Mobile Language Switcher -->
-            <div class="mt-3">
-              <button 
-                class="btn btn-outline-secondary btn-sm me-2" 
-                @click="changeLanguage('en')"
-                :class="{ 'btn-secondary text-white': locale === 'en' }"
-              >
-                🇺🇸 EN
-              </button>
-              <button 
-                class="btn btn-outline-secondary btn-sm" 
-                @click="changeLanguage('hr')"
-                :class="{ 'btn-secondary text-white': locale === 'hr' }"
-              >
-                🇭🇷 HR
-              </button>
-            </div>
+          <!-- Language Switcher positioned absolutely on the right -->
+          <div class="position-absolute end-0 me-2">
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
@@ -106,25 +48,19 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n'
-
-const { locale } = useI18n()
-
-const toggleMobileMenu = () => {
-  // Bootstrap will handle the collapse functionality
-}
-
-const changeLanguage = (lang) => {
-  locale.value = lang
-  localStorage.setItem('locale', lang)
-}
-
+import LanguageSwitcher from './LanguageSwitcher.vue'
 </script>
 
 <style scoped>
 .navbar-brand img {
   max-height: 80px;
   width: auto;
+}
+
+.navbar-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav-link {
