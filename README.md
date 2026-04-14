@@ -4,8 +4,8 @@ Modern barbershop management system with online booking and administrative panel
 
 ## 🚀 Live Demo
 
-- **Client Website**: [https://barberkings.digitalunion.io](https://barberkings.digitalunion.io)
-- **Admin Panel**: [https://barberkings.digitalunion.io/admin](https://barberkings.digitalunion.io/admin)
+- **Website**: [https://goldenspade.github.io/barber-kings/](https://goldenspade.github.io/barber-kings/)
+- **Admin Panel**: [https://goldenspade.github.io/barber-kings/login](https://goldenspade.github.io/barber-kings/login)
 
 ## 📱 Features
 
